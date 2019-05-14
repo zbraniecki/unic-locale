@@ -3,17 +3,9 @@ name = "unic-locale"
 version = "0.1.0"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
-homepage = "http://projectfluent.org/"
-license = "Apache-2.0"
-repository = "https://github.com/projectfluent/fluent-locale-rs"
 readme = "README.md"
+license = "MIT/Apache-2.0"
 categories = ["internationalization"]
-
-[badges]
-travis-ci = { repository = "zbraniecki/unic-locale" }
-coveralls = { repository = "zbraniecki/unic-locale", branch = "master", service = "github" }
-
-maintenance = { status = "actively-developed" }
 
 [dependencies]
 unic-langid = { path = "../unic-langid" }
