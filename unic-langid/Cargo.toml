@@ -17,3 +17,7 @@ harness = false
 [[bench]]
 name = "langid"
 harness = false
+
+[[bench]]
+name = "canonicalize"
+harness = false

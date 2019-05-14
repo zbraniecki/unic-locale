@@ -44,6 +44,8 @@ pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserEr
         }
     }
 
+    variants.sort();
+
     Ok(LanguageIdentifier {
         language,
         script,

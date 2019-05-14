@@ -24,3 +24,7 @@ criterion = "^0.2"
 [[bench]]
 name = "parser"
 harness = false
+
+[[bench]]
+name = "canonicalize"
+harness = false

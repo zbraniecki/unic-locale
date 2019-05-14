@@ -52,6 +52,7 @@ impl LanguageIdentifier {
         for variant in variants {
             variants_field.push(subtags::parse_variant_subtag(variant)?);
         }
+        variants_field.sort();
         Ok(Self {
             language,
             script,
@@ -124,6 +125,7 @@ impl LanguageIdentifier {
         for variant in variants {
             self.variants.push(subtags::parse_variant_subtag(variant)?);
         }
+        self.variants.sort();
         Ok(())
     }
 }

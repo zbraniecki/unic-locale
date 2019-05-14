@@ -52,3 +52,12 @@ fn test_serialize_langid() {
     let langid = LanguageIdentifier::from_str("en-Latn-US").unwrap();
     assert_eq!(&langid.to_string(), "en-Latn-US");
 }
+
+#[test]
+fn test_sorted_variants() {
+    let langid = LanguageIdentifier::from_str("en-nedis-macos").unwrap();
+    assert_eq!(&langid.to_string(), "en-macos-nedis");
+
+    let langid = LanguageIdentifier::from_parts(Some("en"), None, None, &["nedis", "macos"]).unwrap();
+    assert_eq!(&langid.to_string(), "en-macos-nedis");
+}
