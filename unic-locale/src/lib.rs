@@ -7,7 +7,7 @@ use extensions::ExtensionType;
 use std::collections::HashMap;
 use unic_langid::LanguageIdentifier;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Default, PartialEq)]
 pub struct Locale {
     pub langid: LanguageIdentifier,
     pub extensions: HashMap<ExtensionType, HashMap<String, String>>,
@@ -15,14 +15,11 @@ pub struct Locale {
 
 impl Locale {
     pub fn new() -> Self {
-        Locale {
-            langid: LanguageIdentifier::new(),
-            extensions: HashMap::new(),
-        }
+        Default::default()
     }
 
     pub fn from_str(ident: &str) -> Result<Self, errors::LocaleError> {
-        parser::parse_locale(ident).map_err(|err| err.into())
+        parser::parse_locale(ident).map_err(std::convert::Into::into)
     }
 
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {

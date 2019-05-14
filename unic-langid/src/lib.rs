@@ -4,7 +4,7 @@ pub mod subtags;
 
 use crate::errors::LanguageIdentifierError;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, PartialEq)]
 pub struct LanguageIdentifier {
     language: Option<String>,
     script: Option<String>,
@@ -14,12 +14,7 @@ pub struct LanguageIdentifier {
 
 impl LanguageIdentifier {
     pub fn new() -> Self {
-        LanguageIdentifier {
-            language: None,
-            script: None,
-            region: None,
-            variants: vec![],
-        }
+        Default::default()
     }
 
     pub fn from_str(ident: &str) -> Result<Self, LanguageIdentifierError> {
@@ -144,12 +139,6 @@ impl std::fmt::Display for LanguageIdentifier {
         }
 
         write!(f, "{}", subtags.join("-"))
-    }
-}
-
-impl std::cmp::PartialEq for LanguageIdentifier {
-    fn eq(&self, other: &Self) -> bool {
-        self.matches(other, false, false)
     }
 }
 

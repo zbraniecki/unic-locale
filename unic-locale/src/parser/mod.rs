@@ -58,7 +58,7 @@ fn parse_extension_subtags(t: &str) -> Result<extensions::ExtensionsMap, ParserE
                 }
             }
             let t = extensions::convert_str_to_ext_type(subtag)?;
-            current_type = Some(result.entry(t).or_insert(HashMap::new()));
+            current_type = Some(result.entry(t).or_insert_with(HashMap::new));
             continue;
         }
 

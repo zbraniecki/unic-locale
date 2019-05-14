@@ -34,7 +34,7 @@ pub fn convert_ext_key_to_key(input: &str) -> Result<&str, ParserError> {
     if input == "ca" {
         return Ok("calendar");
     }
-    return Ok(input);
+    Ok(input)
 }
 
 pub fn convert_key_to_ext_key(input: &str) -> Result<&str, ParserError> {
@@ -44,5 +44,5 @@ pub fn convert_key_to_ext_key(input: &str) -> Result<&str, ParserError> {
     if input == "calendar" {
         return Ok("ca");
     }
-    return Ok(input);
+    Ok(input)
 }
