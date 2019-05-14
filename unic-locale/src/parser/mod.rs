@@ -41,9 +41,7 @@ pub fn parse_locale(t: &str) -> Result<Locale, ParserError> {
     }
 }
 
-fn parse_extension_subtags(
-    t: &str,
-) -> Result<extensions::ExtensionsMap, ParserError> {
+fn parse_extension_subtags(t: &str) -> Result<extensions::ExtensionsMap, ParserError> {
     let mut result = HashMap::new();
     let mut current_type: Option<&mut HashMap<String, String>> = None;
     let mut current_key: Option<&str> = None;

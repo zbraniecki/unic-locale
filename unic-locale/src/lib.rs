@@ -2,10 +2,10 @@ pub mod errors;
 pub mod extensions;
 pub mod parser;
 
-use std::collections::HashMap;
-use unic_langid::LanguageIdentifier;
 use errors::LocaleError;
 use extensions::ExtensionType;
+use std::collections::HashMap;
+use unic_langid::LanguageIdentifier;
 
 #[derive(Debug, PartialEq)]
 pub struct Locale {
@@ -26,7 +26,9 @@ impl Locale {
     }
 
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
-        if self.extensions.contains_key(&ExtensionType::Private) || other.extensions.contains_key(&ExtensionType::Private) {
+        if self.extensions.contains_key(&ExtensionType::Private)
+            || other.extensions.contains_key(&ExtensionType::Private)
+        {
             return false;
         }
         self.langid
@@ -38,7 +40,8 @@ impl Locale {
     }
 
     pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LocaleError> {
-        self.langid.set_language(language)
+        self.langid
+            .set_language(language)
             .map_err(std::convert::Into::into)
     }
 
@@ -47,7 +50,8 @@ impl Locale {
     }
 
     pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LocaleError> {
-        self.langid.set_script(script)
+        self.langid
+            .set_script(script)
             .map_err(std::convert::Into::into)
     }
 
@@ -56,7 +60,8 @@ impl Locale {
     }
 
     pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LocaleError> {
-        self.langid.set_region(region)
+        self.langid
+            .set_region(region)
             .map_err(std::convert::Into::into)
     }
 
@@ -65,8 +70,24 @@ impl Locale {
     }
 
     pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LocaleError> {
-        self.langid.set_variants(variants)
+        self.langid
+            .set_variants(variants)
             .map_err(std::convert::Into::into)
+    }
+}
+
+impl From<LanguageIdentifier> for Locale {
+    fn from(langid: LanguageIdentifier) -> Self {
+        Locale {
+            langid,
+            extensions: HashMap::new(),
+        }
+    }
+}
+
+impl Into<LanguageIdentifier> for Locale {
+    fn into(self) -> LanguageIdentifier {
+        self.langid
     }
 }
 

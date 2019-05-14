@@ -2,7 +2,7 @@ use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
 
-use unic_locale::parser::{parse_locale};
+use unic_locale::parser::parse_locale;
 
 fn locale_parser_bench(c: &mut Criterion) {
     let strings = &[
@@ -26,8 +26,5 @@ fn locale_parser_bench(c: &mut Criterion) {
     });
 }
 
-criterion_group!(
-    benches,
-    locale_parser_bench,
-);
+criterion_group!(benches, locale_parser_bench,);
 criterion_main!(benches);

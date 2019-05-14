@@ -1,17 +1,14 @@
 use std::collections::HashMap;
 use unic_langid::LanguageIdentifier;
+use unic_locale::extensions::{ExtensionType, ExtensionsMap};
 use unic_locale::parser::parse_locale;
 use unic_locale::{serialize_locale, Locale};
-use unic_locale::extensions::{ExtensionType, ExtensionsMap};
 
 fn assert_locale_extensions(loc: &Locale, extensions: &ExtensionsMap) {
     assert_eq!(&loc.extensions, extensions);
 }
 
-fn assert_parsed_locale_identifier(
-    input: &str,
-    extensions: &ExtensionsMap,
-) {
+fn assert_parsed_locale_identifier(input: &str, extensions: &ExtensionsMap) {
     let loc = parse_locale(input).unwrap();
     assert_locale_extensions(&loc, extensions);
 }
@@ -45,4 +42,18 @@ fn test_locale_identifier() {
 fn test_serialize_locale() {
     let loc = Locale::from_str("en-u-hc-h12").unwrap();
     assert_eq!(serialize_locale(&loc).unwrap(), "en-u-hc-h12");
+}
+
+#[test]
+fn test_from_langid() {
+    let langid = LanguageIdentifier::from_str("en-US").unwrap();
+    let loc = Locale::from(langid);
+    assert_eq!(serialize_locale(&loc).unwrap(), "en-US");
+}
+
+#[test]
+fn test_to_langid() {
+    let loc = Locale::from_str("en-US-u-hc-h12").unwrap();
+    let langid: LanguageIdentifier = loc.into();
+    assert_eq!(langid.to_string(), "en-US");
 }

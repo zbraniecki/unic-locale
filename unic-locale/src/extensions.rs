@@ -5,7 +5,7 @@ use std::collections::HashMap;
 pub enum ExtensionType {
     Unicode,
     Transform,
-    Private
+    Private,
 }
 
 pub type ExtensionsMap = HashMap<ExtensionType, HashMap<String, String>>;
@@ -15,7 +15,7 @@ pub fn convert_str_to_ext_type(input: &str) -> Result<ExtensionType, ParserError
         "u" => Ok(ExtensionType::Unicode),
         "t" => Ok(ExtensionType::Transform),
         "x" => Ok(ExtensionType::Private),
-        _ => Err(ParserError::InvalidSubtag)
+        _ => Err(ParserError::InvalidSubtag),
     }
 }
 
