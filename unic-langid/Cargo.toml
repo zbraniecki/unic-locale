@@ -1,0 +1,19 @@
+[package]
+name = "unic-langid"
+version = "0.1.0"
+authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
+edition = "2018"
+readme = "README.md"
+license = "Apache-2.0"
+categories = ["internationalization"]
+
+[dev-dependencies]
+criterion = "^0.2"
+
+[[bench]]
+name = "parser"
+harness = false
+
+[[bench]]
+name = "langid"
+harness = false
