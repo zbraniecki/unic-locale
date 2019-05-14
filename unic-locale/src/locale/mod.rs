@@ -39,25 +39,3 @@ impl Locale {
         Ok(())
     }
 }
-
-pub fn serialize_locale(loc: &Locale) -> Result<String, LocaleError> {
-    let langtag = serialize_langid(&loc.langid)?;
-    let mut subtags = vec![langtag.as_str()];
-    for (name, ext) in &loc.extensions {
-        subtags.push(&extensions::convert_type_to_ext_type(&name).unwrap());
-
-        for (key, value) in ext {
-            subtags.push(&extensions::convert_key_to_ext_key(&key).unwrap());
-            subtags.push(&value);
-        }
-    }
-
-    Ok(subtags.join("-"))
-}
-
-impl fmt::Display for Locale {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let result = serialize_locale(&self).unwrap();
-        write!(f, "{}", result)
-    }
-}

@@ -2,14 +2,15 @@ use std::collections::HashMap;
 use unic_langid::LanguageIdentifier;
 use unic_locale::parser::parse_locale;
 use unic_locale::{serialize_locale, Locale};
+use unic_locale::extensions::{ExtensionType, ExtensionsMap};
 
-fn assert_locale_extensions(loc: &Locale, extensions: &HashMap<String, HashMap<String, String>>) {
+fn assert_locale_extensions(loc: &Locale, extensions: &ExtensionsMap) {
     assert_eq!(&loc.extensions, extensions);
 }
 
 fn assert_parsed_locale_identifier(
     input: &str,
-    extensions: &HashMap<String, HashMap<String, String>>,
+    extensions: &ExtensionsMap,
 ) {
     let loc = parse_locale(input).unwrap();
     assert_locale_extensions(&loc, extensions);
@@ -30,13 +31,13 @@ fn test_locale_identifier() {
     let mut extensions = HashMap::new();
     let mut unicode_ext = HashMap::new();
     unicode_ext.insert("hour-cycle".into(), "h12".into());
-    extensions.insert("unicode".into(), unicode_ext);
+    extensions.insert(ExtensionType::Unicode, unicode_ext);
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
     let mut extensions = HashMap::new();
     let mut private_ext = HashMap::new();
     private_ext.insert("testing".into(), "true".into());
-    extensions.insert("private".into(), private_ext);
+    extensions.insert(ExtensionType::Private, private_ext);
     assert_parsed_locale_identifier("und-x-testing", &extensions);
 }
 

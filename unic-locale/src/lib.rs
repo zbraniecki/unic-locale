@@ -5,11 +5,12 @@ pub mod parser;
 use std::collections::HashMap;
 use unic_langid::LanguageIdentifier;
 use errors::LocaleError;
+use extensions::ExtensionType;
 
 #[derive(Debug, PartialEq)]
 pub struct Locale {
     pub langid: LanguageIdentifier,
-    pub extensions: HashMap<String, HashMap<String, String>>,
+    pub extensions: HashMap<ExtensionType, HashMap<String, String>>,
 }
 
 impl Locale {
@@ -25,7 +26,7 @@ impl Locale {
     }
 
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
-        if self.extensions.contains_key("private") || other.extensions.contains_key("private") {
+        if self.extensions.contains_key(&ExtensionType::Private) || other.extensions.contains_key(&ExtensionType::Private) {
             return false;
         }
         self.langid
@@ -73,11 +74,13 @@ pub fn serialize_locale(loc: &Locale) -> Result<String, errors::LocaleError> {
     let langtag = loc.langid.to_string();
     let mut subtags = vec![langtag.as_str()];
     for (name, ext) in &loc.extensions {
-        subtags.push(&extensions::convert_type_to_ext_type(&name).unwrap());
+        subtags.push(&extensions::convert_ext_type_to_string(&name));
 
         for (key, value) in ext {
             subtags.push(&extensions::convert_key_to_ext_key(&key).unwrap());
-            subtags.push(&value);
+            if value != "true" {
+                subtags.push(&value);
+            }
         }
     }
 
@@ -89,4 +92,9 @@ impl std::fmt::Display for Locale {
         let result = serialize_locale(&self).unwrap();
         write!(f, "{}", result)
     }
+}
+
+pub fn canonicalize(input: &str) -> Result<String, LocaleError> {
+    let locale = Locale::from_str(input)?;
+    Ok(locale.to_string())
 }

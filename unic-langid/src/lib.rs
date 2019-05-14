@@ -163,3 +163,8 @@ fn subtag_matches(
 fn subtags_match(subtag1: &[String], subtag2: &[String], as_range1: bool, as_range2: bool) -> bool {
     (as_range1 && subtag1.is_empty()) || (as_range2 && subtag2.is_empty()) || subtag1 == subtag2
 }
+
+pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {
+    let lang_id = LanguageIdentifier::from_str(input)?;
+    Ok(lang_id.to_string())
+}

@@ -1,4 +1,31 @@
 use crate::parser::ParserError;
+use std::collections::HashMap;
+
+#[derive(Hash, PartialEq, Eq, Debug)]
+pub enum ExtensionType {
+    Unicode,
+    Transform,
+    Private
+}
+
+pub type ExtensionsMap = HashMap<ExtensionType, HashMap<String, String>>;
+
+pub fn convert_str_to_ext_type(input: &str) -> Result<ExtensionType, ParserError> {
+    match input {
+        "u" => Ok(ExtensionType::Unicode),
+        "t" => Ok(ExtensionType::Transform),
+        "x" => Ok(ExtensionType::Private),
+        _ => Err(ParserError::InvalidSubtag)
+    }
+}
+
+pub fn convert_ext_type_to_string(input: &ExtensionType) -> &'static str {
+    match input {
+        ExtensionType::Unicode => "u",
+        ExtensionType::Transform => "t",
+        ExtensionType::Private => "x",
+    }
+}
 
 pub fn convert_ext_key_to_key(input: &str) -> Result<&str, ParserError> {
     if input == "hc" {
@@ -18,22 +45,4 @@ pub fn convert_key_to_ext_key(input: &str) -> Result<&str, ParserError> {
         return Ok("ca");
     }
     return Ok(input);
-}
-
-pub fn convert_ext_type_to_type(input: &str) -> Result<&str, ParserError> {
-    if input == "u" {
-        return Ok("unicode");
-    } else if input == "x" {
-        return Ok("private");
-    }
-    Err(ParserError::InvalidSubtag)
-}
-
-pub fn convert_type_to_ext_type(input: &str) -> Result<&str, ParserError> {
-    if input == "unicode" {
-        return Ok("u");
-    } else if input == "private" {
-        return Ok("x");
-    }
-    Err(ParserError::InvalidSubtag)
 }
