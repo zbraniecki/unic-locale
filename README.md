@@ -7,4 +7,4 @@ And is intended to function similarly to [ICU Locale](http://icu-project.org/api
 
 # Performance
 
-In early tests the performance of parsing a set of language identifiers into a well formed struct, `unic-langid` is ~50 times faster than ICU Locale.
+In early tests the performance of parsing a set of language identifiers into a well formed struct, `unic-langid` is [~50 times faster](https://gist.github.com/zbraniecki/016f7bd35fc6e09aede997c5bc20222a) than ICU Locale.
