@@ -1,7 +1,7 @@
 use crate::parser::ParserError;
 use std::collections::HashMap;
 
-#[derive(Hash, PartialEq, Eq, Debug)]
+#[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ExtensionType {
     Unicode,
     Transform,

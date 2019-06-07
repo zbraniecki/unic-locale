@@ -3,7 +3,7 @@ pub mod extensions;
 pub mod parser;
 
 use errors::LocaleError;
-use extensions::ExtensionType;
+pub use extensions::ExtensionType;
 use std::collections::HashMap;
 use unic_langid::LanguageIdentifier;
 
@@ -20,6 +20,24 @@ impl Locale {
 
     pub fn from_str(ident: &str) -> Result<Self, errors::LocaleError> {
         parser::parse_locale(ident).map_err(std::convert::Into::into)
+    }
+
+    pub fn from_str_with_options(ident: &str, options: HashMap<&str, &str>) -> Result<Self, errors::LocaleError> {
+        let mut loc = parser::parse_locale(ident).map_err(std::convert::Into::into);
+        if let Ok(ref mut loc) = loc {
+            for (key, value) in options {
+                if key == "language" {
+                    loc.langid.set_language(Some(value))?;
+                } else if key == "script" {
+                    loc.langid.set_script(Some(value))?;
+                } else if key == "region" {
+                    loc.langid.set_region(Some(value))?;
+                } else {
+                    loc.set_extension(ExtensionType::Unicode, key, value)?;
+                }
+            }
+        }
+        loc
     }
 
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
@@ -71,6 +89,21 @@ impl Locale {
             .set_variants(variants)
             .map_err(std::convert::Into::into)
     }
+
+    pub fn set_extension(
+        &mut self,
+        extension: ExtensionType,
+        key: &str,
+        value: &str,
+    ) -> Result<(), LocaleError> {
+        let ext = self
+            .extensions
+            .entry(extension)
+            .or_insert(HashMap::new());
+        //XXX: Check that the value is valid
+        ext.insert(key.to_string(), value.to_string());
+        Ok(())
+    }
 }
 
 impl From<LanguageIdentifier> for Locale {
@@ -94,10 +127,14 @@ pub fn serialize_locale(loc: &Locale) -> Result<String, errors::LocaleError> {
     for (name, ext) in &loc.extensions {
         subtags.push(&extensions::convert_ext_type_to_string(&name));
 
-        for (key, value) in ext {
+        let mut keys: Vec<&String> = ext.keys().collect();
+        keys.sort();
+        for key in keys {
             subtags.push(&extensions::convert_key_to_ext_key(&key).unwrap());
-            if value != "true" {
-                subtags.push(&value);
+            if let Some(value) = ext.get(key) {
+                if value != "true" {
+                    subtags.push(&value);
+                }
             }
         }
     }
