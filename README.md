@@ -4,7 +4,7 @@
 
 Unic crate for Unicode Language Identifier management.
 
-# unic-locale [![crates.io](http://meritbadge.herokuapp.com/funic-locale)](https://crates.io/crates/unic-locale)
+# unic-locale [![crates.io](http://meritbadge.herokuapp.com/unic-locale)](https://crates.io/crates/unic-locale)
 
 Unic crates for Unicode Locale management.
 
