@@ -11,6 +11,7 @@ Usage
 use unic_langid::LanguageIdentifier;
 
 let loc = LanguageIdentifier::from_str("en-US");
+
 assert_eq!(loc.get_language(), "en");
 assert_eq!(loc.get_script(), None);
 assert_eq!(loc.get_region(), Some("US"));
