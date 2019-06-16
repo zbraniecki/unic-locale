@@ -22,7 +22,10 @@ impl Locale {
         parser::parse_locale(ident).map_err(std::convert::Into::into)
     }
 
-    pub fn from_str_with_options(ident: &str, options: HashMap<&str, &str>) -> Result<Self, errors::LocaleError> {
+    pub fn from_str_with_options(
+        ident: &str,
+        options: HashMap<&str, &str>,
+    ) -> Result<Self, errors::LocaleError> {
         let mut loc = parser::parse_locale(ident).map_err(std::convert::Into::into);
         if let Ok(ref mut loc) = loc {
             for (key, value) in options {
@@ -96,10 +99,7 @@ impl Locale {
         key: &str,
         value: &str,
     ) -> Result<(), LocaleError> {
-        let ext = self
-            .extensions
-            .entry(extension)
-            .or_insert(HashMap::new());
+        let ext = self.extensions.entry(extension).or_insert(HashMap::new());
         //XXX: Check that the value is valid
         ext.insert(key.to_string(), value.to_string());
         Ok(())
