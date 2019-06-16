@@ -1,5 +1,6 @@
 [package]
 name = "unic-langid"
+description = "API for managing Unicode Language Identifiers"
 version = "0.1.0"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"

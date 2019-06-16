@@ -1,5 +1,6 @@
 [package]
 name = "unic-locale"
+description = "API for managing Unicode Locale Identifiers"
 version = "0.1.0"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
