@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
@@ -24,7 +25,7 @@ fn language_identifier_from_str_bench(c: &mut Criterion) {
     c.bench_function("language_identifier_from_str", move |b| {
         b.iter(|| {
             for s in strings {
-                let _ = LanguageIdentifier::from_str(s);
+                let _ = LanguageIdentifier::try_from(*s);
             }
         })
     });
