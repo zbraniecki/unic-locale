@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use unic_langid::parser::parse_language_identifier;
 use unic_langid::LanguageIdentifier;
 
@@ -49,13 +50,13 @@ fn test_language_casing() {
 
 #[test]
 fn test_serialize_langid() {
-    let langid = LanguageIdentifier::from_str("en-Latn-US").unwrap();
+    let langid = LanguageIdentifier::try_from("en-Latn-US").unwrap();
     assert_eq!(&langid.to_string(), "en-Latn-US");
 }
 
 #[test]
 fn test_sorted_variants() {
-    let langid = LanguageIdentifier::from_str("en-nedis-macos").unwrap();
+    let langid = LanguageIdentifier::try_from("en-nedis-macos").unwrap();
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 
     let langid =

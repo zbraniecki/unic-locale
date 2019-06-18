@@ -54,7 +54,7 @@ fn test_serialize_locale() {
 
 #[test]
 fn test_from_langid() {
-    let langid = LanguageIdentifier::from_str("en-US").unwrap();
+    let langid = LanguageIdentifier::try_from("en-US").unwrap();
     let loc = Locale::from(langid);
     assert_eq!(&loc.to_string(), "en-US");
 }
