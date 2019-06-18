@@ -5,7 +5,7 @@ pub mod parser;
 use std::convert::TryFrom;
 use errors::LocaleError;
 pub use extensions::{ExtensionsMap, ExtensionType, UnicodeExtensionKey};
-use unic_langid::LanguageIdentifier;
+pub use unic_langid::LanguageIdentifier;
 
 #[derive(Debug, Default, PartialEq)]
 pub struct Locale {

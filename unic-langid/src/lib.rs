@@ -2,6 +2,7 @@ pub mod errors;
 pub mod parser;
 pub mod subtags;
 
+use std::convert::TryFrom;
 use crate::errors::LanguageIdentifierError;
 
 #[derive(Default, Debug, PartialEq)]
@@ -15,10 +16,6 @@ pub struct LanguageIdentifier {
 impl LanguageIdentifier {
     pub fn new() -> Self {
         Default::default()
-    }
-
-    pub fn from_str(ident: &str) -> Result<Self, LanguageIdentifierError> {
-        parser::parse_language_identifier(ident).map_err(std::convert::Into::into)
     }
 
     pub fn from_parts(
@@ -125,6 +122,14 @@ impl LanguageIdentifier {
     }
 }
 
+impl TryFrom<&str> for LanguageIdentifier {
+    type Error = LanguageIdentifierError;
+
+    fn try_from(source: &str) -> Result<Self, Self::Error> {
+        parser::parse_language_identifier(source).map_err(std::convert::Into::into)
+    }
+}
+
 impl std::fmt::Display for LanguageIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let mut subtags = vec![self.get_language()];
@@ -156,6 +161,6 @@ fn subtags_match(subtag1: &[String], subtag2: &[String], as_range1: bool, as_ran
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {
-    let lang_id = LanguageIdentifier::from_str(input)?;
+    let lang_id = LanguageIdentifier::try_from(input)?;
     Ok(lang_id.to_string())
 }
