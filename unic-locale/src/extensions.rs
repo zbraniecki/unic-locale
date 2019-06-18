@@ -1,4 +1,7 @@
-use crate::parser::ParserError;
+use std::convert::TryFrom;
+
+use crate::parser::{parse_extension_subtags, ParserError};
+use crate::errors::LocaleError;
 use std::collections::HashMap;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
@@ -8,41 +11,191 @@ pub enum ExtensionType {
     Private,
 }
 
-pub type ExtensionsMap = HashMap<ExtensionType, HashMap<String, String>>;
+impl TryFrom<&str> for ExtensionType {
+    type Error = LocaleError;
 
-pub fn convert_str_to_ext_type(input: &str) -> Result<ExtensionType, ParserError> {
-    match input {
-        "u" => Ok(ExtensionType::Unicode),
-        "t" => Ok(ExtensionType::Transform),
-        "x" => Ok(ExtensionType::Private),
-        _ => Err(ParserError::InvalidSubtag),
+    fn try_from(key: &str) -> Result<Self, Self::Error> {
+        match key {
+            "u" => Ok(ExtensionType::Unicode),
+            "t" => Ok(ExtensionType::Transform),
+            "x" => Ok(ExtensionType::Private),
+            _ => Err(LocaleError::Unknown)
+        }
     }
 }
 
-pub fn convert_ext_type_to_string(input: &ExtensionType) -> &'static str {
-    match input {
-        ExtensionType::Unicode => "u",
-        ExtensionType::Transform => "t",
-        ExtensionType::Private => "x",
+impl Into<&'static str> for ExtensionType {
+    fn into(self) -> &'static str {
+        match self {
+            ExtensionType::Unicode => "u",
+            ExtensionType::Transform => "t",
+            ExtensionType::Private => "x"
+        }
     }
 }
 
-pub fn convert_ext_key_to_key(input: &str) -> Result<&str, ParserError> {
-    if input == "hc" {
-        return Ok("hour-cycle");
+impl Into<&'static str> for &ExtensionType {
+    fn into(self) -> &'static str {
+        match self {
+            ExtensionType::Unicode => "u",
+            ExtensionType::Transform => "t",
+            ExtensionType::Private => "x"
+        }
     }
-    if input == "ca" {
-        return Ok("calendar");
-    }
-    Ok(input)
 }
 
-pub fn convert_key_to_ext_key(input: &str) -> Result<&str, ParserError> {
-    if input == "hour-cycle" {
-        return Ok("hc");
+
+#[derive(Debug, Hash, PartialEq, Eq)]
+pub enum UnicodeExtensionKey {
+    HourCycle,
+    Calendar,
+    Collation,
+    Capitalized,
+    NumericalSystem,
+}
+
+impl TryFrom<&str> for UnicodeExtensionKey {
+    type Error = LocaleError;
+
+    fn try_from(source: &str) -> Result<Self, Self::Error> {
+        match source {
+            "hc" => Ok(UnicodeExtensionKey::HourCycle),
+            "ca" => Ok(UnicodeExtensionKey::Calendar),
+            "co" => Ok(UnicodeExtensionKey::Collation),
+            "ka" => Ok(UnicodeExtensionKey::Capitalized),
+            "nu" => Ok(UnicodeExtensionKey::NumericalSystem),
+            _ => Err(LocaleError::Unknown)
+        }
     }
-    if input == "calendar" {
-        return Ok("ca");
+}
+
+impl Into<&'static str> for UnicodeExtensionKey {
+    fn into(self) -> &'static str {
+        match self {
+            UnicodeExtensionKey::HourCycle => "hc",
+            UnicodeExtensionKey::Calendar => "ca",
+            UnicodeExtensionKey::Collation => "co",
+            UnicodeExtensionKey::Capitalized => "ka",
+            UnicodeExtensionKey::NumericalSystem => "nu",
+        }
     }
-    Ok(input)
+}
+
+impl Into<&'static str> for &UnicodeExtensionKey {
+    fn into(self) -> &'static str {
+        match self {
+            UnicodeExtensionKey::HourCycle => "hc",
+            UnicodeExtensionKey::Calendar => "ca",
+            UnicodeExtensionKey::Collation => "co",
+            UnicodeExtensionKey::Capitalized => "ka",
+            UnicodeExtensionKey::NumericalSystem => "nu",
+        }
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct ExtensionsMap {
+    unicode: HashMap<UnicodeExtensionKey, Option<String>>,
+    transform: HashMap<String, Option<String>>,
+    private: HashMap<String, Option<String>>
+}
+
+impl ExtensionsMap {
+    pub fn get_unicode(&self) -> &HashMap<UnicodeExtensionKey, Option<String>> {
+        &self.unicode
+    }
+
+    pub fn get_transform(&self) -> &HashMap<String, Option<String>> {
+        &self.transform
+    }
+
+    pub fn get_private(&self) -> &HashMap<String, Option<String>> {
+        &self.private
+    }
+
+    pub fn set_unicode_value(&mut self, key: UnicodeExtensionKey, value: Option<&str>) -> Result<(), LocaleError> {
+        //XXX: Validate value
+        self.unicode.insert(key, value.map(String::from));
+        Ok(())
+    }
+
+    pub fn set_transform_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
+        self.transform.insert(String::from(key), value.map(String::from));
+        Ok(())
+    }
+
+    pub fn set_private_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
+        self.private.insert(String::from(key), value.map(String::from));
+        Ok(())
+    }
+}
+
+impl TryFrom<&str> for ExtensionsMap {
+    type Error = ParserError;
+
+    fn try_from(source: &str) -> Result<Self, Self::Error> {
+        parse_extension_subtags(source)
+    }
+}
+
+
+impl std::fmt::Display for ExtensionsMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut parts: Vec<&str> = vec![];
+
+        if !self.unicode.is_empty() {
+            parts.push(ExtensionType::Unicode.into());
+
+            let mut keys = vec![];
+            for (k, value) in &self.unicode {
+                keys.push((k.into(), value));
+            }
+
+            keys.sort();
+
+            for (k, v) in keys {
+                parts.push(k);
+                if let Some(v) = v {
+                    parts.push(v);
+                }
+            }
+        }
+
+        if !self.transform.is_empty() {
+            parts.push(ExtensionType::Transform.into());
+
+            let mut keys = vec![];
+            for (k, value) in &self.transform {
+                keys.push((k, value));
+            }
+
+            keys.sort();
+
+            for (k, v) in keys {
+                parts.push(k);
+                if let Some(v) = v {
+                    parts.push(v);
+                }
+            }
+        }
+
+        if !self.private.is_empty() {
+            parts.push(ExtensionType::Private.into());
+
+            let mut keys = vec![];
+            for (k, value) in &self.private {
+                keys.push((k, value));
+            }
+
+            keys.sort();
+
+            for (k, v) in keys {
+                parts.push(k);
+                if let Some(v) = v {
+                    parts.push(v);
+                }
+            }
+        }
+        write!(f, "{}", parts.join("-"))
+    }
 }

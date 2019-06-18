@@ -1,9 +1,9 @@
 pub mod errors;
 
+use std::convert::TryFrom;
 pub use self::errors::ParserError;
-use super::extensions;
+use super::extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
 use super::Locale;
-use std::collections::HashMap;
 use unic_langid::parser::parse_language_identifier;
 
 static SEPARATORS: &[u8] = &[b'-', b'_'];
@@ -36,14 +36,14 @@ pub fn parse_locale(t: &str) -> Result<Locale, ParserError> {
     } else {
         Ok(Locale {
             langid: parse_language_identifier(t)?,
-            extensions: HashMap::new(),
+            extensions: ExtensionsMap::default(),
         })
     }
 }
 
-fn parse_extension_subtags(t: &str) -> Result<extensions::ExtensionsMap, ParserError> {
-    let mut result = HashMap::new();
-    let mut current_type: Option<&mut HashMap<String, String>> = None;
+pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
+    let mut result = ExtensionsMap::default();
+    let mut current_type: Option<ExtensionType> = None;
     let mut current_key: Option<&str> = None;
 
     for subtag in t.split(|c: char| SEPARATORS.contains(&(c as u8))) {
@@ -51,21 +51,40 @@ fn parse_extension_subtags(t: &str) -> Result<extensions::ExtensionsMap, ParserE
         if slen == 1 {
             if let Some(current_key) = current_key.take() {
                 if let Some(current_type) = current_type {
-                    let key = extensions::convert_ext_key_to_key(current_key)?;
-                    current_type.insert(key.to_string(), String::from("true"));
+                    match current_type {
+                        ExtensionType::Unicode => {
+                            let key = UnicodeExtensionKey::try_from(current_key).map_err(|_| ParserError::InvalidExtension)?;
+                            result.set_unicode_value(key, None).map_err(|_| ParserError::InvalidExtension)?
+                        },
+                        ExtensionType::Transform => {
+                            result.set_transform_value(current_key, None).map_err(|_| ParserError::InvalidExtension)?
+                        },
+                        ExtensionType::Private => {
+                            result.set_private_value(current_key, None).map_err(|_| ParserError::InvalidExtension)?
+                        },
+                    }
                 } else {
-                    return Err(ParserError::InvalidSubtag);
+                    return Err(ParserError::InvalidExtension);
                 }
             }
-            let t = extensions::convert_str_to_ext_type(subtag)?;
-            current_type = Some(result.entry(t).or_insert_with(HashMap::new));
+            current_type = Some(ExtensionType::try_from(subtag).map_err(|_| ParserError::InvalidExtension)?);
             continue;
         }
 
-        if let Some(ref mut current_type) = current_type {
+        if let Some(current_type) = current_type {
             if let Some(current_key) = current_key.take() {
-                let key = extensions::convert_ext_key_to_key(current_key)?;
-                current_type.insert(key.to_string(), subtag.to_string());
+                match current_type {
+                    ExtensionType::Unicode => {
+                        let key = UnicodeExtensionKey::try_from(current_key).map_err(|_| ParserError::InvalidExtension)?;
+                        result.set_unicode_value(key, Some(subtag)).map_err(|_| ParserError::InvalidExtension)?
+                    },
+                    ExtensionType::Transform => {
+                        result.set_transform_value(current_key, Some(subtag)).map_err(|_| ParserError::InvalidExtension)?
+                    },
+                    ExtensionType::Private => {
+                        result.set_private_value(current_key, Some(subtag)).map_err(|_| ParserError::InvalidExtension)?
+                    },
+                }
             } else {
                 current_key = Some(subtag);
             }
@@ -75,8 +94,18 @@ fn parse_extension_subtags(t: &str) -> Result<extensions::ExtensionsMap, ParserE
     }
     if let Some(current_key) = current_key.take() {
         if let Some(current_type) = current_type {
-            let key = extensions::convert_ext_key_to_key(current_key)?;
-            current_type.insert(key.to_string(), String::from("true"));
+            match current_type {
+                ExtensionType::Unicode => {
+                    let key = UnicodeExtensionKey::try_from(current_key).map_err(|_| ParserError::InvalidExtension)?;
+                    result.set_unicode_value(key, None).map_err(|_| ParserError::InvalidExtension)?
+                },
+                ExtensionType::Transform => {
+                    result.set_transform_value(current_key, None).map_err(|_| ParserError::InvalidExtension)?
+                },
+                ExtensionType::Private => {
+                    result.set_private_value(current_key, None).map_err(|_| ParserError::InvalidExtension)?
+                },
+            }
         } else {
             return Err(ParserError::InvalidSubtag);
         }

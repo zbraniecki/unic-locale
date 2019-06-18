@@ -2,15 +2,15 @@ pub mod errors;
 pub mod extensions;
 pub mod parser;
 
+use std::convert::TryFrom;
 use errors::LocaleError;
-pub use extensions::ExtensionType;
-use std::collections::HashMap;
+pub use extensions::{ExtensionsMap, ExtensionType, UnicodeExtensionKey};
 use unic_langid::LanguageIdentifier;
 
 #[derive(Debug, Default, PartialEq)]
 pub struct Locale {
     pub langid: LanguageIdentifier,
-    pub extensions: HashMap<ExtensionType, HashMap<String, String>>,
+    pub extensions: extensions::ExtensionsMap,
 }
 
 impl Locale {
@@ -18,34 +18,23 @@ impl Locale {
         Default::default()
     }
 
-    pub fn from_str(ident: &str) -> Result<Self, errors::LocaleError> {
-        parser::parse_locale(ident).map_err(std::convert::Into::into)
-    }
-
-    pub fn from_str_with_options(
-        ident: &str,
-        options: HashMap<&str, &str>,
-    ) -> Result<Self, errors::LocaleError> {
-        let mut loc = parser::parse_locale(ident).map_err(std::convert::Into::into);
-        if let Ok(ref mut loc) = loc {
-            for (key, value) in options {
-                if key == "language" {
-                    loc.langid.set_language(Some(value))?;
-                } else if key == "script" {
-                    loc.langid.set_script(Some(value))?;
-                } else if key == "region" {
-                    loc.langid.set_region(Some(value))?;
-                } else {
-                    loc.set_extension(ExtensionType::Unicode, key, value)?;
-                }
-            }
-        }
-        loc
+    pub fn from_parts(
+        language: Option<&str>,
+        script: Option<&str>,
+        region: Option<&str>,
+        variants: &[&str],
+        extensions: Option<extensions::ExtensionsMap>,
+    ) -> Result<Self, LocaleError> {
+        let langid = LanguageIdentifier::from_parts(language, script, region, variants)?;
+        Ok(Locale {
+            langid,
+            extensions: extensions.unwrap_or_default(),
+        })
     }
 
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
-        if self.extensions.contains_key(&ExtensionType::Private)
-            || other.extensions.contains_key(&ExtensionType::Private)
+        if !self.extensions.get_private().is_empty()
+            || !other.extensions.get_private().is_empty()
         {
             return false;
         }
@@ -97,12 +86,23 @@ impl Locale {
         &mut self,
         extension: ExtensionType,
         key: &str,
-        value: &str,
+        value: Option<&str>,
     ) -> Result<(), LocaleError> {
-        let ext = self.extensions.entry(extension).or_insert(HashMap::new());
-        //XXX: Check that the value is valid
-        ext.insert(key.to_string(), value.to_string());
-        Ok(())
+        match extension {
+            ExtensionType::Unicode => {
+                let k = UnicodeExtensionKey::try_from(key)?;
+                self.extensions.set_unicode_value(k, value)
+            },
+            _ => unimplemented!()
+        }
+    }
+}
+
+impl TryFrom<&str> for Locale {
+    type Error = LocaleError;
+
+    fn try_from(source: &str) -> Result<Self, Self::Error> {
+        parser::parse_locale(source).map_err(std::convert::Into::into)
     }
 }
 
@@ -110,7 +110,7 @@ impl From<LanguageIdentifier> for Locale {
     fn from(langid: LanguageIdentifier) -> Self {
         Locale {
             langid,
-            extensions: HashMap::new(),
+            extensions: ExtensionsMap::default(),
         }
     }
 }
@@ -121,35 +121,19 @@ impl Into<LanguageIdentifier> for Locale {
     }
 }
 
-pub fn serialize_locale(loc: &Locale) -> Result<String, errors::LocaleError> {
-    let langtag = loc.langid.to_string();
-    let mut subtags = vec![langtag.as_str()];
-    for (name, ext) in &loc.extensions {
-        subtags.push(&extensions::convert_ext_type_to_string(&name));
-
-        let mut keys: Vec<&String> = ext.keys().collect();
-        keys.sort();
-        for key in keys {
-            subtags.push(&extensions::convert_key_to_ext_key(&key).unwrap());
-            if let Some(value) = ext.get(key) {
-                if value != "true" {
-                    subtags.push(&value);
-                }
-            }
-        }
-    }
-
-    Ok(subtags.join("-"))
-}
-
 impl std::fmt::Display for Locale {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let result = serialize_locale(&self).unwrap();
-        write!(f, "{}", result)
+        let mut subtags = vec![self.langid.to_string()];
+        let ext = self.extensions.to_string();
+
+        if !ext.is_empty() {
+            subtags.push(ext);
+        }
+        write!(f, "{}", subtags.join("-"))
     }
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LocaleError> {
-    let locale = Locale::from_str(input)?;
+    let locale = Locale::try_from(input)?;
     Ok(locale.to_string())
 }

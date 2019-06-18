@@ -6,6 +6,7 @@ use unic_langid::parser::ParserError as LangIdParserError;
 pub enum ParserError {
     InvalidLanguage,
     InvalidSubtag,
+    InvalidExtension,
     LangIdError(LangIdParserError),
 }
 
@@ -20,6 +21,7 @@ impl Error for ParserError {
         match &self {
             ParserError::InvalidLanguage => "The given language subtag is invalid",
             ParserError::InvalidSubtag => "Invalid subtag",
+            ParserError::InvalidExtension => "Invalid extension",
             ParserError::LangIdError(_) => "Language Identifier Parser Error",
         }
     }
