@@ -5,7 +5,7 @@ pub mod subtags;
 use std::convert::TryFrom;
 use crate::errors::LanguageIdentifierError;
 
-#[derive(Default, Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq, Eq, Hash)]
 pub struct LanguageIdentifier {
     language: Option<String>,
     script: Option<String>,
