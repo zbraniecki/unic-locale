@@ -1,15 +1,16 @@
 [package]
 name = "unic-locale"
 description = "API for managing Unicode Locale Identifiers"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
 readme = "README.md"
+repository = "https://github.com/zbraniecki/unic-locale"
 license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-unic-langid = { path = "../unic-langid" }
+unic-langid = "^0.2"
 
 [dev-dependencies]
 criterion = "^0.2"
