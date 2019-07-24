@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 
-use crate::parser::{parse_extension_subtags, ParserError};
 use crate::errors::LocaleError;
+use crate::parser::{parse_extension_subtags, ParserError};
 use std::collections::HashMap;
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
@@ -19,7 +19,7 @@ impl TryFrom<&str> for ExtensionType {
             "u" => Ok(ExtensionType::Unicode),
             "t" => Ok(ExtensionType::Transform),
             "x" => Ok(ExtensionType::Private),
-            _ => Err(LocaleError::Unknown)
+            _ => Err(LocaleError::Unknown),
         }
     }
 }
@@ -29,7 +29,7 @@ impl Into<&'static str> for ExtensionType {
         match self {
             ExtensionType::Unicode => "u",
             ExtensionType::Transform => "t",
-            ExtensionType::Private => "x"
+            ExtensionType::Private => "x",
         }
     }
 }
@@ -39,11 +39,10 @@ impl Into<&'static str> for &ExtensionType {
         match self {
             ExtensionType::Unicode => "u",
             ExtensionType::Transform => "t",
-            ExtensionType::Private => "x"
+            ExtensionType::Private => "x",
         }
     }
 }
-
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub enum UnicodeExtensionKey {
@@ -64,7 +63,7 @@ impl TryFrom<&str> for UnicodeExtensionKey {
             "co" => Ok(UnicodeExtensionKey::Collation),
             "ka" => Ok(UnicodeExtensionKey::Capitalized),
             "nu" => Ok(UnicodeExtensionKey::NumericalSystem),
-            _ => Err(LocaleError::Unknown)
+            _ => Err(LocaleError::Unknown),
         }
     }
 }
@@ -97,7 +96,7 @@ impl Into<&'static str> for &UnicodeExtensionKey {
 pub struct ExtensionsMap {
     unicode: HashMap<UnicodeExtensionKey, Option<String>>,
     transform: HashMap<String, Option<String>>,
-    private: HashMap<String, Option<String>>
+    private: HashMap<String, Option<String>>,
 }
 
 impl ExtensionsMap {
@@ -113,19 +112,29 @@ impl ExtensionsMap {
         &self.private
     }
 
-    pub fn set_unicode_value(&mut self, key: UnicodeExtensionKey, value: Option<&str>) -> Result<(), LocaleError> {
+    pub fn set_unicode_value(
+        &mut self,
+        key: UnicodeExtensionKey,
+        value: Option<&str>,
+    ) -> Result<(), LocaleError> {
         //XXX: Validate value
         self.unicode.insert(key, value.map(String::from));
         Ok(())
     }
 
-    pub fn set_transform_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
-        self.transform.insert(String::from(key), value.map(String::from));
+    pub fn set_transform_value(
+        &mut self,
+        key: &str,
+        value: Option<&str>,
+    ) -> Result<(), LocaleError> {
+        self.transform
+            .insert(String::from(key), value.map(String::from));
         Ok(())
     }
 
     pub fn set_private_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
-        self.private.insert(String::from(key), value.map(String::from));
+        self.private
+            .insert(String::from(key), value.map(String::from));
         Ok(())
     }
 }
@@ -137,7 +146,6 @@ impl TryFrom<&str> for ExtensionsMap {
         parse_extension_subtags(source)
     }
 }
-
 
 impl std::fmt::Display for ExtensionsMap {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

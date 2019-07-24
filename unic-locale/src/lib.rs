@@ -2,9 +2,9 @@ pub mod errors;
 pub mod extensions;
 pub mod parser;
 
-use std::convert::TryFrom;
 use errors::LocaleError;
-pub use extensions::{ExtensionsMap, ExtensionType, UnicodeExtensionKey};
+pub use extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
+use std::convert::TryFrom;
 pub use unic_langid::LanguageIdentifier;
 
 #[derive(Debug, Default, PartialEq, Clone)]
@@ -33,9 +33,7 @@ impl Locale {
     }
 
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
-        if !self.extensions.get_private().is_empty()
-            || !other.extensions.get_private().is_empty()
-        {
+        if !self.extensions.get_private().is_empty() || !other.extensions.get_private().is_empty() {
             return false;
         }
         self.langid
@@ -92,8 +90,8 @@ impl Locale {
             ExtensionType::Unicode => {
                 let k = UnicodeExtensionKey::try_from(key)?;
                 self.extensions.set_unicode_value(k, value)
-            },
-            _ => unimplemented!()
+            }
+            _ => unimplemented!(),
         }
     }
 }
@@ -103,6 +101,14 @@ impl TryFrom<&str> for Locale {
 
     fn try_from(source: &str) -> Result<Self, Self::Error> {
         parser::parse_locale(source).map_err(std::convert::Into::into)
+    }
+}
+
+impl TryFrom<String> for Locale {
+    type Error = LocaleError;
+
+    fn try_from(source: String) -> Result<Self, Self::Error> {
+        parser::parse_locale(&source).map_err(std::convert::Into::into)
     }
 }
 

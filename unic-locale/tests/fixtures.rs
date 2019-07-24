@@ -1,0 +1,118 @@
+use std::collections::HashMap;
+use std::convert::TryFrom;
+use std::convert::TryInto;
+use std::error::Error;
+use std::fs::File;
+use std::path::Path;
+
+use unic_locale::{ExtensionType, ExtensionsMap, Locale, UnicodeExtensionKey};
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct LocaleTestInputData {
+    string: String,
+    extensions: Option<HashMap<String, HashMap<String, String>>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct LocaleTestOutputObject {
+    language: Option<String>,
+    script: Option<String>,
+    region: Option<String>,
+    variants: Option<Vec<String>>,
+    extensions: Option<HashMap<String, HashMap<String, String>>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+enum LocaleTestOutput {
+    String(String),
+    Object(LocaleTestOutputObject),
+}
+
+#[derive(Serialize, Deserialize)]
+struct LocaleTestSet {
+    input: LocaleTestInputData,
+    output: LocaleTestOutput,
+}
+
+fn read_locale_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LocaleTestSet>, Box<Error>> {
+    let file = File::open(path)?;
+    let sets = serde_json::from_reader(file)?;
+    Ok(sets)
+}
+
+fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> ExtensionsMap {
+    let mut result = ExtensionsMap::default();
+    for (key, map) in map {
+        let t: ExtensionType = key
+            .as_str()
+            .try_into()
+            .expect("Failed to format extension type.");
+        for (key, value) in map {
+            match t {
+                ExtensionType::Unicode => {
+                    let k: UnicodeExtensionKey =
+                        key.as_str().try_into().expect("Key type unimplemented.");
+                    result
+                        .set_unicode_value(k, Some(value.as_str()))
+                        .expect("Setting extension value failed.");
+                }
+                _ => unimplemented!(),
+            }
+        }
+    }
+    result
+}
+
+fn test_locale_fixtures(path: &str) {
+    let tests = read_locale_testsets(path).unwrap();
+
+    for test in tests {
+        let s = test.input.string;
+
+        let mut locale = Locale::try_from(s).expect("Parsing failed.");
+
+        if let Some(extensions) = test.input.extensions {
+            for (key, map) in extensions {
+                let k: ExtensionType = key
+                    .as_str()
+                    .try_into()
+                    .expect("Failed to parse extension type.");
+                for (key, value) in map {
+                    locale
+                        .set_extension(k, key.as_str(), Some(value.as_str()))
+                        .expect("Failed to set extension value.");
+                }
+            }
+        }
+
+        match test.output {
+            LocaleTestOutput::Object(o) => {
+                let expected = Locale::from_parts(
+                    o.language,
+                    o.script,
+                    o.region,
+                    o.variants.as_ref().map(|v| v.as_slice()),
+                    o.extensions.map(create_extensions_map),
+                )
+                .expect("Parsing failed.");
+                assert_eq!(locale, expected);
+            }
+            LocaleTestOutput::String(s) => {
+                assert_eq!(locale.to_string(), s);
+            }
+        }
+    }
+}
+
+#[test]
+fn parse() {
+    test_locale_fixtures("./tests/fixtures/parsing.json");
+}
+
+#[test]
+fn serialize() {
+    test_locale_fixtures("./tests/fixtures/serialize.json");
+}

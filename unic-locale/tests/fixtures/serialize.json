@@ -1,0 +1,25 @@
+[
+    {
+      "input": {
+        "string": "en",
+        "extensions": {
+          "u": {
+            "hc": "h12"
+          }
+        }
+      },
+      "output": "en-u-hc-h12"
+    },
+    {
+      "input": {
+        "string": "ar",
+        "extensions": {
+          "u": {
+            "hc": "h12",
+            "ca": "buddhist"
+          }
+        }
+      },
+      "output": "ar-u-ca-buddhist-hc-h12"
+    }
+  ]
