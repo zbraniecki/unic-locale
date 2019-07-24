@@ -8,23 +8,42 @@ Usage
 -----
 
 ```rust
+use std::convert::TryFrom;
+
 use unic_langid::LanguageIdentifier;
 
-let loc = LanguageIdentifier::from_str("en-US");
+let loc = LanguageIdentifier::try_from("en-US").expect("Parsing failed.");
 
 assert_eq!(loc.get_language(), "en");
 assert_eq!(loc.get_script(), None);
 assert_eq!(loc.get_region(), Some("US"));
 
-loc.set_script(Some("Latn"));
+loc.set_script(Some("latn"));
 
 assert_eq!(&loc.to_string(), "en-Latn-US");
+```
+
+```rust
+use std::convert::TryFrom;
+
+use unic_langid::LanguageIdentifier;
+
+let langid = LanguageIdentifier::from_parts(
+    Some("en"),
+    None,
+    None,
+    Some(&["nedis", "macos"])
+).expect("Parsing failed.");
+
+assert_eq!(&langid.to_string(), "en-macos-nedis")
 ```
 
 Status
 ------
 
 The crate is providing fundamental blocks, but is very basic.
+
+In particular, a lot can be done to improve performance, memory usage, and ergonomics of using the crate.
 
 Get Involved
 ------------
