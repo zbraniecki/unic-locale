@@ -7,7 +7,7 @@ use errors::LocaleError;
 pub use extensions::{ExtensionsMap, ExtensionType, UnicodeExtensionKey};
 pub use unic_langid::LanguageIdentifier;
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, PartialEq, Clone)]
 pub struct Locale {
     pub langid: LanguageIdentifier,
     pub extensions: extensions::ExtensionsMap,
@@ -118,6 +118,12 @@ impl From<LanguageIdentifier> for Locale {
 impl Into<LanguageIdentifier> for Locale {
     fn into(self) -> LanguageIdentifier {
         self.langid
+    }
+}
+
+impl AsRef<LanguageIdentifier> for Locale {
+    fn as_ref(&self) -> &LanguageIdentifier {
+        &self.langid
     }
 }
 

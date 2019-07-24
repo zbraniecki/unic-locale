@@ -45,7 +45,7 @@ impl Into<&'static str> for &ExtensionType {
 }
 
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub enum UnicodeExtensionKey {
     HourCycle,
     Calendar,
@@ -93,7 +93,7 @@ impl Into<&'static str> for &UnicodeExtensionKey {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct ExtensionsMap {
     unicode: HashMap<UnicodeExtensionKey, Option<String>>,
     transform: HashMap<String, Option<String>>,

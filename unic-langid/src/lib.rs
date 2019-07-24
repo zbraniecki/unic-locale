@@ -5,7 +5,7 @@ pub mod subtags;
 use std::convert::TryFrom;
 use crate::errors::LanguageIdentifierError;
 
-#[derive(Default, Debug, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct LanguageIdentifier {
     language: Option<String>,
     script: Option<String>,
@@ -127,6 +127,28 @@ impl TryFrom<&str> for LanguageIdentifier {
 
     fn try_from(source: &str) -> Result<Self, Self::Error> {
         parser::parse_language_identifier(source).map_err(std::convert::Into::into)
+    }
+}
+
+impl TryFrom<String> for LanguageIdentifier {
+    type Error = LanguageIdentifierError;
+
+    fn try_from(source: String) -> Result<Self, Self::Error> {
+        parser::parse_language_identifier(&source).map_err(std::convert::Into::into)
+    }
+}
+
+impl TryFrom<&String> for LanguageIdentifier {
+    type Error = LanguageIdentifierError;
+
+    fn try_from(source: &String) -> Result<Self, Self::Error> {
+        parser::parse_language_identifier(source).map_err(std::convert::Into::into)
+    }
+}
+
+impl AsRef<LanguageIdentifier> for LanguageIdentifier {
+    fn as_ref(&self) -> &LanguageIdentifier {
+        self
     }
 }
 
