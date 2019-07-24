@@ -7,7 +7,7 @@ fn assert_language_identifier(
     language: Option<&str>,
     script: Option<&str>,
     region: Option<&str>,
-    variants: &[&str],
+    variants: Option<&[&str]>,
 ) {
     assert_eq!(loc.get_language(), language.unwrap_or("und"));
     assert_eq!(loc.get_script().as_ref().map(String::as_str), script);
@@ -17,7 +17,7 @@ fn assert_language_identifier(
             .iter()
             .map(String::as_str)
             .collect::<Vec<&str>>(),
-        variants
+        variants.unwrap_or(&[])
     );
 }
 
@@ -26,7 +26,7 @@ fn assert_parsed_language_identifier(
     language: Option<&str>,
     script: Option<&str>,
     region: Option<&str>,
-    variants: &[&str],
+    variants: Option<&[&str]>,
 ) {
     let langid = parse_language_identifier(input).unwrap();
     assert_language_identifier(&langid, language, script, region, variants);
@@ -34,18 +34,18 @@ fn assert_parsed_language_identifier(
 
 #[test]
 fn test_language_identifier_parser() {
-    assert_parsed_language_identifier("pl", Some("pl"), None, None, &[]);
-    assert_parsed_language_identifier("en-US", Some("en"), None, Some("US"), &[]);
-    assert_parsed_language_identifier("en-Latn-US", Some("en"), Some("Latn"), Some("US"), &[]);
-    assert_parsed_language_identifier("sl-nedis", Some("sl"), None, None, &["nedis"]);
+    assert_parsed_language_identifier("pl", Some("pl"), None, None, None);
+    assert_parsed_language_identifier("en-US", Some("en"), None, Some("US"), None);
+    assert_parsed_language_identifier("en-Latn-US", Some("en"), Some("Latn"), Some("US"), None);
+    assert_parsed_language_identifier("sl-nedis", Some("sl"), None, None, Some(&["nedis"]));
 }
 
 #[test]
 fn test_language_casing() {
-    assert_parsed_language_identifier("Pl", Some("pl"), None, None, &[]);
-    assert_parsed_language_identifier("En-uS", Some("en"), None, Some("US"), &[]);
-    assert_parsed_language_identifier("eN-lAtN-uS", Some("en"), Some("Latn"), Some("US"), &[]);
-    assert_parsed_language_identifier("ZH_cyrl_hN", Some("zh"), Some("Cyrl"), Some("HN"), &[]);
+    assert_parsed_language_identifier("Pl", Some("pl"), None, None, None);
+    assert_parsed_language_identifier("En-uS", Some("en"), None, Some("US"), None);
+    assert_parsed_language_identifier("eN-lAtN-uS", Some("en"), Some("Latn"), Some("US"), None);
+    assert_parsed_language_identifier("ZH_cyrl_hN", Some("zh"), Some("Cyrl"), Some("HN"), None);
 }
 
 #[test]
@@ -60,6 +60,6 @@ fn test_sorted_variants() {
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 
     let langid =
-        LanguageIdentifier::from_parts(Some("en"), None, None, &["nedis", "macos"]).unwrap();
+        LanguageIdentifier::from_parts(Some("en"), None, None, Some(&["nedis", "macos"])).unwrap();
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 }

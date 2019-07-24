@@ -22,7 +22,7 @@ impl LanguageIdentifier {
         language: Option<S>,
         script: Option<S>,
         region: Option<S>,
-        variants: impl IntoIterator<Item = V>,
+        variants: Option<impl IntoIterator<Item = V>>,
     ) -> Result<Self, LanguageIdentifierError> {
         let language = if let Some(subtag) = language {
             subtags::parse_language_subtag(subtag.as_ref())?
@@ -41,10 +41,13 @@ impl LanguageIdentifier {
         };
         let mut variants_field = vec![];
 
-        for variant in variants {
-            variants_field.push(subtags::parse_variant_subtag(variant.as_ref())?);
+        if let Some(variants) = variants {
+            for variant in variants {
+                variants_field.push(subtags::parse_variant_subtag(variant.as_ref())?);
+            }
+            variants_field.sort();
         }
-        variants_field.sort();
+
         Ok(Self {
             language,
             script,

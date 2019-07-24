@@ -53,7 +53,7 @@ fn test_langid_fixtures(path: &str) {
                     o.language.as_ref(),
                     o.script.as_ref(),
                     o.region.as_ref(),
-                    o.variants.as_ref().unwrap_or(&vec![]),
+                    o.variants.as_ref(),
                 )
                 .expect("Parsing failed.");
                 assert_eq!(langid, expected);

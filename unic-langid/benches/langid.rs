@@ -32,21 +32,21 @@ fn language_identifier_from_str_bench(c: &mut Criterion) {
 }
 
 fn language_identifier_from_parts_bench(c: &mut Criterion) {
-    let entries: Vec<(Option<&str>, Option<&str>, Option<&str>, Vec<&str>)> = vec![
-        (Some("en"), None, Some("US"), vec![]),
-        (Some("en"), None, Some("GB"), vec![]),
-        (Some("es"), None, Some("AR"), vec![]),
-        (Some("it"), None, None, vec![]),
-        (Some("zh"), Some("Hans"), Some("CN"), vec![]),
-        (Some("de"), None, Some("AT"), vec![]),
-        (Some("pl"), None, None, vec![]),
-        (Some("fr"), None, Some("FR"), vec![]),
-        (Some("de"), None, Some("AT"), vec![]),
-        (Some("sr"), Some("Cyrl"), Some("SR"), vec![]),
-        (Some("nb"), None, Some("NO"), vec![]),
-        (Some("fr"), None, Some("FR"), vec![]),
-        (Some("mk"), None, None, vec![]),
-        (Some("uk"), None, None, vec![]),
+    let entries: Vec<(Option<&str>, Option<&str>, Option<&str>, Option<Vec<&str>>)> = vec![
+        (Some("en"), None, Some("US"), None),
+        (Some("en"), None, Some("GB"), None),
+        (Some("es"), None, Some("AR"), None),
+        (Some("it"), None, None, None),
+        (Some("zh"), Some("Hans"), Some("CN"), None),
+        (Some("de"), None, Some("AT"), None),
+        (Some("pl"), None, None, None),
+        (Some("fr"), None, Some("FR"), None),
+        (Some("de"), None, Some("AT"), None),
+        (Some("sr"), Some("Cyrl"), Some("SR"), None),
+        (Some("nb"), None, Some("NO"), None),
+        (Some("fr"), None, Some("FR"), None),
+        (Some("mk"), None, None, None),
+        (Some("uk"), None, None, None),
     ];
     c.bench_function("language_identifier_from_parts", move |b| {
         b.iter(|| {
@@ -55,7 +55,7 @@ fn language_identifier_from_parts_bench(c: &mut Criterion) {
                     language.as_ref(),
                     region.as_ref(),
                     script.as_ref(),
-                    variants,
+                    variants.as_ref(),
                 );
             }
         })
