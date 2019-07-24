@@ -4,6 +4,12 @@
 
   - …
 
+## unic-locale 0.3.0 (July 24, 2019)
+
+  - Switch variants to handle Option for ergonomics
+  - Extend fixtures coverage
+  - Introduce From/Into/AsRef helpers
+
 ## unic-locale 0.2.0 (July 9, 2019)
 
   - Expose LanguageIdentifier from unic_locale
