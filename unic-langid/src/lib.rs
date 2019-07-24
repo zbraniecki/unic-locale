@@ -2,8 +2,8 @@ pub mod errors;
 pub mod parser;
 pub mod subtags;
 
-use std::convert::TryFrom;
 use crate::errors::LanguageIdentifierError;
+use std::convert::TryFrom;
 
 #[derive(Default, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct LanguageIdentifier {
@@ -18,31 +18,31 @@ impl LanguageIdentifier {
         Default::default()
     }
 
-    pub fn from_parts(
-        language: Option<&str>,
-        script: Option<&str>,
-        region: Option<&str>,
-        variants: &[&str],
+    pub fn from_parts<S: AsRef<str>, V: AsRef<str>>(
+        language: Option<S>,
+        script: Option<S>,
+        region: Option<S>,
+        variants: impl IntoIterator<Item = V>,
     ) -> Result<Self, LanguageIdentifierError> {
         let language = if let Some(subtag) = language {
-            subtags::parse_language_subtag(subtag)?
+            subtags::parse_language_subtag(subtag.as_ref())?
         } else {
             None
         };
         let script = if let Some(subtag) = script {
-            Some(subtags::parse_script_subtag(subtag)?)
+            Some(subtags::parse_script_subtag(subtag.as_ref())?)
         } else {
             None
         };
         let region = if let Some(subtag) = region {
-            Some(subtags::parse_region_subtag(subtag)?)
+            Some(subtags::parse_region_subtag(subtag.as_ref())?)
         } else {
             None
         };
         let mut variants_field = vec![];
 
         for variant in variants {
-            variants_field.push(subtags::parse_variant_subtag(variant)?);
+            variants_field.push(subtags::parse_variant_subtag(variant.as_ref())?);
         }
         variants_field.sort();
         Ok(Self {
