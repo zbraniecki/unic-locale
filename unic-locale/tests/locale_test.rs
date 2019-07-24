@@ -18,7 +18,7 @@ fn assert_parsed_locale_identifier(input: &str, extensions: &ExtensionsMap) {
 fn test_basic() {
     let loc = Locale::try_from("en-US").unwrap();
     let loc2 = Locale {
-        langid: LanguageIdentifier::from_parts(Some("en"), None, Some("US"), &[]).unwrap(),
+        langid: LanguageIdentifier::from_parts(Some("en"), None, Some("US"), None).unwrap(),
         extensions: ExtensionsMap::default(),
     };
     assert_eq!(loc, loc2);
@@ -27,9 +27,9 @@ fn test_basic() {
 #[test]
 fn test_from_parts() {
     let extensions = ExtensionsMap::default();
-    let loc = Locale::from_parts(Some("en"), None, None, &[], Some(extensions)).unwrap();
+    let loc = Locale::from_parts(Some("en"), None, None, None, Some(extensions)).unwrap();
     let loc2 = Locale {
-        langid: LanguageIdentifier::from_parts(Some("en"), None, None, &[]).unwrap(),
+        langid: LanguageIdentifier::from_parts(Some("en"), None, None, None).unwrap(),
         extensions: ExtensionsMap::default(),
     };
     assert_eq!(loc, loc2);

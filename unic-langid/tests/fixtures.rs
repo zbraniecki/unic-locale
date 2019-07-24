@@ -50,10 +50,10 @@ fn test_langid_fixtures(path: &str) {
         match test.output {
             LangIdTestOutput::Object(o) => {
                 let expected = LanguageIdentifier::from_parts(
-                    o.language.as_ref(),
-                    o.script.as_ref(),
-                    o.region.as_ref(),
-                    o.variants.as_ref(),
+                    o.language,
+                    o.script,
+                    o.region,
+                    o.variants.as_ref().map(|v| v.as_slice()),
                 )
                 .expect("Parsing failed.");
                 assert_eq!(langid, expected);

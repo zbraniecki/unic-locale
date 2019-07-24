@@ -18,11 +18,11 @@ impl Locale {
         Default::default()
     }
 
-    pub fn from_parts(
-        language: Option<&str>,
-        script: Option<&str>,
-        region: Option<&str>,
-        variants: &[&str],
+    pub fn from_parts<S: AsRef<str>>(
+        language: Option<S>,
+        script: Option<S>,
+        region: Option<S>,
+        variants: Option<&[S]>,
         extensions: Option<extensions::ExtensionsMap>,
     ) -> Result<Self, LocaleError> {
         let langid = LanguageIdentifier::from_parts(language, script, region, variants)?;

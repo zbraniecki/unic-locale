@@ -18,11 +18,11 @@ impl LanguageIdentifier {
         Default::default()
     }
 
-    pub fn from_parts<S: AsRef<str>, V: AsRef<str>>(
+    pub fn from_parts<S: AsRef<str>>(
         language: Option<S>,
         script: Option<S>,
         region: Option<S>,
-        variants: Option<impl IntoIterator<Item = V>>,
+        variants: Option<&[S]>,
     ) -> Result<Self, LanguageIdentifierError> {
         let language = if let Some(subtag) = language {
             subtags::parse_language_subtag(subtag.as_ref())?
