@@ -1,6 +1,7 @@
 use crate::parser::errors::ParserError;
+use std::borrow::Cow;
 
-pub fn parse_language_subtag(subtag: &str) -> Result<Option<String>, ParserError> {
+pub fn parse_language_subtag(subtag: &str) -> Result<Option<Cow<'static, str>>, ParserError> {
     let slen = subtag.len();
 
     if slen < 2 || slen > 8 || slen == 4 || subtag.contains(|c: char| !c.is_ascii_alphabetic()) {
@@ -12,11 +13,11 @@ pub fn parse_language_subtag(subtag: &str) -> Result<Option<String>, ParserError
     if value == "und" {
         Ok(None)
     } else {
-        Ok(Some(value))
+        Ok(Some(Cow::from(value)))
     }
 }
 
-pub fn parse_script_subtag(subtag: &str) -> Result<String, ParserError> {
+pub fn parse_script_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserError> {
     let slen = subtag.len();
 
     if slen != 4 || subtag.contains(|c: char| !c.is_ascii_alphabetic()) {
@@ -24,22 +25,22 @@ pub fn parse_script_subtag(subtag: &str) -> Result<String, ParserError> {
     }
     let mut result = subtag.to_ascii_lowercase();
     result[0..1].make_ascii_uppercase();
-    Ok(result)
+    Ok(result.into())
 }
 
-pub fn parse_region_subtag(subtag: &str) -> Result<String, ParserError> {
+pub fn parse_region_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserError> {
     let slen = subtag.len();
 
     if slen == 2 && !subtag.contains(|c: char| !c.is_ascii_alphabetic())
         || slen == 3 && !subtag.contains(|c: char| !c.is_ascii_digit())
     {
-        Ok(subtag.to_ascii_uppercase())
+        Ok(subtag.to_ascii_uppercase().into())
     } else {
         Err(ParserError::InvalidSubtag)
     }
 }
 
-pub fn parse_variant_subtag(subtag: &str) -> Result<String, ParserError> {
+pub fn parse_variant_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserError> {
     let slen = subtag.len();
 
     if slen < 4 || slen > 8 {
@@ -57,5 +58,5 @@ pub fn parse_variant_subtag(subtag: &str) -> Result<String, ParserError> {
         return Err(ParserError::InvalidSubtag);
     }
 
-    Ok(subtag.to_ascii_lowercase())
+    Ok(subtag.to_ascii_lowercase().into())
 }

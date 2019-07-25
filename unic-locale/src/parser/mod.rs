@@ -3,7 +3,6 @@ pub mod errors;
 pub use self::errors::ParserError;
 use super::extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
 use super::Locale;
-use std::convert::TryFrom;
 use unic_langid::parser::parse_language_identifier;
 
 static SEPARATORS: &[u8] = &[b'-', b'_'];
@@ -53,7 +52,8 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
                 if let Some(current_type) = current_type {
                     match current_type {
                         ExtensionType::Unicode => {
-                            let key = UnicodeExtensionKey::try_from(current_key)
+                            let key: UnicodeExtensionKey = current_key
+                                .parse()
                                 .map_err(|_| ParserError::InvalidExtension)?;
                             result
                                 .set_unicode_value(key, None)
@@ -70,8 +70,7 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
                     return Err(ParserError::InvalidExtension);
                 }
             }
-            current_type =
-                Some(ExtensionType::try_from(subtag).map_err(|_| ParserError::InvalidExtension)?);
+            current_type = Some(subtag.parse().map_err(|_| ParserError::InvalidExtension)?);
             continue;
         }
 
@@ -79,7 +78,8 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
             if let Some(current_key) = current_key.take() {
                 match current_type {
                     ExtensionType::Unicode => {
-                        let key = UnicodeExtensionKey::try_from(current_key)
+                        let key: UnicodeExtensionKey = current_key
+                            .parse()
                             .map_err(|_| ParserError::InvalidExtension)?;
                         result
                             .set_unicode_value(key, Some(subtag))
@@ -103,7 +103,8 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
         if let Some(current_type) = current_type {
             match current_type {
                 ExtensionType::Unicode => {
-                    let key = UnicodeExtensionKey::try_from(current_key)
+                    let key: UnicodeExtensionKey = current_key
+                        .parse()
                         .map_err(|_| ParserError::InvalidExtension)?;
                     result
                         .set_unicode_value(key, None)

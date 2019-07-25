@@ -8,11 +8,9 @@ Usage
 -----
 
 ```rust
-use std::convert::TryFrom;
-
 use unic_locale::{Locale, ExtensionType};
 
-let loc = Locale::try_from("en-US-u-hc-h12")
+let loc: Locale = "en-US-u-hc-h12".parse()
     .expect("Parsing.failed");
 
 assert_eq!(loc.get_language(), "en");

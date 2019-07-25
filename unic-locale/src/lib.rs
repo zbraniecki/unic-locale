@@ -4,7 +4,7 @@ pub mod parser;
 
 use errors::LocaleError;
 pub use extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
-use std::convert::TryFrom;
+use std::str::FromStr;
 pub use unic_langid::LanguageIdentifier;
 
 #[derive(Debug, Default, PartialEq, Clone)]
@@ -50,7 +50,7 @@ impl Locale {
             .map_err(std::convert::Into::into)
     }
 
-    pub fn get_script(&self) -> &Option<String> {
+    pub fn get_script(&self) -> Option<&str> {
         self.langid.get_script()
     }
 
@@ -60,7 +60,7 @@ impl Locale {
             .map_err(std::convert::Into::into)
     }
 
-    pub fn get_region(&self) -> &Option<String> {
+    pub fn get_region(&self) -> Option<&str> {
         self.langid.get_region()
     }
 
@@ -70,7 +70,7 @@ impl Locale {
             .map_err(std::convert::Into::into)
     }
 
-    pub fn get_variants(&self) -> &[String] {
+    pub fn get_variants(&self) -> Vec<&str> {
         self.langid.get_variants()
     }
 
@@ -88,7 +88,7 @@ impl Locale {
     ) -> Result<(), LocaleError> {
         match extension {
             ExtensionType::Unicode => {
-                let k = UnicodeExtensionKey::try_from(key)?;
+                let k = UnicodeExtensionKey::from_str(key)?;
                 self.extensions.set_unicode_value(k, value)
             }
             _ => unimplemented!(),
@@ -96,19 +96,11 @@ impl Locale {
     }
 }
 
-impl TryFrom<&str> for Locale {
-    type Error = LocaleError;
+impl FromStr for Locale {
+    type Err = LocaleError;
 
-    fn try_from(source: &str) -> Result<Self, Self::Error> {
+    fn from_str(source: &str) -> Result<Self, Self::Err> {
         parser::parse_locale(source).map_err(std::convert::Into::into)
-    }
-}
-
-impl TryFrom<String> for Locale {
-    type Error = LocaleError;
-
-    fn try_from(source: String) -> Result<Self, Self::Error> {
-        parser::parse_locale(&source).map_err(std::convert::Into::into)
     }
 }
 
@@ -146,6 +138,6 @@ impl std::fmt::Display for Locale {
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LocaleError> {
-    let locale = Locale::try_from(input)?;
+    let locale: Locale = input.parse()?;
     Ok(locale.to_string())
 }

@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use std::error::Error;
 use std::fs::File;
 use std::path::Path;
@@ -45,7 +44,7 @@ fn test_langid_fixtures(path: &str) {
     for test in tests {
         let s = test.input.string;
 
-        let langid = LanguageIdentifier::try_from(s).expect("Parsing failed.");
+        let langid: LanguageIdentifier = s.parse().expect("Parsing failed.");
 
         match test.output {
             LangIdTestOutput::Object(o) => {

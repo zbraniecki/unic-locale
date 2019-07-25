@@ -8,11 +8,9 @@ Usage
 -----
 
 ```rust
-use std::convert::TryFrom;
-
 use unic_langid::LanguageIdentifier;
 
-let loc = LanguageIdentifier::try_from("en-US").expect("Parsing failed.");
+let loc: LanguageIdentifier = "en-US".parse().expect("Parsing failed.");
 
 assert_eq!(loc.get_language(), "en");
 assert_eq!(loc.get_script(), None);
@@ -24,8 +22,6 @@ assert_eq!(&loc.to_string(), "en-Latn-US");
 ```
 
 ```rust
-use std::convert::TryFrom;
-
 use unic_langid::LanguageIdentifier;
 
 let langid = LanguageIdentifier::from_parts(

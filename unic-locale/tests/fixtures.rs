@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::convert::TryFrom;
-use std::convert::TryInto;
 use std::error::Error;
 use std::fs::File;
 use std::path::Path;
@@ -46,15 +44,11 @@ fn read_locale_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LocaleTestSet>, B
 fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> ExtensionsMap {
     let mut result = ExtensionsMap::default();
     for (key, map) in map {
-        let t: ExtensionType = key
-            .as_str()
-            .try_into()
-            .expect("Failed to format extension type.");
+        let t: ExtensionType = key.parse().expect("Failed to format extension type.");
         for (key, value) in map {
             match t {
                 ExtensionType::Unicode => {
-                    let k: UnicodeExtensionKey =
-                        key.as_str().try_into().expect("Key type unimplemented.");
+                    let k: UnicodeExtensionKey = key.parse().expect("Key type unimplemented.");
                     result
                         .set_unicode_value(k, Some(value.as_str()))
                         .expect("Setting extension value failed.");
@@ -72,14 +66,11 @@ fn test_locale_fixtures(path: &str) {
     for test in tests {
         let s = test.input.string;
 
-        let mut locale = Locale::try_from(s).expect("Parsing failed.");
+        let mut locale: Locale = s.parse().expect("Parsing failed.");
 
         if let Some(extensions) = test.input.extensions {
             for (key, map) in extensions {
-                let k: ExtensionType = key
-                    .as_str()
-                    .try_into()
-                    .expect("Failed to parse extension type.");
+                let k: ExtensionType = key.parse().expect("Failed to parse extension type.");
                 for (key, value) in map {
                     locale
                         .set_extension(k, key.as_str(), Some(value.as_str()))

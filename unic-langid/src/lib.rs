@@ -3,14 +3,15 @@ pub mod parser;
 pub mod subtags;
 
 use crate::errors::LanguageIdentifierError;
-use std::convert::TryFrom;
+use std::borrow::Cow;
+use std::str::FromStr;
 
 #[derive(Default, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct LanguageIdentifier {
-    language: Option<String>,
-    script: Option<String>,
-    region: Option<String>,
-    variants: Vec<String>,
+    language: Option<Cow<'static, str>>,
+    script: Option<Cow<'static, str>>,
+    region: Option<Cow<'static, str>>,
+    variants: Vec<Cow<'static, str>>,
 }
 
 impl LanguageIdentifier {
@@ -73,7 +74,7 @@ impl LanguageIdentifier {
     }
 
     pub fn get_language(&self) -> &str {
-        self.language.as_ref().map(String::as_str).unwrap_or("und")
+        self.language.as_ref().map(|s| s.as_ref()).unwrap_or("und")
     }
 
     pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError> {
@@ -85,8 +86,8 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    pub fn get_script(&self) -> &Option<String> {
-        &self.script
+    pub fn get_script(&self) -> Option<&str> {
+        self.script.as_ref().map(|s| s.as_ref())
     }
 
     pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
@@ -98,8 +99,8 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    pub fn get_region(&self) -> &Option<String> {
-        &self.region
+    pub fn get_region(&self) -> Option<&str> {
+        self.region.as_ref().map(|s| s.as_ref())
     }
 
     pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
@@ -111,8 +112,8 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    pub fn get_variants(&self) -> &[String] {
-        &self.variants
+    pub fn get_variants(&self) -> Vec<&str> {
+        self.variants.iter().map(|s| s.as_ref()).collect()
     }
 
     pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
@@ -125,26 +126,10 @@ impl LanguageIdentifier {
     }
 }
 
-impl TryFrom<&str> for LanguageIdentifier {
-    type Error = LanguageIdentifierError;
+impl FromStr for LanguageIdentifier {
+    type Err = LanguageIdentifierError;
 
-    fn try_from(source: &str) -> Result<Self, Self::Error> {
-        parser::parse_language_identifier(source).map_err(std::convert::Into::into)
-    }
-}
-
-impl TryFrom<String> for LanguageIdentifier {
-    type Error = LanguageIdentifierError;
-
-    fn try_from(source: String) -> Result<Self, Self::Error> {
-        parser::parse_language_identifier(&source).map_err(std::convert::Into::into)
-    }
-}
-
-impl TryFrom<&String> for LanguageIdentifier {
-    type Error = LanguageIdentifierError;
-
-    fn try_from(source: &String) -> Result<Self, Self::Error> {
+    fn from_str(source: &str) -> Result<Self, Self::Err> {
         parser::parse_language_identifier(source).map_err(std::convert::Into::into)
     }
 }
@@ -168,24 +153,29 @@ impl std::fmt::Display for LanguageIdentifier {
             subtags.push(variant);
         }
 
-        write!(f, "{}", subtags.join("-"))
+        f.write_str(&subtags.join("-"))
     }
 }
 
 fn subtag_matches(
-    subtag1: &Option<String>,
-    subtag2: &Option<String>,
+    subtag1: &Option<Cow<'static, str>>,
+    subtag2: &Option<Cow<'static, str>>,
     as_range1: bool,
     as_range2: bool,
 ) -> bool {
     (as_range1 && subtag1.is_none()) || (as_range2 && subtag2.is_none()) || subtag1 == subtag2
 }
 
-fn subtags_match(subtag1: &[String], subtag2: &[String], as_range1: bool, as_range2: bool) -> bool {
+fn subtags_match(
+    subtag1: &[Cow<'static, str>],
+    subtag2: &[Cow<'static, str>],
+    as_range1: bool,
+    as_range2: bool,
+) -> bool {
     (as_range1 && subtag1.is_empty()) || (as_range2 && subtag2.is_empty()) || subtag1 == subtag2
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {
-    let lang_id = LanguageIdentifier::try_from(input)?;
+    let lang_id: LanguageIdentifier = input.parse()?;
     Ok(lang_id.to_string())
 }

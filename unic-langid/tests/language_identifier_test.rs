@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use unic_langid::parser::parse_language_identifier;
 use unic_langid::LanguageIdentifier;
 
@@ -10,15 +9,9 @@ fn assert_language_identifier(
     variants: Option<&[&str]>,
 ) {
     assert_eq!(loc.get_language(), language.unwrap_or("und"));
-    assert_eq!(loc.get_script().as_ref().map(String::as_str), script);
-    assert_eq!(loc.get_region().as_ref().map(String::as_str), region);
-    assert_eq!(
-        loc.get_variants()
-            .iter()
-            .map(String::as_str)
-            .collect::<Vec<&str>>(),
-        variants.unwrap_or(&[])
-    );
+    assert_eq!(loc.get_script(), script);
+    assert_eq!(loc.get_region(), region);
+    assert_eq!(loc.get_variants(), variants.unwrap_or(&[]));
 }
 
 fn assert_parsed_language_identifier(
@@ -35,6 +28,7 @@ fn assert_parsed_language_identifier(
 #[test]
 fn test_language_identifier_parser() {
     assert_parsed_language_identifier("pl", Some("pl"), None, None, None);
+    assert_parsed_language_identifier("und", None, None, None, None);
     assert_parsed_language_identifier("en-US", Some("en"), None, Some("US"), None);
     assert_parsed_language_identifier("en-Latn-US", Some("en"), Some("Latn"), Some("US"), None);
     assert_parsed_language_identifier("sl-nedis", Some("sl"), None, None, Some(&["nedis"]));
@@ -50,13 +44,13 @@ fn test_language_casing() {
 
 #[test]
 fn test_serialize_langid() {
-    let langid = LanguageIdentifier::try_from("en-Latn-US").unwrap();
+    let langid: LanguageIdentifier = "en-Latn-US".parse().unwrap();
     assert_eq!(&langid.to_string(), "en-Latn-US");
 }
 
 #[test]
 fn test_sorted_variants() {
-    let langid = LanguageIdentifier::try_from("en-nedis-macos").unwrap();
+    let langid: LanguageIdentifier = "en-nedis-macos".parse().unwrap();
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 
     let langid =

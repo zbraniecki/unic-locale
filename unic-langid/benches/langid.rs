@@ -1,7 +1,6 @@
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
-use std::convert::TryFrom;
 
 use unic_langid::LanguageIdentifier;
 
@@ -25,14 +24,14 @@ fn language_identifier_from_str_bench(c: &mut Criterion) {
     c.bench_function("language_identifier_from_str", move |b| {
         b.iter(|| {
             for s in strings {
-                let _ = LanguageIdentifier::try_from(*s);
+                let _: Result<LanguageIdentifier, _> = s.parse();
             }
         })
     });
 }
 
 fn language_identifier_from_parts_bench(c: &mut Criterion) {
-    let entries: Vec<(Option<&str>, Option<&str>, Option<&str>, Option<Vec<&str>>)> = vec![
+    let entries: Vec<(Option<&str>, Option<&str>, Option<&str>, Option<&[&&str]>)> = vec![
         (Some("en"), None, Some("US"), None),
         (Some("en"), None, Some("GB"), None),
         (Some("es"), None, Some("AR"), None),
@@ -55,7 +54,7 @@ fn language_identifier_from_parts_bench(c: &mut Criterion) {
                     language.as_ref(),
                     region.as_ref(),
                     script.as_ref(),
-                    variants.as_ref(),
+                    *variants,
                 );
             }
         })

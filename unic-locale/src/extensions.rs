@@ -1,4 +1,4 @@
-use std::convert::TryFrom;
+use std::str::FromStr;
 
 use crate::errors::LocaleError;
 use crate::parser::{parse_extension_subtags, ParserError};
@@ -11,10 +11,10 @@ pub enum ExtensionType {
     Private,
 }
 
-impl TryFrom<&str> for ExtensionType {
-    type Error = LocaleError;
+impl FromStr for ExtensionType {
+    type Err = LocaleError;
 
-    fn try_from(key: &str) -> Result<Self, Self::Error> {
+    fn from_str(key: &str) -> Result<Self, Self::Err> {
         match key {
             "u" => Ok(ExtensionType::Unicode),
             "t" => Ok(ExtensionType::Transform),
@@ -53,10 +53,10 @@ pub enum UnicodeExtensionKey {
     NumericalSystem,
 }
 
-impl TryFrom<&str> for UnicodeExtensionKey {
-    type Error = LocaleError;
+impl FromStr for UnicodeExtensionKey {
+    type Err = LocaleError;
 
-    fn try_from(source: &str) -> Result<Self, Self::Error> {
+    fn from_str(source: &str) -> Result<Self, Self::Err> {
         match source {
             "hc" => Ok(UnicodeExtensionKey::HourCycle),
             "ca" => Ok(UnicodeExtensionKey::Calendar),
@@ -139,10 +139,10 @@ impl ExtensionsMap {
     }
 }
 
-impl TryFrom<&str> for ExtensionsMap {
-    type Error = ParserError;
+impl FromStr for ExtensionsMap {
+    type Err = ParserError;
 
-    fn try_from(source: &str) -> Result<Self, Self::Error> {
+    fn from_str(source: &str) -> Result<Self, Self::Err> {
         parse_extension_subtags(source)
     }
 }
