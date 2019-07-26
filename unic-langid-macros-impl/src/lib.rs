@@ -39,6 +39,6 @@ pub fn langid(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(quote! {
-        ::unic_langid::LanguageIdentifier::from_parts(#lang, #script, #region, #variants).expect("must parse")
+        ::unic_langid_impl::LanguageIdentifier::from_parts(#lang, #script, #region, #variants).expect("must parse")
     })
 }
