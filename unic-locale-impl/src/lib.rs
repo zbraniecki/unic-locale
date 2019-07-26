@@ -32,6 +32,20 @@ impl Locale {
         })
     }
 
+    pub fn from_parts_unchecked(
+        language: Option<&'static str>,
+        script: Option<&'static str>,
+        region: Option<&'static str>,
+        variants: Option<&[&'static str]>,
+        extensions: Option<extensions::ExtensionsMap>,
+    ) -> Self {
+        let langid = LanguageIdentifier::from_parts_unchecked(language, script, region, variants);
+        Self {
+            langid,
+            extensions: extensions.unwrap_or_default(),
+        }
+    }
+
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
         if !self.extensions.get_private().is_empty() || !other.extensions.get_private().is_empty() {
             return false;

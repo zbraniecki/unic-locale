@@ -57,6 +57,24 @@ impl LanguageIdentifier {
         })
     }
 
+    pub fn from_parts_unchecked(
+        language: Option<&'static str>,
+        script: Option<&'static str>,
+        region: Option<&'static str>,
+        variants: Option<&[&'static str]>,
+    ) -> Self {
+        Self {
+            language: language.map(|l| l.into()),
+            script: script.map(|s| s.into()),
+            region: region.map(|r| r.into()),
+            variants: variants.map_or(vec![], |v| {
+                v.iter()
+                    .map(|v| -> Cow<'static, str> { Cow::Borrowed(v) })
+                    .collect()
+            }),
+        }
+    }
+
     pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
         subtag_matches(
             &self.language,

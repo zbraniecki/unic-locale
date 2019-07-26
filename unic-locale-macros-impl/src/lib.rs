@@ -38,6 +38,8 @@ pub fn locale(input: TokenStream) -> TokenStream {
         quote!(Some(&[#(#variants,)*]))
     };
 
+    // We're reparsing the extensions here. It would be nice to just
+    // pass the parsed ones.
     let extensions = parsed.get_extensions().to_string();
     let extensions = if extensions.is_empty() {
         quote!(None)
@@ -45,14 +47,13 @@ pub fn locale(input: TokenStream) -> TokenStream {
         quote!(Some(#extensions))
     };
 
-    // let extensions = quote!(None);
     TokenStream::from(quote! {
-        ::unic_locale_impl::Locale::from_parts(
+        ::unic_locale_impl::Locale::from_parts_unchecked(
             #lang,
             #script,
             #region,
             #variants,
             #extensions.map(|e: &str| e.parse().expect("must parse"))
-        ).expect("must parse")
+        )
     })
 }
