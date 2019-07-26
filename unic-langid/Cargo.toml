@@ -11,7 +11,7 @@ categories = ["internationalization"]
 
 [dependencies]
 unic-langid-impl = "0.4"
-unic-langid-macros = "0.1"
+unic-langid-macros = { version = "0.1", optional = true }
 
 [dev-dependencies]
 unic-langid-macros = "0.1"
