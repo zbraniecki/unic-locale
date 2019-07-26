@@ -6,7 +6,7 @@ use crate::errors::LanguageIdentifierError;
 use std::borrow::Cow;
 use std::str::FromStr;
 
-#[derive(Default, Debug, PartialEq, Eq, Clone)]
+#[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct LanguageIdentifier {
     language: Option<Cow<'static, str>>,
     script: Option<Cow<'static, str>>,
