@@ -4,7 +4,7 @@ use crate::errors::LocaleError;
 use crate::parser::{parse_extension_subtags, ParserError};
 use std::collections::HashMap;
 
-#[derive(Hash, PartialEq, Eq, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ExtensionType {
     Unicode,
     Transform,

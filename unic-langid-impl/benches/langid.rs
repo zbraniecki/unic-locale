@@ -59,6 +59,32 @@ fn language_identifier_from_parts_bench(c: &mut Criterion) {
             }
         })
     });
+
+    let entries2: Vec<(Option<&str>, Option<&str>, Option<&str>, Option<&[&str]>)> = vec![
+        (Some("en"), None, Some("US"), None),
+        (Some("en"), None, Some("GB"), None),
+        (Some("es"), None, Some("AR"), None),
+        (Some("it"), None, None, None),
+        (Some("zh"), Some("Hans"), Some("CN"), None),
+        (Some("de"), None, Some("AT"), None),
+        (Some("pl"), None, None, None),
+        (Some("fr"), None, Some("FR"), None),
+        (Some("de"), None, Some("AT"), None),
+        (Some("sr"), Some("Cyrl"), Some("SR"), None),
+        (Some("nb"), None, Some("NO"), None),
+        (Some("fr"), None, Some("FR"), None),
+        (Some("mk"), None, None, None),
+        (Some("uk"), None, None, None),
+    ];
+    c.bench_function("language_identifier_from_parts_unchecked", move |b| {
+        b.iter(|| {
+            for (language, region, script, variants) in &entries2 {
+                let _ = LanguageIdentifier::from_parts_unchecked(
+                    *language, *region, *script, *variants,
+                );
+            }
+        })
+    });
 }
 
 criterion_group!(

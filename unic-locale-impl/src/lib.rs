@@ -14,10 +14,6 @@ pub struct Locale {
 }
 
 impl Locale {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn from_parts<S: AsRef<str>>(
         language: Option<S>,
         script: Option<S>,
@@ -46,7 +42,13 @@ impl Locale {
         }
     }
 
-    pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
+    pub fn matches<O: AsRef<Self>>(
+        &self,
+        other: &O,
+        self_as_range: bool,
+        other_as_range: bool,
+    ) -> bool {
+        let other = other.as_ref();
         if !self.extensions.get_private().is_empty() || !other.extensions.get_private().is_empty() {
             return false;
         }
@@ -140,6 +142,12 @@ impl Into<LanguageIdentifier> for Locale {
 impl AsRef<LanguageIdentifier> for Locale {
     fn as_ref(&self) -> &LanguageIdentifier {
         &self.langid
+    }
+}
+
+impl AsRef<Locale> for Locale {
+    fn as_ref(&self) -> &Locale {
+        self
     }
 }
 

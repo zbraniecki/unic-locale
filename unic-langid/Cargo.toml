@@ -13,6 +13,9 @@ categories = ["internationalization"]
 unic-langid-impl = { path = "../unic-langid-impl" }
 unic-langid-macros = { path = "../unic-langid-macros", optional = true }
 
+[dev-dependencies]
+unic-langid-macros = { path = "../unic-langid-macros" }
+
 [features]
 default = []
 

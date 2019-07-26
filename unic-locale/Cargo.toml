@@ -14,6 +14,9 @@ unic-langid-impl = { path = "../unic-langid-impl" }
 unic-locale-impl = { path = "../unic-locale-impl" }
 unic-locale-macros = { path = "../unic-locale-macros", optional = true }
 
+[dev-dependencies]
+unic-locale-macros = { path = "../unic-locale-macros" }
+
 [features]
 default = []
 

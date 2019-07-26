@@ -6,7 +6,7 @@ use crate::errors::LanguageIdentifierError;
 use std::borrow::Cow;
 use std::str::FromStr;
 
-#[derive(Default, Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
 pub struct LanguageIdentifier {
     language: Option<Cow<'static, str>>,
     script: Option<Cow<'static, str>>,
@@ -15,10 +15,6 @@ pub struct LanguageIdentifier {
 }
 
 impl LanguageIdentifier {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
     pub fn from_parts<S: AsRef<str>>(
         language: Option<S>,
         script: Option<S>,
@@ -75,7 +71,13 @@ impl LanguageIdentifier {
         }
     }
 
-    pub fn matches(&self, other: &Self, self_as_range: bool, other_as_range: bool) -> bool {
+    pub fn matches<O: AsRef<Self>>(
+        &self,
+        other: &O,
+        self_as_range: bool,
+        other_as_range: bool,
+    ) -> bool {
+        let other = other.as_ref();
         subtag_matches(
             &self.language,
             &other.language,
