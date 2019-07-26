@@ -1,5 +1,7 @@
 [workspace]
 members = [
     "unic-langid",
+    "unic-langid-macros",
+    "unic-langid-macros-impl",
     "unic-locale",
 ]

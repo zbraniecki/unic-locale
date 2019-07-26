@@ -13,6 +13,7 @@ categories = ["internationalization"]
 criterion = "^0.2"
 serde = { version = "^1.0", features = ["derive"] }
 serde_json = "^1.0"
+unic-langid-macros = { path = "../unic-langid-macros" }
 
 [[bench]]
 name = "parser"
