@@ -35,3 +35,20 @@ The API is intended to function similarly to [ICU Locale](http://icu-project.org
 In early tests the performance of parsing a set of language identifiers into a well formed struct, `unic-langid` is [~50 times faster](https://gist.github.com/zbraniecki/016f7bd35fc6e09aede997c5bc20222a) than ICU Locale.
 
 There's a lot of room for improvement since at the moment the crates use `String` fields which can be replaced with variants tailored for short strings, and the parser uses naive parsing, which can also be optimized later.
+
+# Meta-crate
+
+Whoa, I can see you saying, what is it about with all those crates here?
+
+Well, that's an excelent question!
+
+Unless you want a deep dive into procedural macro and [proc-macro-hack](https://github.com/dtolnay/proc-macro-hack), let me just give you a tl;dr:
+
+ - unic-{langid|locale} - User facing public crates that you should use. Potentially with `features = ["macros"]`
+ - unic-{langid|locale|-impl - The real code behind all of this.
+ - unic-{langid|locale}-macro-impl - Actual implementations of the procedural macros
+ - unic-{langid|locale}-macro - Declaration crates for the macros
+
+In result, there's a little bit of hackery here to get everything work nicely for you, but all you should care about are the two top crates with optional features if you want.
+
+The rest will hopefully go away one day once we mature the macros ecosystem in Rust.
