@@ -44,10 +44,10 @@ Well, that's an excelent question!
 
 Unless you want a deep dive into procedural macro and [proc-macro-hack](https://github.com/dtolnay/proc-macro-hack), let me just give you a tl;dr:
 
- - unic-{langid|locale} - User facing public crates that you should use. Potentially with `features = ["macros"]`
- - unic-{langid|locale|-impl - The real code behind all of this.
- - unic-{langid|locale}-macro-impl - Actual implementations of the procedural macros
- - unic-{langid|locale}-macro - Declaration crates for the macros
+ - `unic-{langid|locale}` - User facing public crates that you should use. Potentially with `features = ["macros"]`
+ - `unic-{langid|locale|-impl` - The real code behind all of this.
+ - `unic-{langid|locale}-macro-impl` - Actual implementations of the procedural macros
+ - `unic-{langid|locale}-macro` - Declaration crates for the macros
 
 In result, there's a little bit of hackery here to get everything work nicely for you, but all you should care about are the two top crates with optional features if you want.
 
