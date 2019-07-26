@@ -94,6 +94,10 @@ impl Locale {
             _ => unimplemented!(),
         }
     }
+
+    pub fn get_extensions(&self) -> &extensions::ExtensionsMap {
+        &self.extensions
+    }
 }
 
 impl FromStr for Locale {

@@ -4,4 +4,6 @@ members = [
     "unic-langid-macros",
     "unic-langid-macros-impl",
     "unic-locale",
+    "unic-locale-macros",
+    "unic-locale-macros-impl",
 ]
