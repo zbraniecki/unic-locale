@@ -6,7 +6,7 @@ use proc_macro_hack::proc_macro_hack;
 use quote::quote;
 use syn::{parse_macro_input, LitStr};
 
-use unic_locale::Locale;
+use unic_locale_impl::Locale;
 
 #[proc_macro_hack]
 pub fn locale(input: TokenStream) -> TokenStream {
@@ -47,12 +47,12 @@ pub fn locale(input: TokenStream) -> TokenStream {
 
     // let extensions = quote!(None);
     TokenStream::from(quote! {
-        ::unic_locale::Locale::from_parts(
+        ::unic_locale_impl::Locale::from_parts(
             #lang,
             #script,
             #region,
             #variants,
-            #extensions.map(|e| e.parse().expect("Must parse"))
+            #extensions.map(|e: &str| e.parse().expect("must parse"))
         ).expect("must parse")
     })
 }

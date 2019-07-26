@@ -1,7 +1,7 @@
 use super::parser::ParserError;
 use std::error::Error;
 use std::fmt::{self, Display};
-use unic_langid::errors::LanguageIdentifierError;
+use unic_langid_impl::errors::LanguageIdentifierError;
 
 #[derive(Debug)]
 pub enum LocaleError {

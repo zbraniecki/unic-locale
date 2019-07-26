@@ -12,4 +12,4 @@ categories = ["internationalization"]
 [dependencies]
 proc-macro-hack = "0.5"
 unic-langid-macros-impl = { path = "../unic-langid-macros-impl" }
-unic-langid = { path = "../unic-langid" }
+unic-langid-impl = { path = "../unic-langid-impl" }

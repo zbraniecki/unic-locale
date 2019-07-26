@@ -3,7 +3,7 @@ use std::error::Error;
 use std::fs::File;
 use std::path::Path;
 
-use unic_locale::{ExtensionType, ExtensionsMap, Locale, UnicodeExtensionKey};
+use unic_locale_impl::{ExtensionType, ExtensionsMap, Locale, UnicodeExtensionKey};
 
 use serde::{Deserialize, Serialize};
 

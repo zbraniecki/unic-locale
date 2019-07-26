@@ -2,7 +2,7 @@ use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
 
-use unic_langid::parser::parse_language_identifier;
+use unic_langid_impl::parser::parse_language_identifier;
 
 fn language_identifier_parser_bench(c: &mut Criterion) {
     let strings = &[

@@ -6,7 +6,7 @@ use proc_macro_hack::proc_macro_hack;
 use quote::quote;
 use syn::{parse_macro_input, LitStr};
 
-use unic_langid::LanguageIdentifier;
+use unic_langid_impl::LanguageIdentifier;
 
 #[proc_macro_hack]
 pub fn langid(input: TokenStream) -> TokenStream {

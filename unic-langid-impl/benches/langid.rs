@@ -2,7 +2,7 @@ use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
 
-use unic_langid::LanguageIdentifier;
+use unic_langid_impl::LanguageIdentifier;
 
 fn language_identifier_from_str_bench(c: &mut Criterion) {
     let strings = &[

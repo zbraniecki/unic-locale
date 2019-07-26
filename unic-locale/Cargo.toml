@@ -10,17 +10,12 @@ license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-unic-langid = { path = "../unic-langid" }
+unic-langid-impl = { path = "../unic-langid-impl" }
+unic-locale-impl = { path = "../unic-locale-impl" }
+unic-locale-macros = { path = "../unic-locale-macros", optional = true }
 
-[dev-dependencies]
-criterion = "^0.2"
-serde = { version = "^1.0", features = ["derive"] }
-serde_json = "^1.0"
+[features]
+default = []
 
-[[bench]]
-name = "parser"
-harness = false
-
-[[bench]]
-name = "canonicalize"
-harness = false
+# Provide macros.
+macros = ["unic-locale-macros"]

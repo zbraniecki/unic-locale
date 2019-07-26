@@ -3,7 +3,7 @@ pub mod errors;
 pub use self::errors::ParserError;
 use super::extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
 use super::Locale;
-use unic_langid::parser::parse_language_identifier;
+use unic_langid_impl::parser::parse_language_identifier;
 
 static SEPARATORS: &[u8] = &[b'-', b'_'];
 

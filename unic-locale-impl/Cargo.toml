@@ -1,6 +1,6 @@
 [package]
-name = "unic-langid"
-description = "API for managing Unicode Language Identifiers"
+name = "unic-locale-impl"
+description = "API for managing Unicode Locale Identifiers"
 version = "0.3.0"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
@@ -11,10 +11,16 @@ categories = ["internationalization"]
 
 [dependencies]
 unic-langid-impl = { path = "../unic-langid-impl" }
-unic-langid-macros = { path = "../unic-langid-macros", optional = true }
 
-[features]
-default = []
+[dev-dependencies]
+criterion = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
-# Provide macros.
-macros = ["unic-langid-macros"]
+[[bench]]
+name = "parser"
+harness = false
+
+[[bench]]
+name = "canonicalize"
+harness = false

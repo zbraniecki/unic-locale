@@ -1,5 +1,5 @@
-use unic_langid::parser::parse_language_identifier;
-use unic_langid::LanguageIdentifier;
+use unic_langid_impl::parser::parse_language_identifier;
+use unic_langid_impl::LanguageIdentifier;
 
 fn assert_language_identifier(
     loc: &LanguageIdentifier,

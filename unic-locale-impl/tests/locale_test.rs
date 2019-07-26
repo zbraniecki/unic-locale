@@ -1,7 +1,7 @@
-use unic_langid::LanguageIdentifier;
-use unic_locale::extensions::{ExtensionsMap, UnicodeExtensionKey};
-use unic_locale::parser::parse_locale;
-use unic_locale::Locale;
+use unic_langid_impl::LanguageIdentifier;
+use unic_locale_impl::extensions::{ExtensionsMap, UnicodeExtensionKey};
+use unic_locale_impl::parser::parse_locale;
+use unic_locale_impl::Locale;
 
 fn assert_locale_extensions(loc: &Locale, extensions: &ExtensionsMap) {
     assert_eq!(&loc.extensions, extensions);

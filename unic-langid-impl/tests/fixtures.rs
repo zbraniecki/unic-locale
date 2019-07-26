@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fs::File;
 use std::path::Path;
 
-use unic_langid::LanguageIdentifier;
+use unic_langid_impl::LanguageIdentifier;
 
 use serde::{Deserialize, Serialize};
 
