@@ -39,6 +39,6 @@ pub fn langid(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(quote! {
-        ::unic_langid::LanguageIdentifier::from_parts_unchecked(#lang, #script, #region, #variants)
+        $crate::LanguageIdentifier::from_parts_unchecked(#lang, #script, #region, #variants)
     })
 }

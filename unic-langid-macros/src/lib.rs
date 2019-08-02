@@ -1,4 +1,5 @@
 use proc_macro_hack::proc_macro_hack;
+pub use unic_langid_impl::LanguageIdentifier;
 
 /// Add one to an expression.
 ///

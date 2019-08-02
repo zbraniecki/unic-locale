@@ -12,10 +12,10 @@ categories = ["internationalization"]
 [dependencies]
 unic-langid-impl = "0.4"
 unic-locale-impl = "0.4"
-unic-locale-macros = { version = "0.2", optional = true }
+unic-locale-macros = { path = "../unic-locale-macros", optional = true }
 
 [dev-dependencies]
-unic-locale-macros = "0.2"
+unic-locale-macros = { path = "../unic-locale-macros" }
 
 [features]
 default = []

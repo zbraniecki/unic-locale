@@ -48,7 +48,7 @@ pub fn locale(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(quote! {
-        ::unic_locale::Locale::from_parts_unchecked(
+        $crate::Locale::from_parts_unchecked(
             #lang,
             #script,
             #region,
