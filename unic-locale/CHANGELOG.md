@@ -4,6 +4,10 @@
 
   - …
 
+## unic-locale 0.4.2 (August 2, 2019)
+
+  - Update the macros to 0.3.0.
+
 ## unic-locale 0.4.1 (July 29, 2019)
 
   - Update the macros to 0.2.0 to make the macro work without explicit import of the impl.
