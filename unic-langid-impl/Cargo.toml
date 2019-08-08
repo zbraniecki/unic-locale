@@ -9,6 +9,9 @@ repository = "https://github.com/zbraniecki/unic-locale"
 license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
+[dependencies]
+tinystr = "0.1"
+
 [dev-dependencies]
 criterion = "0.2"
 serde = { version = "1.0", features = ["derive"] }

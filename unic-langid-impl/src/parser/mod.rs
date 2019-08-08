@@ -45,11 +45,12 @@ pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserEr
     }
 
     variants.sort();
+    variants.dedup();
 
     Ok(LanguageIdentifier {
         language,
         script,
         region,
-        variants,
+        variants: variants.into_boxed_slice(),
     })
 }

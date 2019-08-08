@@ -13,32 +13,29 @@ pub fn langid(input: TokenStream) -> TokenStream {
     let id = parse_macro_input!(input as LitStr);
     let parsed: LanguageIdentifier = id.value().parse().expect("Malformed Language Identifier");
 
-    let lang = parsed.get_language();
-    let lang = if lang.is_empty() {
-        quote!(None)
+    let (lang, script, region, variants) = parsed.to_raw_parts();
+    let lang = if let Some(lang) = lang {
+        quote!(Some($crate::TinyStr8::new_unchecked(#lang)))
     } else {
-        quote!(Some(#lang))
+        quote!(None)
     };
-    let script = parsed.get_script();
     let script = if let Some(script) = script {
-        quote!(Some(#script))
+        quote!(Some($crate::TinyStr4::new_unchecked(#script)))
     } else {
         quote!(None)
     };
-    let region = parsed.get_region();
     let region = if let Some(region) = region {
-        quote!(Some(#region))
+        quote!(Some($crate::TinyStr4::new_unchecked(#region)))
     } else {
         quote!(None)
     };
-    let variants = parsed.get_variants();
-    let variants = if variants.is_empty() {
-        quote!(None)
-    } else {
-        quote!(Some(&[#(#variants,)*]))
-    };
+    let variants: Vec<_> = variants
+        .into_iter()
+        .map(|v| quote!($crate::TinyStr8::new_unchecked(#v)))
+        .collect();
+    let variants = quote!(Box::new([#(#variants,)*]));
 
     TokenStream::from(quote! {
-        $crate::LanguageIdentifier::from_parts_unchecked(#lang, #script, #region, #variants)
+        unsafe { $crate::LanguageIdentifier::from_raw_parts_unchecked(#lang, #script, #region, #variants) }
     })
 }

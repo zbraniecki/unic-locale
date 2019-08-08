@@ -1,46 +1,55 @@
 use crate::parser::errors::ParserError;
-use std::borrow::Cow;
+use tinystr::{TinyStr4, TinyStr8};
 
-pub fn parse_language_subtag(subtag: &str) -> Result<Option<Cow<'static, str>>, ParserError> {
+pub fn parse_language_subtag(subtag: &str) -> Result<Option<TinyStr8>, ParserError> {
     let slen = subtag.len();
 
-    if slen < 2 || slen > 8 || slen == 4 || subtag.contains(|c: char| !c.is_ascii_alphabetic()) {
+    let s: TinyStr8 = subtag.parse().map_err(|_| ParserError::InvalidLanguage)?;
+    if slen < 2 || slen > 8 || slen == 4 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidLanguage);
     }
 
-    let value = subtag.to_ascii_lowercase();
+    let value = s.to_ascii_lowercase();
 
     if value == "und" {
         Ok(None)
     } else {
-        Ok(Some(Cow::from(value)))
+        Ok(Some(value))
     }
 }
 
-pub fn parse_script_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserError> {
+pub fn parse_script_subtag(subtag: &str) -> Result<TinyStr4, ParserError> {
     let slen = subtag.len();
 
-    if slen != 4 || subtag.contains(|c: char| !c.is_ascii_alphabetic()) {
+    let s: TinyStr4 = subtag.parse().map_err(|_| ParserError::InvalidSubtag)?;
+    if slen != 4 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
-    let mut result = subtag.to_ascii_lowercase();
-    result[0..1].make_ascii_uppercase();
-    Ok(result.into())
+    Ok(s.to_ascii_titlecase())
 }
 
-pub fn parse_region_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserError> {
+pub fn parse_region_subtag(subtag: &str) -> Result<TinyStr4, ParserError> {
     let slen = subtag.len();
 
-    if slen == 2 && !subtag.contains(|c: char| !c.is_ascii_alphabetic())
-        || slen == 3 && !subtag.contains(|c: char| !c.is_ascii_digit())
-    {
-        Ok(subtag.to_ascii_uppercase().into())
-    } else {
-        Err(ParserError::InvalidSubtag)
+    match slen {
+        2 => {
+            let s: TinyStr4 = subtag.parse().map_err(|_| ParserError::InvalidSubtag)?;
+            if !s.is_ascii_alphanumeric() {
+                return Err(ParserError::InvalidSubtag);
+            }
+            Ok(s.to_ascii_uppercase())
+        }
+        3 => {
+            if subtag.contains(|c: char| !c.is_ascii_digit()) {
+                return Err(ParserError::InvalidSubtag);
+            }
+            Ok(subtag.parse().unwrap())
+        }
+        _ => Err(ParserError::InvalidSubtag),
     }
 }
 
-pub fn parse_variant_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserError> {
+pub fn parse_variant_subtag(subtag: &str) -> Result<TinyStr8, ParserError> {
     let slen = subtag.len();
 
     if slen < 4 || slen > 8 {
@@ -58,5 +67,7 @@ pub fn parse_variant_subtag(subtag: &str) -> Result<Cow<'static, str>, ParserErr
         return Err(ParserError::InvalidSubtag);
     }
 
-    Ok(subtag.to_ascii_lowercase().into())
+    let s: TinyStr8 = subtag.parse().unwrap();
+
+    Ok(s.to_ascii_lowercase())
 }

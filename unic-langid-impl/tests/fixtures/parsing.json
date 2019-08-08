@@ -147,5 +147,14 @@
     "output": {
       "script": "Latn"
     }
+  },
+  {
+    "input": {
+      "string": "pl-macos-Windows-nedis-macos-nedis-aRabic"
+    },
+    "output": {
+      "language": "pl",
+      "variants": ["arabic", "macos", "nedis", "windows"]
+    }
   }
 ]
