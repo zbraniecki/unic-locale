@@ -8,4 +8,5 @@ members = [
     "unic-locale-impl",
     "unic-locale-macros",
     "unic-locale-macros-impl",
+    "tinystr",
 ]

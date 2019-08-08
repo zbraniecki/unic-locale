@@ -1,0 +1,20 @@
+[package]
+name = "tinystr"
+version = "0.1.0"
+authors = ["Raph Levien <raph.levien@gmail.com>", "Zibi Braniecki <zibi@braniecki.net>"]
+edition = "2018"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "tinystr4"
+harness = false
+
+[[bench]]
+name = "tinystr8"
+harness = false
+
+[[bench]]
+name = "string"
+harness = false
