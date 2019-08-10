@@ -3,15 +3,16 @@ pub mod parser;
 pub mod subtags;
 
 use crate::errors::LanguageIdentifierError;
-use std::borrow::Cow;
 use std::str::FromStr;
+
+use tinystr::{TinyStr4, TinyStr8};
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct LanguageIdentifier {
-    language: Option<Cow<'static, str>>,
-    script: Option<Cow<'static, str>>,
-    region: Option<Cow<'static, str>>,
-    variants: Vec<Cow<'static, str>>,
+    language: Option<TinyStr8>,
+    script: Option<TinyStr4>,
+    region: Option<TinyStr4>,
+    variants: Box<[TinyStr8]>,
 }
 
 impl LanguageIdentifier {
@@ -19,7 +20,7 @@ impl LanguageIdentifier {
         language: Option<S>,
         script: Option<S>,
         region: Option<S>,
-        variants: Option<&[S]>,
+        variants: &[S],
     ) -> Result<Self, LanguageIdentifierError> {
         let language = if let Some(subtag) = language {
             subtags::parse_language_subtag(subtag.as_ref())?
@@ -36,38 +37,42 @@ impl LanguageIdentifier {
         } else {
             None
         };
-        let mut variants_field = vec![];
 
-        if let Some(variants) = variants {
-            for variant in variants {
-                variants_field.push(subtags::parse_variant_subtag(variant.as_ref())?);
-            }
-            variants_field.sort();
+        let mut vars = Vec::with_capacity(variants.len());
+        for variant in variants {
+            vars.push(subtags::parse_variant_subtag(variant.as_ref())?);
         }
+        vars.sort();
+        vars.dedup();
 
         Ok(Self {
             language,
             script,
             region,
-            variants: variants_field,
+            variants: vars.into_boxed_slice(),
         })
     }
 
-    pub fn from_parts_unchecked(
-        language: Option<&'static str>,
-        script: Option<&'static str>,
-        region: Option<&'static str>,
-        variants: Option<&[&'static str]>,
+    pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>) {
+        (
+            self.language.map(|l| l.into()),
+            self.script.map(|s| s.into()),
+            self.region.map(|r| r.into()),
+            self.variants.into_iter().map(|v| (*v).into()).collect(),
+        )
+    }
+
+    pub const unsafe fn from_raw_parts_unchecked(
+        language: Option<TinyStr8>,
+        script: Option<TinyStr4>,
+        region: Option<TinyStr4>,
+        variants: Box<[TinyStr8]>,
     ) -> Self {
         Self {
-            language: language.map(|l| l.into()),
-            script: script.map(|s| s.into()),
-            region: region.map(|r| r.into()),
-            variants: variants.map_or(vec![], |v| {
-                v.iter()
-                    .map(|v| -> Cow<'static, str> { Cow::Borrowed(v) })
-                    .collect()
-            }),
+            language,
+            script,
+            region,
+            variants,
         }
     }
 
@@ -137,11 +142,14 @@ impl LanguageIdentifier {
     }
 
     pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
-        self.variants.clear();
+        let mut result = Vec::with_capacity(variants.len());
         for variant in variants {
-            self.variants.push(subtags::parse_variant_subtag(variant)?);
+            result.push(subtags::parse_variant_subtag(variant)?);
         }
-        self.variants.sort();
+        result.sort();
+        result.dedup();
+
+        self.variants = result.into_boxed_slice();
         Ok(())
     }
 }
@@ -169,7 +177,7 @@ impl std::fmt::Display for LanguageIdentifier {
         if let Some(region) = self.get_region() {
             subtags.push(region);
         }
-        for variant in &self.variants {
+        for variant in self.variants.iter() {
             subtags.push(variant);
         }
 
@@ -177,18 +185,18 @@ impl std::fmt::Display for LanguageIdentifier {
     }
 }
 
-fn subtag_matches(
-    subtag1: &Option<Cow<'static, str>>,
-    subtag2: &Option<Cow<'static, str>>,
+fn subtag_matches<P: PartialEq>(
+    subtag1: &Option<P>,
+    subtag2: &Option<P>,
     as_range1: bool,
     as_range2: bool,
 ) -> bool {
     (as_range1 && subtag1.is_none()) || (as_range2 && subtag2.is_none()) || subtag1 == subtag2
 }
 
-fn subtags_match(
-    subtag1: &[Cow<'static, str>],
-    subtag2: &[Cow<'static, str>],
+fn subtags_match<P: PartialEq>(
+    subtag1: &[P],
+    subtag2: &[P],
     as_range1: bool,
     as_range2: bool,
 ) -> bool {

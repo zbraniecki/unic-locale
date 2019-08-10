@@ -2,6 +2,9 @@
 use unic_langid::langid;
 use unic_langid::LanguageIdentifier;
 
+// This will become possible when Box can be produced in a const fn
+// static LANGID: LanguageIdentifier = langid!("en-US");
+
 fn main() {
     let langid: LanguageIdentifier = "en-US".parse().unwrap();
     println!("{:#?}", langid);

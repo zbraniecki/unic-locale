@@ -16,7 +16,8 @@ struct LangIdTestOutputObject {
     language: Option<String>,
     script: Option<String>,
     region: Option<String>,
-    variants: Option<Vec<String>>,
+    #[serde(default)]
+    variants: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -49,10 +50,14 @@ fn test_langid_fixtures(path: &str) {
         match test.output {
             LangIdTestOutput::Object(o) => {
                 let expected = LanguageIdentifier::from_parts(
-                    o.language,
-                    o.script,
-                    o.region,
-                    o.variants.as_ref().map(|v| v.as_slice()),
+                    o.language.as_ref().map(String::as_str),
+                    o.script.as_ref().map(String::as_str),
+                    o.region.as_ref().map(String::as_str),
+                    o.variants
+                        .iter()
+                        .map(|s| s.as_str())
+                        .collect::<Vec<_>>()
+                        .as_ref(),
                 )
                 .expect("Parsing failed.");
                 assert_eq!(langid, expected);
