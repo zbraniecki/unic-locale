@@ -34,6 +34,7 @@ impl Locale {
         (lang, region, script, variants, self.extensions.to_string())
     }
 
+    #[inline(always)]
     pub unsafe fn from_raw_parts_unchecked(
         language: Option<TinyStr8>,
         script: Option<TinyStr4>,
@@ -153,6 +154,7 @@ impl AsRef<LanguageIdentifier> for Locale {
 }
 
 impl AsRef<Locale> for Locale {
+    #[inline(always)]
     fn as_ref(&self) -> &Locale {
         self
     }

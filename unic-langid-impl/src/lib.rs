@@ -68,6 +68,7 @@ impl LanguageIdentifier {
         )
     }
 
+    #[inline(always)]
     pub const unsafe fn from_raw_parts_unchecked(
         language: Option<TinyStr8>,
         script: Option<TinyStr4>,
@@ -171,6 +172,7 @@ impl FromStr for LanguageIdentifier {
 }
 
 impl AsRef<LanguageIdentifier> for LanguageIdentifier {
+    #[inline(always)]
     fn as_ref(&self) -> &LanguageIdentifier {
         self
     }
