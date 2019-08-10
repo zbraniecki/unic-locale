@@ -13,14 +13,14 @@ pub enum ExtensionType {
 }
 
 impl FromStr for ExtensionType {
-    type Err = LocaleError;
+    type Err = ParserError;
 
     fn from_str(key: &str) -> Result<Self, Self::Err> {
         match key {
             "u" => Ok(ExtensionType::Unicode),
             "t" => Ok(ExtensionType::Transform),
             "x" => Ok(ExtensionType::Private),
-            _ => Err(LocaleError::Unknown),
+            _ => Err(ParserError::InvalidExtension),
         }
     }
 }
@@ -36,26 +36,6 @@ impl std::fmt::Display for ExtensionType {
     }
 }
 
-impl Into<&'static str> for ExtensionType {
-    fn into(self) -> &'static str {
-        match self {
-            ExtensionType::Unicode => "u",
-            ExtensionType::Transform => "t",
-            ExtensionType::Private => "x",
-        }
-    }
-}
-
-impl Into<&'static str> for &ExtensionType {
-    fn into(self) -> &'static str {
-        match self {
-            ExtensionType::Unicode => "u",
-            ExtensionType::Transform => "t",
-            ExtensionType::Private => "x",
-        }
-    }
-}
-
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Ord, PartialOrd)]
 pub enum UnicodeExtensionKey {
     Calendar,
@@ -66,7 +46,7 @@ pub enum UnicodeExtensionKey {
 }
 
 impl FromStr for UnicodeExtensionKey {
-    type Err = LocaleError;
+    type Err = ParserError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
         match source {
@@ -75,7 +55,7 @@ impl FromStr for UnicodeExtensionKey {
             "hc" => Ok(UnicodeExtensionKey::HourCycle),
             "ka" => Ok(UnicodeExtensionKey::Capitalized),
             "nu" => Ok(UnicodeExtensionKey::NumericalSystem),
-            _ => Err(LocaleError::Unknown),
+            _ => Err(ParserError::InvalidExtension),
         }
     }
 }
@@ -90,30 +70,6 @@ impl std::fmt::Display for UnicodeExtensionKey {
             UnicodeExtensionKey::NumericalSystem => "nu",
         };
         f.write_str(s)
-    }
-}
-
-impl Into<&'static str> for UnicodeExtensionKey {
-    fn into(self) -> &'static str {
-        match self {
-            UnicodeExtensionKey::Calendar => "ca",
-            UnicodeExtensionKey::Collation => "co",
-            UnicodeExtensionKey::HourCycle => "hc",
-            UnicodeExtensionKey::Capitalized => "ka",
-            UnicodeExtensionKey::NumericalSystem => "nu",
-        }
-    }
-}
-
-impl Into<&'static str> for &UnicodeExtensionKey {
-    fn into(self) -> &'static str {
-        match self {
-            UnicodeExtensionKey::Calendar => "ca",
-            UnicodeExtensionKey::Collation => "co",
-            UnicodeExtensionKey::HourCycle => "hc",
-            UnicodeExtensionKey::Capitalized => "ka",
-            UnicodeExtensionKey::NumericalSystem => "nu",
-        }
     }
 }
 
@@ -194,11 +150,10 @@ impl std::fmt::Display for ExtensionsMap {
             write!(f, "{}", ExtensionType::Transform)?;
 
             for (key, value) in &self.transform {
-                f.write_char('-')?;
-                f.write_str(key)?;
                 if let Some(value) = value {
-                    f.write_char('-')?;
-                    f.write_str(value)?;
+                    write!(f, "-{}-{}", key, value)?;
+                } else {
+                    write!(f, "-{}", key)?;
                 }
             }
         }
@@ -207,11 +162,10 @@ impl std::fmt::Display for ExtensionsMap {
             write!(f, "{}", ExtensionType::Private)?;
 
             for (key, value) in &self.private {
-                f.write_char('-')?;
-                f.write_str(key)?;
                 if let Some(value) = value {
-                    f.write_char('-')?;
-                    f.write_str(value)?;
+                    write!(f, "-{}-{}", key, value)?;
+                } else {
+                    write!(f, "-{}", key)?;
                 }
             }
         }
