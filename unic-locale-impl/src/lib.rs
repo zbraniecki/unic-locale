@@ -160,13 +160,11 @@ impl AsRef<Locale> for Locale {
 
 impl std::fmt::Display for Locale {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut subtags = vec![self.langid.to_string()];
-        let ext = self.extensions.to_string();
-
-        if !ext.is_empty() {
-            subtags.push(ext);
+        if self.extensions.is_empty() {
+            write!(f, "{}", self.langid)
+        } else {
+            write!(f, "{}-{}", self.langid, self.extensions)
         }
-        write!(f, "{}", subtags.join("-"))
     }
 }
 

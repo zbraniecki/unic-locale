@@ -2,7 +2,8 @@ use std::str::FromStr;
 
 use crate::errors::LocaleError;
 use crate::parser::{parse_extension_subtags, ParserError};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
+use std::fmt::Write;
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ExtensionType {
@@ -21,6 +22,17 @@ impl FromStr for ExtensionType {
             "x" => Ok(ExtensionType::Private),
             _ => Err(LocaleError::Unknown),
         }
+    }
+}
+
+impl std::fmt::Display for ExtensionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let ch = match self {
+            ExtensionType::Unicode => 'u',
+            ExtensionType::Transform => 't',
+            ExtensionType::Private => 'x',
+        };
+        f.write_char(ch)
     }
 }
 
@@ -44,11 +56,11 @@ impl Into<&'static str> for &ExtensionType {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Ord, PartialOrd)]
 pub enum UnicodeExtensionKey {
-    HourCycle,
     Calendar,
     Collation,
+    HourCycle,
     Capitalized,
     NumericalSystem,
 }
@@ -58,9 +70,9 @@ impl FromStr for UnicodeExtensionKey {
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
         match source {
-            "hc" => Ok(UnicodeExtensionKey::HourCycle),
             "ca" => Ok(UnicodeExtensionKey::Calendar),
             "co" => Ok(UnicodeExtensionKey::Collation),
+            "hc" => Ok(UnicodeExtensionKey::HourCycle),
             "ka" => Ok(UnicodeExtensionKey::Capitalized),
             "nu" => Ok(UnicodeExtensionKey::NumericalSystem),
             _ => Err(LocaleError::Unknown),
@@ -68,12 +80,25 @@ impl FromStr for UnicodeExtensionKey {
     }
 }
 
+impl std::fmt::Display for UnicodeExtensionKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let s = match self {
+            UnicodeExtensionKey::Calendar => "ca",
+            UnicodeExtensionKey::Collation => "co",
+            UnicodeExtensionKey::HourCycle => "hc",
+            UnicodeExtensionKey::Capitalized => "ka",
+            UnicodeExtensionKey::NumericalSystem => "nu",
+        };
+        f.write_str(s)
+    }
+}
+
 impl Into<&'static str> for UnicodeExtensionKey {
     fn into(self) -> &'static str {
         match self {
-            UnicodeExtensionKey::HourCycle => "hc",
             UnicodeExtensionKey::Calendar => "ca",
             UnicodeExtensionKey::Collation => "co",
+            UnicodeExtensionKey::HourCycle => "hc",
             UnicodeExtensionKey::Capitalized => "ka",
             UnicodeExtensionKey::NumericalSystem => "nu",
         }
@@ -83,9 +108,9 @@ impl Into<&'static str> for UnicodeExtensionKey {
 impl Into<&'static str> for &UnicodeExtensionKey {
     fn into(self) -> &'static str {
         match self {
-            UnicodeExtensionKey::HourCycle => "hc",
             UnicodeExtensionKey::Calendar => "ca",
             UnicodeExtensionKey::Collation => "co",
+            UnicodeExtensionKey::HourCycle => "hc",
             UnicodeExtensionKey::Capitalized => "ka",
             UnicodeExtensionKey::NumericalSystem => "nu",
         }
@@ -94,21 +119,21 @@ impl Into<&'static str> for &UnicodeExtensionKey {
 
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct ExtensionsMap {
-    unicode: HashMap<UnicodeExtensionKey, Option<String>>,
-    transform: HashMap<String, Option<String>>,
-    private: HashMap<String, Option<String>>,
+    unicode: BTreeMap<UnicodeExtensionKey, Option<String>>,
+    transform: BTreeMap<String, Option<String>>,
+    private: BTreeMap<String, Option<String>>,
 }
 
 impl ExtensionsMap {
-    pub fn get_unicode(&self) -> &HashMap<UnicodeExtensionKey, Option<String>> {
+    pub fn get_unicode(&self) -> &BTreeMap<UnicodeExtensionKey, Option<String>> {
         &self.unicode
     }
 
-    pub fn get_transform(&self) -> &HashMap<String, Option<String>> {
+    pub fn get_transform(&self) -> &BTreeMap<String, Option<String>> {
         &self.transform
     }
 
-    pub fn get_private(&self) -> &HashMap<String, Option<String>> {
+    pub fn get_private(&self) -> &BTreeMap<String, Option<String>> {
         &self.private
     }
 
@@ -137,6 +162,10 @@ impl ExtensionsMap {
             .insert(String::from(key), value.map(String::from));
         Ok(())
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.unicode.is_empty() && self.transform.is_empty() && self.private.is_empty()
+    }
 }
 
 impl FromStr for ExtensionsMap {
@@ -149,61 +178,43 @@ impl FromStr for ExtensionsMap {
 
 impl std::fmt::Display for ExtensionsMap {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut parts: Vec<&str> = vec![];
-
         if !self.unicode.is_empty() {
-            parts.push(ExtensionType::Unicode.into());
+            write!(f, "{}", ExtensionType::Unicode)?;
 
-            let mut keys = vec![];
-            for (k, value) in &self.unicode {
-                keys.push((k.into(), value));
-            }
-
-            keys.sort();
-
-            for (k, v) in keys {
-                parts.push(k);
-                if let Some(v) = v {
-                    parts.push(v);
+            for (key, value) in &self.unicode {
+                if let Some(value) = value {
+                    write!(f, "-{}-{}", key, value)?;
+                } else {
+                    write!(f, "-{}", key)?;
                 }
             }
         }
 
         if !self.transform.is_empty() {
-            parts.push(ExtensionType::Transform.into());
+            write!(f, "{}", ExtensionType::Transform)?;
 
-            let mut keys = vec![];
-            for (k, value) in &self.transform {
-                keys.push((k, value));
-            }
-
-            keys.sort();
-
-            for (k, v) in keys {
-                parts.push(k);
-                if let Some(v) = v {
-                    parts.push(v);
+            for (key, value) in &self.transform {
+                f.write_char('-')?;
+                f.write_str(key)?;
+                if let Some(value) = value {
+                    f.write_char('-')?;
+                    f.write_str(value)?;
                 }
             }
         }
 
         if !self.private.is_empty() {
-            parts.push(ExtensionType::Private.into());
+            write!(f, "{}", ExtensionType::Private)?;
 
-            let mut keys = vec![];
-            for (k, value) in &self.private {
-                keys.push((k, value));
-            }
-
-            keys.sort();
-
-            for (k, v) in keys {
-                parts.push(k);
-                if let Some(v) = v {
-                    parts.push(v);
+            for (key, value) in &self.private {
+                f.write_char('-')?;
+                f.write_str(key)?;
+                if let Some(value) = value {
+                    f.write_char('-')?;
+                    f.write_str(value)?;
                 }
             }
         }
-        write!(f, "{}", parts.join("-"))
+        Ok(())
     }
 }
