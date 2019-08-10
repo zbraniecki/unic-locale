@@ -4,7 +4,12 @@ pub use self::errors::ParserError;
 use crate::subtags;
 use crate::LanguageIdentifier;
 
-pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserError> {
+static SEPARATORS: &[char] = &['-', '_'];
+
+pub fn parse_language_identifier(
+    t: &str,
+    allow_extension: bool,
+) -> Result<(LanguageIdentifier, Option<&str>), ParserError> {
     let mut position = 0;
 
     let mut language = None;
@@ -12,12 +17,24 @@ pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserEr
     let mut region = None;
     let mut variants = vec![];
 
-    for subtag in t.split(|c| ['-', '_'].contains(&c)) {
+    let mut ptr = 0;
+    let mut has_extension = false;
+
+    for subtag in t.split(|c| SEPARATORS.contains(&c)) {
+        let slen = subtag.len();
+
+        ptr += slen + 1;
+
         if position == 0 {
             // Language
             language = subtags::parse_language_subtag(subtag)?;
             position = 1;
             continue;
+        }
+
+        if allow_extension && slen == 1 {
+            has_extension = true;
+            break;
         }
 
         if position == 1 {
@@ -47,10 +64,19 @@ pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserEr
     variants.sort();
     variants.dedup();
 
-    Ok(LanguageIdentifier {
-        language,
-        script,
-        region,
-        variants: variants.into_boxed_slice(),
-    })
+    let exception = if has_extension {
+        Some(&t[ptr - 2..])
+    } else {
+        None
+    };
+
+    Ok((
+        LanguageIdentifier {
+            language,
+            script,
+            region,
+            variants: variants.into_boxed_slice(),
+        },
+        exception,
+    ))
 }

@@ -13,7 +13,7 @@ categories = ["internationalization"]
 proc_macro = true
 
 [dependencies]
-unic-locale-impl = "0.4"
+unic-locale-impl = { path = "../unic-locale-impl" }
 syn = "0.15"
 quote = "0.6"
 proc-macro-hack = "0.5"

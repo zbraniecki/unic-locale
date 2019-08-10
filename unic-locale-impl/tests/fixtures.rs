@@ -18,7 +18,8 @@ struct LocaleTestOutputObject {
     language: Option<String>,
     script: Option<String>,
     region: Option<String>,
-    variants: Option<Vec<String>>,
+    #[serde(default)]
+    variants: Vec<String>,
     extensions: Option<HashMap<String, HashMap<String, String>>>,
 }
 
@@ -82,10 +83,14 @@ fn test_locale_fixtures(path: &str) {
         match test.output {
             LocaleTestOutput::Object(o) => {
                 let expected = Locale::from_parts(
-                    o.language,
-                    o.script,
-                    o.region,
-                    o.variants.as_ref().map(|v| v.as_slice()),
+                    o.language.as_ref().map(String::as_str),
+                    o.script.as_ref().map(String::as_str),
+                    o.region.as_ref().map(String::as_str),
+                    o.variants
+                        .iter()
+                        .map(|s| s.as_str())
+                        .collect::<Vec<_>>()
+                        .as_ref(),
                     o.extensions.map(create_extensions_map),
                 )
                 .expect("Parsing failed.");

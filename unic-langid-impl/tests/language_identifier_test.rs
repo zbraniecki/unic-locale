@@ -22,7 +22,18 @@ fn assert_parsed_language_identifier(
     region: Option<&str>,
     variants: Option<&[&str]>,
 ) {
-    let langid = parse_language_identifier(input).unwrap();
+    let (langid, _) = parse_language_identifier(input, false).unwrap();
+    assert_language_identifier(&langid, language, script, region, variants);
+}
+
+fn assert_parsed_locale(
+    input: &str,
+    language: Option<&str>,
+    script: Option<&str>,
+    region: Option<&str>,
+    variants: Option<&[&str]>,
+) {
+    let (langid, _) = parse_language_identifier(input, true).unwrap();
     assert_language_identifier(&langid, language, script, region, variants);
 }
 
@@ -33,6 +44,21 @@ fn test_language_identifier_parser() {
     assert_parsed_language_identifier("en-US", Some("en"), None, Some("US"), None);
     assert_parsed_language_identifier("en-Latn-US", Some("en"), Some("Latn"), Some("US"), None);
     assert_parsed_language_identifier("sl-nedis", Some("sl"), None, None, Some(&["nedis"]));
+}
+
+#[test]
+fn test_language_identifier_parser_allow_ext() {
+    assert_parsed_locale("en-Latn-US", Some("en"), Some("Latn"), Some("US"), None);
+    assert_parsed_locale(
+        "sl-nedis-x-private-windows",
+        Some("sl"),
+        None,
+        None,
+        Some(&["nedis"]),
+    );
+
+    let s = LanguageIdentifier::from_str("pl-u-hc-h12", true).unwrap();
+    assert_eq!(s.to_string(), "pl");
 }
 
 #[test]

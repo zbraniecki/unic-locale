@@ -16,6 +16,12 @@ pub struct LanguageIdentifier {
 }
 
 impl LanguageIdentifier {
+    pub fn from_str(input: &str, allow_extensions: bool) -> Result<Self, LanguageIdentifierError> {
+        parser::parse_language_identifier(input, allow_extensions)
+            .map_err(std::convert::Into::into)
+            .map(|(langid, _)| langid)
+    }
+
     pub fn from_parts<S: AsRef<str>>(
         language: Option<S>,
         script: Option<S>,
@@ -158,7 +164,9 @@ impl FromStr for LanguageIdentifier {
     type Err = LanguageIdentifierError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        parser::parse_language_identifier(source).map_err(std::convert::Into::into)
+        parser::parse_language_identifier(source, false)
+            .map_err(std::convert::Into::into)
+            .map(|(langid, _)| langid)
     }
 }
 

@@ -5,6 +5,7 @@ pub mod parser;
 use errors::LocaleError;
 pub use extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
 use std::str::FromStr;
+use tinystr::{TinyStr4, TinyStr8};
 pub use unic_langid_impl::LanguageIdentifier;
 
 #[derive(Debug, Default, PartialEq, Clone)]
@@ -18,7 +19,7 @@ impl Locale {
         language: Option<S>,
         script: Option<S>,
         region: Option<S>,
-        variants: Option<&[S]>,
+        variants: &[S],
         extensions: Option<extensions::ExtensionsMap>,
     ) -> Result<Self, LocaleError> {
         let langid = LanguageIdentifier::from_parts(language, script, region, variants)?;
@@ -28,17 +29,23 @@ impl Locale {
         })
     }
 
-    pub fn from_parts_unchecked(
-        language: Option<&'static str>,
-        script: Option<&'static str>,
-        region: Option<&'static str>,
-        variants: Option<&[&'static str]>,
-        extensions: Option<extensions::ExtensionsMap>,
+    pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>, String) {
+        let (lang, region, script, variants) = self.langid.to_raw_parts();
+        (lang, region, script, variants, self.extensions.to_string())
+    }
+
+    pub unsafe fn from_raw_parts_unchecked(
+        language: Option<TinyStr8>,
+        script: Option<TinyStr4>,
+        region: Option<TinyStr4>,
+        variants: Box<[TinyStr8]>,
+        extensions: extensions::ExtensionsMap,
     ) -> Self {
-        let langid = LanguageIdentifier::from_parts_unchecked(language, script, region, variants);
+        let langid =
+            LanguageIdentifier::from_raw_parts_unchecked(language, script, region, variants);
         Self {
             langid,
-            extensions: extensions.unwrap_or_default(),
+            extensions: extensions,
         }
     }
 
