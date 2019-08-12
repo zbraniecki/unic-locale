@@ -1,7 +1,7 @@
 pub mod errors;
 
 pub use self::errors::ParserError;
-use super::extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
+use super::extensions::{ExtensionType, ExtensionsMap};
 use super::Locale;
 use unic_langid_impl::parser::parse_language_identifier;
 
@@ -33,12 +33,9 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
             if let Some(current_key) = current_key.take() {
                 if let Some(current_type) = current_type {
                     match current_type {
-                        ExtensionType::Unicode => {
-                            let key: UnicodeExtensionKey = current_key.parse()?;
-                            result
-                                .set_unicode_value(key, None)
-                                .map_err(|_| ParserError::InvalidExtension)?
-                        }
+                        ExtensionType::Unicode => result
+                            .set_unicode_value(current_key, None)
+                            .map_err(|_| ParserError::InvalidExtension)?,
                         ExtensionType::Transform => result
                             .set_transform_value(current_key, None)
                             .map_err(|_| ParserError::InvalidExtension)?,
@@ -57,12 +54,9 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
         if let Some(current_type) = current_type {
             if let Some(current_key) = current_key.take() {
                 match current_type {
-                    ExtensionType::Unicode => {
-                        let key: UnicodeExtensionKey = current_key.parse()?;
-                        result
-                            .set_unicode_value(key, Some(subtag))
-                            .map_err(|_| ParserError::InvalidExtension)?
-                    }
+                    ExtensionType::Unicode => result
+                        .set_unicode_value(current_key, Some(subtag))
+                        .map_err(|_| ParserError::InvalidExtension)?,
                     ExtensionType::Transform => result
                         .set_transform_value(current_key, Some(subtag))
                         .map_err(|_| ParserError::InvalidExtension)?,
@@ -80,12 +74,9 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
     if let Some(current_key) = current_key.take() {
         if let Some(current_type) = current_type {
             match current_type {
-                ExtensionType::Unicode => {
-                    let key: UnicodeExtensionKey = current_key.parse()?;
-                    result
-                        .set_unicode_value(key, None)
-                        .map_err(|_| ParserError::InvalidExtension)?
-                }
+                ExtensionType::Unicode => result
+                    .set_unicode_value(current_key, None)
+                    .map_err(|_| ParserError::InvalidExtension)?,
                 ExtensionType::Transform => result
                     .set_transform_value(current_key, None)
                     .map_err(|_| ParserError::InvalidExtension)?,

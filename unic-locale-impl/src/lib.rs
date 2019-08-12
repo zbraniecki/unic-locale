@@ -111,10 +111,7 @@ impl Locale {
         value: Option<&str>,
     ) -> Result<(), LocaleError> {
         match extension {
-            ExtensionType::Unicode => {
-                let k = UnicodeExtensionKey::from_str(key)?;
-                self.extensions.set_unicode_value(k, value)
-            }
+            ExtensionType::Unicode => self.extensions.set_unicode_value(key, value),
             _ => unimplemented!(),
         }
     }

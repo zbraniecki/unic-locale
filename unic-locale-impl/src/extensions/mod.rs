@@ -1,3 +1,8 @@
+mod transform;
+mod unicode;
+
+pub use unicode::UnicodeExtensionKey;
+
 use std::str::FromStr;
 
 use crate::errors::LocaleError;
@@ -36,52 +41,15 @@ impl std::fmt::Display for ExtensionType {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, Ord, PartialOrd)]
-pub enum UnicodeExtensionKey {
-    Calendar,
-    Collation,
-    HourCycle,
-    Capitalized,
-    NumericalSystem,
-}
-
-impl FromStr for UnicodeExtensionKey {
-    type Err = ParserError;
-
-    fn from_str(source: &str) -> Result<Self, Self::Err> {
-        match source {
-            "ca" => Ok(UnicodeExtensionKey::Calendar),
-            "co" => Ok(UnicodeExtensionKey::Collation),
-            "hc" => Ok(UnicodeExtensionKey::HourCycle),
-            "ka" => Ok(UnicodeExtensionKey::Capitalized),
-            "nu" => Ok(UnicodeExtensionKey::NumericalSystem),
-            _ => Err(ParserError::InvalidExtension),
-        }
-    }
-}
-
-impl std::fmt::Display for UnicodeExtensionKey {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let s = match self {
-            UnicodeExtensionKey::Calendar => "ca",
-            UnicodeExtensionKey::Collation => "co",
-            UnicodeExtensionKey::HourCycle => "hc",
-            UnicodeExtensionKey::Capitalized => "ka",
-            UnicodeExtensionKey::NumericalSystem => "nu",
-        };
-        f.write_str(s)
-    }
-}
-
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct ExtensionsMap {
-    unicode: BTreeMap<UnicodeExtensionKey, Option<String>>,
+    unicode: BTreeMap<String, Option<String>>,
     transform: BTreeMap<String, Option<String>>,
     private: BTreeMap<String, Option<String>>,
 }
 
 impl ExtensionsMap {
-    pub fn get_unicode(&self) -> &BTreeMap<UnicodeExtensionKey, Option<String>> {
+    pub fn get_unicode(&self) -> &BTreeMap<String, Option<String>> {
         &self.unicode
     }
 
@@ -93,13 +61,10 @@ impl ExtensionsMap {
         &self.private
     }
 
-    pub fn set_unicode_value(
-        &mut self,
-        key: UnicodeExtensionKey,
-        value: Option<&str>,
-    ) -> Result<(), LocaleError> {
+    pub fn set_unicode_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
         //XXX: Validate value
-        self.unicode.insert(key, value.map(String::from));
+        self.unicode
+            .insert(String::from(key), value.map(String::from));
         Ok(())
     }
 

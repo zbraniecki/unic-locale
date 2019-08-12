@@ -49,9 +49,8 @@ fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> Exten
         for (key, value) in map {
             match t {
                 ExtensionType::Unicode => {
-                    let k: UnicodeExtensionKey = key.parse().expect("Key type unimplemented.");
                     result
-                        .set_unicode_value(k, Some(value.as_str()))
+                        .set_unicode_value(&key, Some(value.as_str()))
                         .expect("Setting extension value failed.");
                 }
                 _ => unimplemented!(),

@@ -1,5 +1,4 @@
 use unic_langid_impl::LanguageIdentifier;
-use unic_locale_impl::extensions::UnicodeExtensionKey;
 use unic_locale_impl::parser::parse_locale;
 use unic_locale_impl::{ExtensionsMap, Locale};
 
@@ -38,9 +37,7 @@ fn test_from_parts() {
 #[test]
 fn test_locale_identifier() {
     let mut extensions = ExtensionsMap::default();
-    extensions
-        .set_unicode_value(UnicodeExtensionKey::HourCycle, Some("h12"))
-        .unwrap();
+    extensions.set_unicode_value("hc", Some("h12")).unwrap();
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
     let mut extensions = ExtensionsMap::default();

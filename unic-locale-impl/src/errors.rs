@@ -1,4 +1,4 @@
-use super::parser::ParserError;
+use crate::parser::ParserError;
 use std::error::Error;
 use std::fmt::{self, Display};
 use unic_langid_impl::errors::LanguageIdentifierError;
