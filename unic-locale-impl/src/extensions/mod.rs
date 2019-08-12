@@ -1,7 +1,7 @@
 mod transform;
 mod unicode;
 
-pub use unicode::UnicodeExtensionKey;
+pub use unicode::UnicodeExtensionList;
 
 use std::str::FromStr;
 
@@ -10,21 +10,23 @@ use crate::parser::{parse_extension_subtags, ParserError};
 use std::collections::BTreeMap;
 use std::fmt::Write;
 
+use tinystr::TinyStr4;
+
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ExtensionType {
     Unicode,
     Transform,
+    Other(char),
     Private,
 }
 
-impl FromStr for ExtensionType {
-    type Err = ParserError;
-
-    fn from_str(key: &str) -> Result<Self, Self::Err> {
+impl ExtensionType {
+    pub fn from_char(key: char) -> Result<Self, ParserError> {
         match key {
-            "u" => Ok(ExtensionType::Unicode),
-            "t" => Ok(ExtensionType::Transform),
-            "x" => Ok(ExtensionType::Private),
+            'u' => Ok(ExtensionType::Unicode),
+            't' => Ok(ExtensionType::Transform),
+            'x' => Ok(ExtensionType::Private),
+            sign @ _ if sign.is_ascii_alphanumeric() => Ok(ExtensionType::Other(sign)),
             _ => Err(ParserError::InvalidExtension),
         }
     }
@@ -35,6 +37,7 @@ impl std::fmt::Display for ExtensionType {
         let ch = match self {
             ExtensionType::Unicode => 'u',
             ExtensionType::Transform => 't',
+            ExtensionType::Other(n) => n.clone(),
             ExtensionType::Private => 'x',
         };
         f.write_char(ch)
@@ -43,13 +46,14 @@ impl std::fmt::Display for ExtensionType {
 
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct ExtensionsMap {
-    unicode: BTreeMap<String, Option<String>>,
+    unicode: UnicodeExtensionList,
     transform: BTreeMap<String, Option<String>>,
+    other: BTreeMap<char, BTreeMap<String, Option<String>>>,
     private: BTreeMap<String, Option<String>>,
 }
 
 impl ExtensionsMap {
-    pub fn get_unicode(&self) -> &BTreeMap<String, Option<String>> {
+    pub fn get_unicode(&self) -> &UnicodeExtensionList {
         &self.unicode
     }
 
@@ -62,10 +66,7 @@ impl ExtensionsMap {
     }
 
     pub fn set_unicode_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
-        //XXX: Validate value
-        self.unicode
-            .insert(String::from(key), value.map(String::from));
-        Ok(())
+        self.unicode.set(key, value.map(|s| String::from(s)))
     }
 
     pub fn set_transform_value(
@@ -99,17 +100,7 @@ impl FromStr for ExtensionsMap {
 
 impl std::fmt::Display for ExtensionsMap {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if !self.unicode.is_empty() {
-            write!(f, "{}", ExtensionType::Unicode)?;
-
-            for (key, value) in &self.unicode {
-                if let Some(value) = value {
-                    write!(f, "-{}-{}", key, value)?;
-                } else {
-                    write!(f, "-{}", key)?;
-                }
-            }
-        }
+        write!(f, "{}", self.unicode)?;
 
         if !self.transform.is_empty() {
             write!(f, "{}", ExtensionType::Transform)?;

@@ -3,7 +3,7 @@ pub mod extensions;
 pub mod parser;
 
 use errors::LocaleError;
-pub use extensions::{ExtensionType, ExtensionsMap, UnicodeExtensionKey};
+pub use extensions::{ExtensionType, ExtensionsMap};
 use std::str::FromStr;
 use tinystr::{TinyStr4, TinyStr8};
 pub use unic_langid_impl::LanguageIdentifier;

@@ -3,7 +3,7 @@ use std::error::Error;
 use std::fs::File;
 use std::path::Path;
 
-use unic_locale_impl::{ExtensionType, ExtensionsMap, Locale, UnicodeExtensionKey};
+use unic_locale_impl::{ExtensionType, ExtensionsMap, Locale};
 
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +45,8 @@ fn read_locale_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LocaleTestSet>, B
 fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> ExtensionsMap {
     let mut result = ExtensionsMap::default();
     for (key, map) in map {
-        let t: ExtensionType = key.parse().expect("Failed to format extension type.");
+        let t: ExtensionType = ExtensionType::from_char(key.chars().nth(0).unwrap())
+            .expect("Failed to format extension type.");
         for (key, value) in map {
             match t {
                 ExtensionType::Unicode => {
@@ -70,10 +71,11 @@ fn test_locale_fixtures(path: &str) {
 
         if let Some(extensions) = test.input.extensions {
             for (key, map) in extensions {
-                let k: ExtensionType = key.parse().expect("Failed to parse extension type.");
+                let t: ExtensionType = ExtensionType::from_char(key.chars().nth(0).unwrap())
+                    .expect("Failed to format extension type.");
                 for (key, value) in map {
                     locale
-                        .set_extension(k, key.as_str(), Some(value.as_str()))
+                        .set_extension(t, &key, Some(value.as_str()))
                         .expect("Failed to set extension value.");
                 }
             }

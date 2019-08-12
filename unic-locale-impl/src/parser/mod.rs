@@ -39,6 +39,7 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
                         ExtensionType::Transform => result
                             .set_transform_value(current_key, None)
                             .map_err(|_| ParserError::InvalidExtension)?,
+                        ExtensionType::Other(_) => unimplemented!(),
                         ExtensionType::Private => result
                             .set_private_value(current_key, None)
                             .map_err(|_| ParserError::InvalidExtension)?,
@@ -47,7 +48,7 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
                     return Err(ParserError::InvalidExtension);
                 }
             }
-            current_type = Some(subtag.parse()?);
+            current_type = Some(ExtensionType::from_char(subtag.chars().nth(0).unwrap())?);
             continue;
         }
 
@@ -60,6 +61,7 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
                     ExtensionType::Transform => result
                         .set_transform_value(current_key, Some(subtag))
                         .map_err(|_| ParserError::InvalidExtension)?,
+                    ExtensionType::Other(_) => unimplemented!(),
                     ExtensionType::Private => result
                         .set_private_value(current_key, Some(subtag))
                         .map_err(|_| ParserError::InvalidExtension)?,
@@ -80,6 +82,7 @@ pub fn parse_extension_subtags(t: &str) -> Result<ExtensionsMap, ParserError> {
                 ExtensionType::Transform => result
                     .set_transform_value(current_key, None)
                     .map_err(|_| ParserError::InvalidExtension)?,
+                ExtensionType::Other(_) => unimplemented!(),
                 ExtensionType::Private => result
                     .set_private_value(current_key, None)
                     .map_err(|_| ParserError::InvalidExtension)?,
