@@ -76,6 +76,7 @@ pub fn parse_language_identifier(
             script,
             region,
             variants: variants.into_boxed_slice(),
+            is_valid: None,
         },
         exception,
     ))

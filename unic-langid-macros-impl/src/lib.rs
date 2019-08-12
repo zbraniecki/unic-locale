@@ -13,7 +13,7 @@ pub fn langid(input: TokenStream) -> TokenStream {
     let id = parse_macro_input!(input as LitStr);
     let parsed: LanguageIdentifier = id.value().parse().expect("Malformed Language Identifier");
 
-    let (lang, script, region, variants) = parsed.to_raw_parts();
+    let (lang, script, region, variants, is_valid) = parsed.to_raw_parts();
     let lang = if let Some(lang) = lang {
         quote!(Some($crate::TinyStr8::new_unchecked(#lang)))
     } else {
@@ -36,6 +36,6 @@ pub fn langid(input: TokenStream) -> TokenStream {
     let variants = quote!(Box::new([#(#variants,)*]));
 
     TokenStream::from(quote! {
-        unsafe { $crate::LanguageIdentifier::from_raw_parts_unchecked(#lang, #script, #region, #variants) }
+        unsafe { $crate::LanguageIdentifier::from_raw_parts_unchecked(#lang, #script, #region, #variants, #is_valid) }
     })
 }

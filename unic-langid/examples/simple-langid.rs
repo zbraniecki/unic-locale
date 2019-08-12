@@ -10,6 +10,17 @@ fn main() {
     println!("{:#?}", langid);
     assert_eq!(langid.get_language(), "en");
 
+    #[cfg(feature = "validity")]
+    {
+        use unic_langid::validity::IsValid;
+
+        let mut langid: LanguageIdentifier = "en-US".parse().unwrap();
+        assert_eq!(langid.is_valid(), None);
+        assert_eq!(langid.validate().is_ok(), true);
+        assert_eq!(langid.is_valid(), Some(true));
+        println!("{:#?}", langid);
+    }
+
     #[cfg(feature = "unic-langid-macros")]
     {
         let langid = langid!("de-AT");

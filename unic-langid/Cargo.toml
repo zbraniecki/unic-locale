@@ -20,3 +20,5 @@ default = []
 
 # Provide macros.
 macros = ["unic-langid-macros"]
+
+validity = ["unic-langid-impl/validity"]

@@ -2,6 +2,9 @@ pub mod errors;
 pub mod parser;
 pub mod subtags;
 
+#[cfg(feature = "validity")]
+pub mod validity;
+
 use crate::errors::LanguageIdentifierError;
 use std::str::FromStr;
 
@@ -13,6 +16,7 @@ pub struct LanguageIdentifier {
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
     variants: Box<[TinyStr8]>,
+    is_valid: Option<bool>,
 }
 
 impl LanguageIdentifier {
@@ -56,15 +60,17 @@ impl LanguageIdentifier {
             script,
             region,
             variants: vars.into_boxed_slice(),
+            is_valid: None,
         })
     }
 
-    pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>) {
+    pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>, Option<bool>) {
         (
             self.language.map(|l| l.into()),
             self.script.map(|s| s.into()),
             self.region.map(|r| r.into()),
             self.variants.into_iter().map(|v| (*v).into()).collect(),
+            self.is_valid,
         )
     }
 
@@ -74,12 +80,14 @@ impl LanguageIdentifier {
         script: Option<TinyStr4>,
         region: Option<TinyStr4>,
         variants: Box<[TinyStr8]>,
+        is_valid: Option<bool>,
     ) -> Self {
         Self {
             language,
             script,
             region,
             variants,
+            is_valid,
         }
     }
 
@@ -159,6 +167,17 @@ impl LanguageIdentifier {
         self.variants = result.into_boxed_slice();
         Ok(())
     }
+
+    pub fn canonicalize_str(input: &str) -> Result<String, LanguageIdentifierError> {
+        let lang_id: LanguageIdentifier = input.parse()?;
+        Ok(lang_id.to_string())
+    }
+
+    pub fn is_str_well_formed(input: &str) -> bool {
+        // XXX: We could optimize it by extracting the testing
+        //      fns out of the parser.
+        input.parse::<LanguageIdentifier>().is_ok()
+    }
 }
 
 impl FromStr for LanguageIdentifier {
@@ -211,9 +230,4 @@ fn subtags_match<P: PartialEq>(
     as_range2: bool,
 ) -> bool {
     (as_range1 && subtag1.is_empty()) || (as_range2 && subtag2.is_empty()) || subtag1 == subtag2
-}
-
-pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {
-    let lang_id: LanguageIdentifier = input.parse()?;
-    Ok(lang_id.to_string())
 }
