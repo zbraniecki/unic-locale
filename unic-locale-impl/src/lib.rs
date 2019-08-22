@@ -44,10 +44,7 @@ impl Locale {
     ) -> Self {
         let langid =
             LanguageIdentifier::from_raw_parts_unchecked(language, script, region, variants);
-        Self {
-            langid,
-            extensions: extensions,
-        }
+        Self { langid, extensions }
     }
 
     pub fn matches<O: AsRef<Self>>(

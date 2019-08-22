@@ -30,7 +30,7 @@ pub fn locale(input: TokenStream) -> TokenStream {
         quote!(None)
     };
     let variants: Vec<_> = variants
-        .into_iter()
+        .iter()
         .map(|v| quote!($crate::TinyStr8::new_unchecked(#v)))
         .collect();
     let variants = quote!(Box::new([#(#variants,)*]));

@@ -17,12 +17,11 @@ impl TransformExtensionList {
     }
 
     pub fn parse_from_iter<'a>(
-        iter: &mut impl Iterator<Item = &'a str>,
+        mut iter: &mut impl Iterator<Item = &'a str>,
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
 
-        let mut iter = iter.peekable();
-        let mut st = iter.peek();
+        let mut st = iter.next();
 
         while let Some(subtag) = st {
             let slen = subtag.len();
@@ -38,8 +37,7 @@ impl TransformExtensionList {
                         .map_err(|_| ParserError::InvalidLanguage)?,
                 );
             }
-            iter.next();
-            st = iter.peek();
+            st = iter.next();
         }
 
         Ok(text)

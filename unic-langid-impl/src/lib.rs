@@ -67,7 +67,7 @@ impl LanguageIdentifier {
             self.language.map(|l| l.into()),
             self.script.map(|s| s.into()),
             self.region.map(|r| r.into()),
-            self.variants.into_iter().map(|v| (*v).into()).collect(),
+            self.variants.iter().map(|v| (*v).into()).collect(),
         )
     }
 

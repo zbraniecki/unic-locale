@@ -44,12 +44,10 @@ impl UnicodeExtensionList {
                     current_types = vec![];
                 }
                 current_keyword = Some(subtag.to_ascii_lowercase());
+            } else if current_keyword.is_some() {
+                current_types.push(subtag.to_ascii_lowercase());
             } else {
-                if current_keyword.is_some() {
-                    current_types.push(subtag.to_ascii_lowercase());
-                } else {
-                    uext.attributes.push(subtag.to_ascii_lowercase());
-                }
+                uext.attributes.push(subtag.to_ascii_lowercase());
             }
             st = iter.next();
         }

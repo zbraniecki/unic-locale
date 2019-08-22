@@ -26,7 +26,7 @@ impl ExtensionType {
             'u' => Ok(ExtensionType::Unicode),
             't' => Ok(ExtensionType::Transform),
             'x' => Ok(ExtensionType::Private),
-            sign @ _ if sign.is_ascii_alphanumeric() => {
+            sign if sign.is_ascii_alphanumeric() => {
                 Ok(ExtensionType::Other(sign.to_ascii_lowercase()))
             }
             _ => Err(ParserError::InvalidExtension),
@@ -39,7 +39,7 @@ impl std::fmt::Display for ExtensionType {
         let ch = match self {
             ExtensionType::Unicode => 'u',
             ExtensionType::Transform => 't',
-            ExtensionType::Other(n) => n.clone(),
+            ExtensionType::Other(n) => *n,
             ExtensionType::Private => 'x',
         };
         f.write_char(ch)
