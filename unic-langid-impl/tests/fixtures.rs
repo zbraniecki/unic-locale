@@ -33,7 +33,7 @@ struct LangIdTestSet {
     output: LangIdTestOutput,
 }
 
-fn read_langid_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LangIdTestSet>, Box<Error>> {
+fn read_langid_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LangIdTestSet>, Box<dyn Error>> {
     let file = File::open(path)?;
     let sets = serde_json::from_reader(file)?;
     Ok(sets)

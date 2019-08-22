@@ -1,16 +1,16 @@
+mod private;
 mod transform;
 mod unicode;
 
+pub use private::PrivateExtensionList;
+pub use transform::TransformExtensionList;
 pub use unicode::UnicodeExtensionList;
 
 use std::str::FromStr;
 
-use crate::errors::LocaleError;
-use crate::parser::{parse_extension_subtags, ParserError};
+use crate::parser::ParserError;
 use std::collections::BTreeMap;
 use std::fmt::Write;
-
-use tinystr::TinyStr4;
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ExtensionType {
@@ -26,7 +26,9 @@ impl ExtensionType {
             'u' => Ok(ExtensionType::Unicode),
             't' => Ok(ExtensionType::Transform),
             'x' => Ok(ExtensionType::Private),
-            sign @ _ if sign.is_ascii_alphanumeric() => Ok(ExtensionType::Other(sign)),
+            sign @ _ if sign.is_ascii_alphanumeric() => {
+                Ok(ExtensionType::Other(sign.to_ascii_lowercase()))
+            }
             _ => Err(ParserError::InvalidExtension),
         }
     }
@@ -46,43 +48,40 @@ impl std::fmt::Display for ExtensionType {
 
 #[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct ExtensionsMap {
-    unicode: UnicodeExtensionList,
-    transform: BTreeMap<String, Option<String>>,
+    pub unicode: UnicodeExtensionList,
+    pub transform: TransformExtensionList,
     other: BTreeMap<char, BTreeMap<String, Option<String>>>,
-    private: BTreeMap<String, Option<String>>,
+    pub private: PrivateExtensionList,
 }
 
 impl ExtensionsMap {
-    pub fn get_unicode(&self) -> &UnicodeExtensionList {
-        &self.unicode
-    }
+    pub fn from_iter<'a>(
+        mut iter: &mut impl Iterator<Item = &'a str>,
+    ) -> Result<Self, ParserError> {
+        let mut result = ExtensionsMap::default();
 
-    pub fn get_transform(&self) -> &BTreeMap<String, Option<String>> {
-        &self.transform
-    }
+        let mut st = iter.next();
+        while let Some(subtag) = st {
+            let subtag = subtag.to_ascii_lowercase();
 
-    pub fn get_private(&self) -> &BTreeMap<String, Option<String>> {
-        &self.private
-    }
+            match subtag.as_str() {
+                "" => break,
+                "u" => {
+                    result.unicode = UnicodeExtensionList::parse_from_iter(&mut iter)?;
+                }
+                "t" => {
+                    result.transform = TransformExtensionList::parse_from_iter(&mut iter)?;
+                }
+                "x" => {
+                    result.private = PrivateExtensionList::parse_from_iter(&mut iter)?;
+                }
+                _ => unimplemented!(),
+            }
 
-    pub fn set_unicode_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
-        self.unicode.set(key, value.map(|s| String::from(s)))
-    }
+            st = iter.next();
+        }
 
-    pub fn set_transform_value(
-        &mut self,
-        key: &str,
-        value: Option<&str>,
-    ) -> Result<(), LocaleError> {
-        self.transform
-            .insert(String::from(key), value.map(String::from));
-        Ok(())
-    }
-
-    pub fn set_private_value(&mut self, key: &str, value: Option<&str>) -> Result<(), LocaleError> {
-        self.private
-            .insert(String::from(key), value.map(String::from));
-        Ok(())
+        Ok(result)
     }
 
     pub fn is_empty(&self) -> bool {
@@ -90,41 +89,23 @@ impl ExtensionsMap {
     }
 }
 
+static SEPARATORS: &[char] = &['-', '_'];
+
 impl FromStr for ExtensionsMap {
     type Err = ParserError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        parse_extension_subtags(source)
+        let mut iterator = source.split(|c| SEPARATORS.contains(&c));
+        Self::from_iter(&mut iterator)
     }
 }
 
 impl std::fmt::Display for ExtensionsMap {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.unicode)?;
+        write!(f, "{}", self.transform)?;
+        write!(f, "{}", self.private)?;
 
-        if !self.transform.is_empty() {
-            write!(f, "{}", ExtensionType::Transform)?;
-
-            for (key, value) in &self.transform {
-                if let Some(value) = value {
-                    write!(f, "-{}-{}", key, value)?;
-                } else {
-                    write!(f, "-{}", key)?;
-                }
-            }
-        }
-
-        if !self.private.is_empty() {
-            write!(f, "{}", ExtensionType::Private)?;
-
-            for (key, value) in &self.private {
-                if let Some(value) = value {
-                    write!(f, "-{}-{}", key, value)?;
-                } else {
-                    write!(f, "-{}", key)?;
-                }
-            }
-        }
         Ok(())
     }
 }

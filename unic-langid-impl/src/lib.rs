@@ -3,6 +3,7 @@ pub mod parser;
 pub mod subtags;
 
 use crate::errors::LanguageIdentifierError;
+use std::iter::Peekable;
 use std::str::FromStr;
 
 use tinystr::{TinyStr4, TinyStr8};
@@ -16,12 +17,6 @@ pub struct LanguageIdentifier {
 }
 
 impl LanguageIdentifier {
-    pub fn from_str(input: &str, allow_extensions: bool) -> Result<Self, LanguageIdentifierError> {
-        parser::parse_language_identifier(input, allow_extensions)
-            .map_err(std::convert::Into::into)
-            .map(|(langid, _)| langid)
-    }
-
     pub fn from_parts<S: AsRef<str>>(
         language: Option<S>,
         script: Option<S>,
@@ -57,6 +52,14 @@ impl LanguageIdentifier {
             region,
             variants: vars.into_boxed_slice(),
         })
+    }
+
+    pub fn from_iter<'a>(
+        iter: &mut Peekable<impl Iterator<Item = &'a str>>,
+        allow_extension: bool,
+    ) -> Result<LanguageIdentifier, LanguageIdentifierError> {
+        parser::parse_language_identifier_from_iter(iter, allow_extension)
+            .map_err(std::convert::Into::into)
     }
 
     pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>) {
@@ -165,9 +168,7 @@ impl FromStr for LanguageIdentifier {
     type Err = LanguageIdentifierError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        parser::parse_language_identifier(source, false)
-            .map_err(std::convert::Into::into)
-            .map(|(langid, _)| langid)
+        parser::parse_language_identifier(source).map_err(std::convert::Into::into)
     }
 }
 

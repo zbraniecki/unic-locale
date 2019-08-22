@@ -37,11 +37,14 @@ fn test_from_parts() {
 #[test]
 fn test_locale_identifier() {
     let mut extensions = ExtensionsMap::default();
-    extensions.set_unicode_value("hc", Some("h12")).unwrap();
+    extensions
+        .unicode
+        .set_keyword("hc", vec![String::from("h12")])
+        .unwrap();
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
     let mut extensions = ExtensionsMap::default();
-    extensions.set_private_value("testing", None).unwrap();
+    extensions.private.insert("testing".to_string()).unwrap();
     assert_parsed_locale_identifier("und-x-testing", &extensions);
 }
 

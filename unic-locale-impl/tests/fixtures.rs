@@ -36,7 +36,7 @@ struct LocaleTestSet {
     output: LocaleTestOutput,
 }
 
-fn read_locale_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LocaleTestSet>, Box<Error>> {
+fn read_locale_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LocaleTestSet>, Box<dyn Error>> {
     let file = File::open(path)?;
     let sets = serde_json::from_reader(file)?;
     Ok(sets)
@@ -51,7 +51,8 @@ fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> Exten
             match t {
                 ExtensionType::Unicode => {
                     result
-                        .set_unicode_value(&key, Some(value.as_str()))
+                        .unicode
+                        .set_keyword(&key, vec![value])
                         .expect("Setting extension value failed.");
                 }
                 _ => unimplemented!(),
@@ -75,7 +76,9 @@ fn test_locale_fixtures(path: &str) {
                     .expect("Failed to format extension type.");
                 for (key, value) in map {
                     locale
-                        .set_extension(t, &key, Some(value.as_str()))
+                        .extensions
+                        .unicode
+                        .set_keyword(&key, vec![value])
                         .expect("Failed to set extension value.");
                 }
             }

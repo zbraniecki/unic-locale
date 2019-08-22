@@ -57,7 +57,7 @@ impl Locale {
         other_as_range: bool,
     ) -> bool {
         let other = other.as_ref();
-        if !self.extensions.get_private().is_empty() || !other.extensions.get_private().is_empty() {
+        if !self.extensions.private.is_empty() || !other.extensions.private.is_empty() {
             return false;
         }
         self.langid
@@ -102,22 +102,6 @@ impl Locale {
         self.langid
             .set_variants(variants)
             .map_err(std::convert::Into::into)
-    }
-
-    pub fn set_extension(
-        &mut self,
-        extension: ExtensionType,
-        key: &str,
-        value: Option<&str>,
-    ) -> Result<(), LocaleError> {
-        match extension {
-            ExtensionType::Unicode => self.extensions.set_unicode_value(key, value),
-            _ => unimplemented!(),
-        }
-    }
-
-    pub fn get_extensions(&self) -> &extensions::ExtensionsMap {
-        &self.extensions
     }
 }
 

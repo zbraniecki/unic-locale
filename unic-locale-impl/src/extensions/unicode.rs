@@ -1,14 +1,12 @@
 use crate::errors::LocaleError;
-use crate::parser::errors::ParserError;
+use crate::parser::ParserError;
 
 use std::collections::BTreeMap;
 use std::fmt::Write;
-use std::str::FromStr;
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct UnicodeExtensionList {
-    // XXX: Type is a Vec<String>
-    keywords: BTreeMap<String, Option<String>>,
+    keywords: BTreeMap<String, Vec<String>>,
     attributes: Vec<String>,
 }
 
@@ -17,13 +15,50 @@ impl UnicodeExtensionList {
         self.keywords.is_empty() && self.attributes.is_empty()
     }
 
-    pub fn set(&mut self, key: &str, value: Option<String>) -> Result<(), LocaleError> {
-        if key.len() == 2 {
-            self.keywords.insert(String::from(key), value);
-        } else {
-            self.attributes.push(String::from(key));
-        }
+    pub fn set_keyword(&mut self, key: &str, value: Vec<String>) -> Result<(), LocaleError> {
+        self.keywords.insert(String::from(key), value);
         Ok(())
+    }
+
+    pub fn set_attribute(&mut self, value: String) -> Result<(), LocaleError> {
+        self.attributes.push(value);
+        Ok(())
+    }
+
+    pub fn parse_from_iter<'a>(
+        iter: &mut impl Iterator<Item = &'a str>,
+    ) -> Result<Self, ParserError> {
+        let mut uext = Self::default();
+
+        let mut st = iter.next();
+
+        let mut current_keyword = None;
+        let mut current_types = vec![];
+
+        while let Some(subtag) = st {
+            let slen = subtag.len();
+
+            if slen == 2 {
+                if let Some(current_keyword) = current_keyword {
+                    uext.keywords.insert(current_keyword, current_types);
+                    current_types = vec![];
+                }
+                current_keyword = Some(subtag.to_ascii_lowercase());
+            } else {
+                if current_keyword.is_some() {
+                    current_types.push(subtag.to_ascii_lowercase());
+                } else {
+                    uext.attributes.push(subtag.to_ascii_lowercase());
+                }
+            }
+            st = iter.next();
+        }
+
+        if let Some(current_keyword) = current_keyword {
+            uext.keywords.insert(current_keyword, current_types);
+        }
+
+        Ok(uext)
     }
 }
 
@@ -36,10 +71,10 @@ impl std::fmt::Display for UnicodeExtensionList {
         f.write_char('u')?;
 
         for (k, t) in &self.keywords {
-            if let Some(t) = t {
-                write!(f, "-{}-{}", k, t)?;
-            } else {
+            if t.is_empty() {
                 write!(f, "-{}", k)?;
+            } else {
+                write!(f, "-{}-{}", k, t.join("-"))?;
             }
         }
 
@@ -47,50 +82,5 @@ impl std::fmt::Display for UnicodeExtensionList {
             write!(f, "-{}", attr)?;
         }
         Ok(())
-    }
-}
-
-#[derive(Debug, Hash, PartialEq, Eq, Clone, Ord, PartialOrd)]
-pub enum UnicodeExtensionKey {
-    Calendar,       // ca
-    CurrencyFormat, // cf
-    Collation,      // co
-    Currency,       // cu
-    Emoji,          // em
-    FirstDay,       // fw
-    HourCycle,      // hc
-    LineBreak,      // lb
-    LineBreakWork,  // lw
-    Measurement,    // ms
-    Numbering,      // nu
-    Region,         // rg
-    RegionSubdiv,   // sd
-    SentenceBreak,  // ss
-    TimeZone,       // tz
-    CommonVariant,  // va
-}
-
-impl FromStr for UnicodeExtensionKey {
-    type Err = ParserError;
-
-    fn from_str(source: &str) -> Result<Self, Self::Err> {
-        match source {
-            "ca" => Ok(UnicodeExtensionKey::Calendar),
-            "co" => Ok(UnicodeExtensionKey::Collation),
-            "hc" => Ok(UnicodeExtensionKey::HourCycle),
-            _ => Err(ParserError::InvalidExtension),
-        }
-    }
-}
-
-impl std::fmt::Display for UnicodeExtensionKey {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let s = match self {
-            UnicodeExtensionKey::Calendar => "ca",
-            UnicodeExtensionKey::Collation => "co",
-            UnicodeExtensionKey::HourCycle => "hc",
-            _ => unimplemented!(),
-        };
-        f.write_str(s)
     }
 }

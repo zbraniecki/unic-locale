@@ -1,15 +1,17 @@
 pub mod errors;
 
+use std::iter::Peekable;
+
 pub use self::errors::ParserError;
 use crate::subtags;
 use crate::LanguageIdentifier;
 
 static SEPARATORS: &[char] = &['-', '_'];
 
-pub fn parse_language_identifier(
-    t: &str,
+pub fn parse_language_identifier_from_iter<'a>(
+    iter: &mut Peekable<impl Iterator<Item = &'a str>>,
     allow_extension: bool,
-) -> Result<(LanguageIdentifier, Option<&str>), ParserError> {
+) -> Result<LanguageIdentifier, ParserError> {
     let mut position = 0;
 
     let mut language = None;
@@ -17,66 +19,56 @@ pub fn parse_language_identifier(
     let mut region = None;
     let mut variants = vec![];
 
-    let mut ptr = 0;
-    let mut has_extension = false;
-
-    for subtag in t.split(|c| SEPARATORS.contains(&c)) {
-        let slen = subtag.len();
-
-        ptr += slen + 1;
-
+    while let Some(subtag) = iter.next() {
         if position == 0 {
             // Language
             language = subtags::parse_language_subtag(subtag)?;
             position = 1;
-            continue;
-        }
-
-        if allow_extension && slen == 1 {
-            has_extension = true;
-            break;
-        }
-
-        if position == 1 {
-            position = 2;
-            // Script
+        } else if position == 1 {
             if let Ok(s) = subtags::parse_script_subtag(subtag) {
                 script = Some(s);
-                continue;
+                position = 2;
+            } else if let Ok(s) = subtags::parse_region_subtag(subtag) {
+                region = Some(s);
+                position = 3;
+            } else {
+                variants.push(subtags::parse_variant_subtag(subtag)?);
+                position = 3;
             }
-        }
-
-        if position == 2 {
-            position = 3;
-            // Region
+        } else if position == 2 {
             if let Ok(s) = subtags::parse_region_subtag(subtag) {
                 region = Some(s);
-                continue;
+                position = 3;
+            } else {
+                variants.push(subtags::parse_variant_subtag(subtag)?);
+                position = 3;
             }
-        }
-
-        if position == 3 {
+        } else {
             // Variants
             variants.push(subtags::parse_variant_subtag(subtag)?);
+        }
+
+        if allow_extension {
+            if let Some(st_peek) = iter.peek() {
+                if st_peek.len() == 1 {
+                    break;
+                }
+            }
         }
     }
 
     variants.sort();
     variants.dedup();
 
-    let exception = if has_extension {
-        Some(&t[ptr - 2..])
-    } else {
-        None
-    };
+    Ok(LanguageIdentifier {
+        language,
+        script,
+        region,
+        variants: variants.into_boxed_slice(),
+    })
+}
 
-    Ok((
-        LanguageIdentifier {
-            language,
-            script,
-            region,
-            variants: variants.into_boxed_slice(),
-        },
-        exception,
-    ))
+pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserError> {
+    let mut iter = t.split(|c| SEPARATORS.contains(&c)).peekable();
+    parse_language_identifier_from_iter(&mut iter, false)
 }

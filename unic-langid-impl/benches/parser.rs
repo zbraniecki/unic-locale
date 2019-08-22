@@ -24,7 +24,7 @@ fn language_identifier_parser_bench(c: &mut Criterion) {
     c.bench_function("language_identifier_parser", move |b| {
         b.iter(|| {
             for s in strings {
-                let _ = parse_language_identifier(s, false);
+                let _ = parse_language_identifier(s);
             }
         })
     });
@@ -50,7 +50,7 @@ fn language_identifier_parser_casing_bench(c: &mut Criterion) {
     c.bench_function("language_identifier_parser_casing", move |b| {
         b.iter(|| {
             for s in strings {
-                let _ = parse_language_identifier(s, false);
+                let _ = parse_language_identifier(s);
             }
         })
     });

@@ -13,4 +13,4 @@ categories = ["internationalization"]
 proc-macro-hack = "0.5"
 unic-langid-macros-impl = { path = "../unic-langid-macros-impl" }
 unic-langid-impl = { path = "../unic-langid-impl" }
-tinystr = "0.1"
+tinystr = "0.2"
