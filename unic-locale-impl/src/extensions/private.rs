@@ -1,7 +1,5 @@
 use crate::parser::ParserError;
 
-use std::fmt::Write;
-
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct PrivateExtensionList(Vec<String>);
 
@@ -10,7 +8,7 @@ impl PrivateExtensionList {
         self.0.is_empty()
     }
 
-    pub fn parse_from_iter<'a>(
+    pub fn try_from_iter<'a>(
         iter: &mut impl Iterator<Item = &'a str>,
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
@@ -34,7 +32,7 @@ impl std::fmt::Display for PrivateExtensionList {
             return Ok(());
         }
 
-        f.write_char('x')?;
+        f.write_str("-x")?;
 
         for subtag in &self.0 {
             write!(f, "-{}", subtag)?;

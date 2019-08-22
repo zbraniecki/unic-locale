@@ -67,7 +67,7 @@ fn language_identifier_construct_bench(c: &mut Criterion) {
             |b, langids: &Vec<LanguageIdentifier>| {
                 let entries = langids
                     .iter()
-                    .map(|langid| langid.clone().to_raw_parts())
+                    .map(|langid| langid.clone().into_raw_parts())
                     .collect::<Vec<_>>();
                 b.iter(|| {
                     for (language, script, region, variants) in &entries {

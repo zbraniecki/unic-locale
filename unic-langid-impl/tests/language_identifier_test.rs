@@ -62,7 +62,7 @@ fn test_sorted_variants() {
 #[test]
 fn test_from_parts_unchecked() {
     let langid: LanguageIdentifier = "en-nedis-macos".parse().unwrap();
-    let (lang, script, region, variants) = langid.to_raw_parts();
+    let (lang, script, region, variants) = langid.into_raw_parts();
     let langid = unsafe {
         LanguageIdentifier::from_raw_parts_unchecked(
             lang.map(|l| TinyStr8::new_unchecked(l)),

@@ -37,10 +37,7 @@ fn test_from_parts() {
 #[test]
 fn test_locale_identifier() {
     let mut extensions = ExtensionsMap::default();
-    extensions
-        .unicode
-        .set_keyword("hc", vec![String::from("h12")])
-        .unwrap();
+    extensions.unicode.set_keyword("hc", vec!["h12"]).unwrap();
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
     let mut extensions = ExtensionsMap::default();
@@ -71,7 +68,7 @@ fn test_to_langid() {
 #[test]
 fn test_from_parts_unchecked() {
     let loc: Locale = "en-US".parse().unwrap();
-    let (lang, script, region, variants, extensions) = loc.to_raw_parts();
+    let (lang, script, region, variants, extensions) = loc.into_raw_parts();
     let loc = unsafe {
         Locale::from_raw_parts_unchecked(
             lang.map(|l| TinyStr8::new_unchecked(l)),

@@ -5,7 +5,7 @@ pub fn parse_language_subtag(subtag: &str) -> Result<Option<TinyStr8>, ParserErr
     let slen = subtag.len();
 
     let s: TinyStr8 = subtag.parse().map_err(|_| ParserError::InvalidLanguage)?;
-    if slen < 2 || slen > 8 || slen == 4 || !s.is_ascii_alphanumeric() {
+    if slen < 2 || slen > 8 || slen == 4 || !s.is_ascii_alphabetic() {
         return Err(ParserError::InvalidLanguage);
     }
 
@@ -22,7 +22,7 @@ pub fn parse_script_subtag(subtag: &str) -> Result<TinyStr4, ParserError> {
     let slen = subtag.len();
 
     let s: TinyStr4 = subtag.parse().map_err(|_| ParserError::InvalidSubtag)?;
-    if slen != 4 || !s.is_ascii_alphanumeric() {
+    if slen != 4 || !s.is_ascii_alphabetic() {
         return Err(ParserError::InvalidSubtag);
     }
     Ok(s.to_ascii_titlecase())
@@ -34,7 +34,7 @@ pub fn parse_region_subtag(subtag: &str) -> Result<TinyStr4, ParserError> {
     match slen {
         2 => {
             let s: TinyStr4 = subtag.parse().map_err(|_| ParserError::InvalidSubtag)?;
-            if !s.is_ascii_alphanumeric() {
+            if !s.is_ascii_alphabetic() {
                 return Err(ParserError::InvalidSubtag);
             }
             Ok(s.to_ascii_uppercase())

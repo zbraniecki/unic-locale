@@ -6,11 +6,13 @@ pub use private::PrivateExtensionList;
 pub use transform::TransformExtensionList;
 pub use unicode::UnicodeExtensionList;
 
-use std::str::FromStr;
-
-use crate::parser::ParserError;
 use std::collections::BTreeMap;
 use std::fmt::Write;
+use std::str::FromStr;
+
+use tinystr::TinyStr8;
+
+use crate::parser::ParserError;
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ExtensionType {
@@ -50,12 +52,12 @@ impl std::fmt::Display for ExtensionType {
 pub struct ExtensionsMap {
     pub unicode: UnicodeExtensionList,
     pub transform: TransformExtensionList,
-    other: BTreeMap<char, BTreeMap<String, Option<String>>>,
+    pub other: BTreeMap<char, Vec<TinyStr8>>,
     pub private: PrivateExtensionList,
 }
 
 impl ExtensionsMap {
-    pub fn from_iter<'a>(
+    pub fn try_from_iter<'a>(
         mut iter: &mut impl Iterator<Item = &'a str>,
     ) -> Result<Self, ParserError> {
         let mut result = ExtensionsMap::default();
@@ -67,13 +69,13 @@ impl ExtensionsMap {
             match subtag.as_str() {
                 "" => break,
                 "u" => {
-                    result.unicode = UnicodeExtensionList::parse_from_iter(&mut iter)?;
+                    result.unicode = UnicodeExtensionList::try_from_iter(&mut iter)?;
                 }
                 "t" => {
-                    result.transform = TransformExtensionList::parse_from_iter(&mut iter)?;
+                    result.transform = TransformExtensionList::try_from_iter(&mut iter)?;
                 }
                 "x" => {
-                    result.private = PrivateExtensionList::parse_from_iter(&mut iter)?;
+                    result.private = PrivateExtensionList::try_from_iter(&mut iter)?;
                 }
                 _ => unimplemented!(),
             }
@@ -96,15 +98,13 @@ impl FromStr for ExtensionsMap {
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
         let mut iterator = source.split(|c| SEPARATORS.contains(&c));
-        Self::from_iter(&mut iterator)
+        Self::try_from_iter(&mut iterator)
     }
 }
 
 impl std::fmt::Display for ExtensionsMap {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.unicode)?;
-        write!(f, "{}", self.transform)?;
-        write!(f, "{}", self.private)?;
+        write!(f, "{}{}{}", self.unicode, self.transform, self.private)?;
 
         Ok(())
     }

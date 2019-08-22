@@ -52,7 +52,7 @@ fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> Exten
                 ExtensionType::Unicode => {
                     result
                         .unicode
-                        .set_keyword(&key, vec![value])
+                        .set_keyword(&key, vec![value.as_str()])
                         .expect("Setting extension value failed.");
                 }
                 _ => unimplemented!(),
@@ -71,14 +71,12 @@ fn test_locale_fixtures(path: &str) {
         let mut locale: Locale = s.parse().expect("Parsing failed.");
 
         if let Some(extensions) = test.input.extensions {
-            for (key, map) in extensions {
-                let t: ExtensionType = ExtensionType::from_char(key.chars().nth(0).unwrap())
-                    .expect("Failed to format extension type.");
+            for (_, map) in extensions {
                 for (key, value) in map {
                     locale
                         .extensions
                         .unicode
-                        .set_keyword(&key, vec![value])
+                        .set_keyword(&key, vec![value.as_str()])
                         .expect("Failed to set extension value.");
                 }
             }

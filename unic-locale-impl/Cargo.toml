@@ -11,7 +11,7 @@ categories = ["internationalization"]
 
 [dependencies]
 unic-langid-impl = { path = "../unic-langid-impl" }
-tinystr = "0.2"
+tinystr = "0.3"
 
 [dev-dependencies]
 criterion = "0.2"

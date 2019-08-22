@@ -13,7 +13,7 @@ pub fn locale(input: TokenStream) -> TokenStream {
     let id = parse_macro_input!(input as LitStr);
     let parsed: Locale = id.value().parse().expect("Malformed Locale Identifier");
 
-    let (lang, script, region, variants, extensions) = parsed.to_raw_parts();
+    let (lang, script, region, variants, extensions) = parsed.into_raw_parts();
     let lang = if let Some(lang) = lang {
         quote!(Some($crate::TinyStr8::new_unchecked(#lang)))
     } else {

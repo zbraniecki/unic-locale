@@ -54,7 +54,7 @@ impl LanguageIdentifier {
         })
     }
 
-    pub fn from_iter<'a>(
+    pub fn try_from_iter<'a>(
         iter: &mut Peekable<impl Iterator<Item = &'a str>>,
         allow_extension: bool,
     ) -> Result<LanguageIdentifier, LanguageIdentifierError> {
@@ -62,7 +62,7 @@ impl LanguageIdentifier {
             .map_err(std::convert::Into::into)
     }
 
-    pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>) {
+    pub fn into_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>) {
         (
             self.language.map(|l| l.into()),
             self.script.map(|s| s.into()),

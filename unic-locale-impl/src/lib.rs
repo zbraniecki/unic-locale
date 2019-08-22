@@ -14,6 +14,8 @@ pub struct Locale {
     pub extensions: extensions::ExtensionsMap,
 }
 
+type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>, String);
+
 impl Locale {
     pub fn from_parts<S: AsRef<str>>(
         language: Option<S>,
@@ -29,8 +31,8 @@ impl Locale {
         })
     }
 
-    pub fn to_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>, String) {
-        let (lang, region, script, variants) = self.langid.to_raw_parts();
+    pub fn into_raw_parts(self) -> RawPartsTuple {
+        let (lang, region, script, variants) = self.langid.into_raw_parts();
         (lang, region, script, variants, self.extensions.to_string())
     }
 
@@ -140,11 +142,7 @@ impl AsRef<Locale> for Locale {
 
 impl std::fmt::Display for Locale {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.extensions.is_empty() {
-            write!(f, "{}", self.langid)
-        } else {
-            write!(f, "{}-{}", self.langid, self.extensions)
-        }
+        write!(f, "{}{}", self.langid, self.extensions)
     }
 }
 

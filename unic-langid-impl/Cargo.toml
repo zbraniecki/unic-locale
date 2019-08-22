@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-tinystr = "0.2"
+tinystr = "0.3"
 
 [dev-dependencies]
 criterion = "0.2"
