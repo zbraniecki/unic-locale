@@ -21,23 +21,24 @@ impl TransformExtensionList {
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
 
-        let mut st = iter.next();
+        let mut iter = iter.peekable();
+        let mut st_peek = iter.peek();
 
-        while let Some(subtag) = st {
+        while let Some(subtag) = st_peek {
             let slen = subtag.len();
 
             if slen == 2
                 && subtag.as_bytes()[0].is_ascii_alphabetic()
                 && subtag.as_bytes()[1].is_ascii_digit()
             {
-
+                iter.next();
             } else {
                 text.tlang = Some(
-                    LanguageIdentifier::from_iter(&mut iter.peekable(), true)
+                    LanguageIdentifier::from_iter(&mut iter, true)
                         .map_err(|_| ParserError::InvalidLanguage)?,
                 );
             }
-            st = iter.next();
+            st_peek = iter.peek();
         }
 
         Ok(text)
