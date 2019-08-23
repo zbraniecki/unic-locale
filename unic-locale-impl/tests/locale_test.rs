@@ -41,7 +41,7 @@ fn test_locale_identifier() {
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
     let mut extensions = ExtensionsMap::default();
-    extensions.private.insert("testing".to_string()).unwrap();
+    extensions.private.add_tag("testing").unwrap();
     assert_parsed_locale_identifier("und-x-testing", &extensions);
 }
 

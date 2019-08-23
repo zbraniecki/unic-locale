@@ -2,6 +2,7 @@ use crate::errors::LocaleError;
 use crate::parser::ParserError;
 
 use std::collections::BTreeMap;
+use std::iter::Peekable;
 
 use tinystr::{TinyStr4, TinyStr8};
 
@@ -40,6 +41,16 @@ fn parse_attribute(t: &str) -> Result<TinyStr8, ParserError> {
     Ok(s.to_ascii_lowercase())
 }
 
+fn is_attribute(t: &str) -> bool {
+    let slen = t.len();
+    (slen >= 3 && slen <= 8) && !t.contains(|c: char| !c.is_ascii_alphanumeric())
+}
+
+fn is_type(t: &str) -> bool {
+    let slen = t.len();
+    (slen >= 3 && slen <= 8) && !t.contains(|c: char| !c.is_ascii_alphanumeric())
+}
+
 impl UnicodeExtensionList {
     pub fn is_empty(&self) -> bool {
         self.keywords.is_empty() && self.attributes.is_empty()
@@ -63,30 +74,34 @@ impl UnicodeExtensionList {
     }
 
     pub fn try_from_iter<'a>(
-        iter: &mut impl Iterator<Item = &'a str>,
+        iter: &mut Peekable<impl Iterator<Item = &'a str>>,
     ) -> Result<Self, ParserError> {
         let mut uext = Self::default();
 
-        let mut st = iter.next();
+        let mut st_peek = iter.peek();
 
         let mut current_keyword = None;
         let mut current_types = vec![];
 
-        while let Some(subtag) = st {
+        while let Some(subtag) = st_peek {
             let slen = subtag.len();
-
             if slen == 2 {
                 if let Some(current_keyword) = current_keyword {
                     uext.keywords.insert(current_keyword, current_types);
                     current_types = vec![];
                 }
                 current_keyword = Some(parse_key(subtag)?);
-            } else if current_keyword.is_some() {
+                iter.next();
+            } else if current_keyword.is_some() && is_type(subtag) {
                 current_types.push(parse_type(subtag)?);
-            } else {
+                iter.next();
+            } else if is_attribute(subtag) {
                 uext.attributes.push(parse_attribute(subtag)?);
+                iter.next();
+            } else {
+                break;
             }
-            st = iter.next();
+            st_peek = iter.peek();
         }
 
         if let Some(current_keyword) = current_keyword {

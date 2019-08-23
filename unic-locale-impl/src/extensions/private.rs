@@ -1,28 +1,42 @@
+use crate::errors::LocaleError;
 use crate::parser::ParserError;
 
+use tinystr::TinyStr8;
+
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
-pub struct PrivateExtensionList(Vec<String>);
+pub struct PrivateExtensionList(Vec<TinyStr8>);
+
+fn parse_value(t: &str) -> Result<TinyStr8, ParserError> {
+    let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
+    if t.is_empty() || t.len() > 8 || !s.is_ascii_alphanumeric() {
+        return Err(ParserError::InvalidSubtag);
+    }
+
+    Ok(s.to_ascii_lowercase())
+}
 
 impl PrivateExtensionList {
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
+    pub fn add_tag(&mut self, tag: &str) -> Result<(), LocaleError> {
+        self.0.push(parse_value(tag)?);
+        self.0.sort();
+        Ok(())
+    }
+
     pub fn try_from_iter<'a>(
         iter: &mut impl Iterator<Item = &'a str>,
     ) -> Result<Self, ParserError> {
-        let mut text = Self::default();
+        let mut pext = Self::default();
 
         for subtag in iter {
-            text.0.push(subtag.to_ascii_lowercase());
+            pext.0.push(parse_value(subtag)?);
         }
+        pext.0.sort();
 
-        Ok(text)
-    }
-
-    pub fn insert(&mut self, value: String) -> Result<(), ParserError> {
-        self.0.push(value);
-        Ok(())
+        Ok(pext)
     }
 }
 

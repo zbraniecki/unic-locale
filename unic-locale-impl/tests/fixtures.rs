@@ -3,6 +3,7 @@ use std::error::Error;
 use std::fs::File;
 use std::path::Path;
 
+use unic_langid_impl::LanguageIdentifier;
 use unic_locale_impl::{ExtensionType, ExtensionsMap, Locale};
 
 use serde::{Deserialize, Serialize};
@@ -47,16 +48,34 @@ fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> Exten
     for (key, map) in map {
         let t: ExtensionType = ExtensionType::from_char(key.chars().nth(0).unwrap())
             .expect("Failed to format extension type.");
-        for (key, value) in map {
-            match t {
-                ExtensionType::Unicode => {
+        match t {
+            ExtensionType::Unicode => {
+                for (key, value) in map {
                     result
                         .unicode
                         .set_keyword(&key, vec![value.as_str()])
                         .expect("Setting extension value failed.");
                 }
-                _ => unimplemented!(),
             }
+            ExtensionType::Transform => {
+                if let Some(tfield) = map.get("tlang") {
+                    let tlang: LanguageIdentifier =
+                        tfield.parse().expect("Parsing language identifier failed.");
+                    result
+                        .transform
+                        .set_tlang(tlang)
+                        .expect("Setting extension value failed.");
+                }
+            }
+            ExtensionType::Private => {
+                for (key, _) in map {
+                    result
+                        .private
+                        .add_tag(&key)
+                        .expect("Setting extension value failed.");
+                }
+            }
+            _ => unimplemented!(),
         }
     }
     result

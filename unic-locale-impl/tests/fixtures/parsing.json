@@ -40,5 +40,56 @@
           }
         }
       }
+    },
+    {
+      "input": {
+        "string": "en-US-t-pl-Latn-DE"
+      },
+      "output": {
+        "language": "en",
+        "region": "US",
+        "extensions": {
+          "t": {
+            "tlang": "pl-Latn-DE"
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "string": "en-US-x-private-foobar"
+      },
+      "output": {
+        "language": "en",
+        "region": "US",
+        "extensions": {
+          "x": {
+            "private": "true",
+            "foobar": "true"
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "string": "en-US-u-ca-buddhist-hc-h12-t-es-AR-x-private-foobar"
+      },
+      "output": {
+        "language": "en",
+        "region": "US",
+        "extensions": {
+          "u": {
+            "ca": "buddhist",
+            "hc": "h12"
+          },
+          "t": {
+            "tlang": "es-AR"
+          },
+          "x": {
+            "private": "true",
+            "foobar": "true"
+          }
+        }
+      }
     }
   ]

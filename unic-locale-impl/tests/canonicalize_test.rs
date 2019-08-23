@@ -16,4 +16,8 @@ fn test_canonicalize_locale() {
     assert_canonicalize("pl-U-HC-H12", "pl-u-hc-h12");
     assert_canonicalize("eN-uS-X_Private", "en-US-x-private");
     assert_canonicalize("eN-uS-t-pl-PL", "en-US-t-pl-PL");
+    assert_canonicalize(
+        "en-US-u-CA-Buddhist-t-ES-ar-x-foo",
+        "en-US-u-ca-buddhist-t-es-AR-x-foo",
+    );
 }

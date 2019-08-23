@@ -8,6 +8,7 @@ pub use unicode::UnicodeExtensionList;
 
 use std::collections::BTreeMap;
 use std::fmt::Write;
+use std::iter::Peekable;
 use std::str::FromStr;
 
 use tinystr::TinyStr8;
@@ -58,7 +59,7 @@ pub struct ExtensionsMap {
 
 impl ExtensionsMap {
     pub fn try_from_iter<'a>(
-        mut iter: &mut impl Iterator<Item = &'a str>,
+        iter: &mut Peekable<impl Iterator<Item = &'a str>>,
     ) -> Result<Self, ParserError> {
         let mut result = ExtensionsMap::default();
 
@@ -69,13 +70,13 @@ impl ExtensionsMap {
             match subtag.as_str() {
                 "" => break,
                 "u" => {
-                    result.unicode = UnicodeExtensionList::try_from_iter(&mut iter)?;
+                    result.unicode = UnicodeExtensionList::try_from_iter(iter)?;
                 }
                 "t" => {
-                    result.transform = TransformExtensionList::try_from_iter(&mut iter)?;
+                    result.transform = TransformExtensionList::try_from_iter(iter)?;
                 }
                 "x" => {
-                    result.private = PrivateExtensionList::try_from_iter(&mut iter)?;
+                    result.private = PrivateExtensionList::try_from_iter(iter)?;
                 }
                 _ => unimplemented!(),
             }
@@ -97,7 +98,7 @@ impl FromStr for ExtensionsMap {
     type Err = ParserError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        let mut iterator = source.split(|c| SEPARATORS.contains(&c));
+        let mut iterator = source.split(|c| SEPARATORS.contains(&c)).peekable();
         Self::try_from_iter(&mut iterator)
     }
 }

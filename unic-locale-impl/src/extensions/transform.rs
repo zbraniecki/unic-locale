@@ -4,6 +4,7 @@ use crate::parser::ParserError;
 use unic_langid_impl::LanguageIdentifier;
 
 use std::collections::BTreeMap;
+use std::iter::Peekable;
 
 use tinystr::{TinyStr4, TinyStr8};
 
@@ -33,6 +34,11 @@ fn parse_tvalue(t: &str) -> Result<TinyStr8, ParserError> {
     Ok(s.to_ascii_lowercase())
 }
 
+fn is_language_subtag(t: &str) -> bool {
+    let slen = t.len();
+    (slen >= 2 && slen <= 8 || slen == 4) && !t.contains(|c: char| !c.is_ascii_alphabetic())
+}
+
 impl TransformExtensionList {
     pub fn is_empty(&self) -> bool {
         self.tlang.is_none() && self.tfields.is_empty()
@@ -55,11 +61,10 @@ impl TransformExtensionList {
     }
 
     pub fn try_from_iter<'a>(
-        iter: &mut impl Iterator<Item = &'a str>,
+        mut iter: &mut Peekable<impl Iterator<Item = &'a str>>,
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
 
-        let mut iter = iter.peekable();
         let mut st_peek = iter.peek();
 
         let mut current_tkey = None;
@@ -77,11 +82,13 @@ impl TransformExtensionList {
                 iter.next();
             } else if current_tkey.is_some() {
                 current_tvalue.push(parse_tvalue(subtag)?);
-            } else {
+            } else if is_language_subtag(subtag) {
                 text.tlang = Some(
                     LanguageIdentifier::try_from_iter(&mut iter, true)
                         .map_err(|_| ParserError::InvalidLanguage)?,
                 );
+            } else {
+                break;
             }
             st_peek = iter.peek();
         }
