@@ -17,7 +17,7 @@ impl TransformExtensionList {
     }
 
     pub fn parse_from_iter<'a>(
-        mut iter: &mut impl Iterator<Item = &'a str>,
+        iter: &mut impl Iterator<Item = &'a str>,
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
 
@@ -33,7 +33,7 @@ impl TransformExtensionList {
 
             } else {
                 text.tlang = Some(
-                    LanguageIdentifier::from_iter(&mut iter, true)
+                    LanguageIdentifier::from_iter(&mut iter.peekable(), true)
                         .map_err(|_| ParserError::InvalidLanguage)?,
                 );
             }

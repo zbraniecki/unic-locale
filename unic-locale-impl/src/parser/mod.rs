@@ -8,7 +8,7 @@ use unic_langid_impl::LanguageIdentifier;
 static SEPARATORS: &[char] = &['-', '_'];
 
 pub fn parse_locale(t: &str) -> Result<Locale, ParserError> {
-    let mut iter = t.split(|c| SEPARATORS.contains(&c));
+    let mut iter = t.split(|c| SEPARATORS.contains(&c)).peekable();
 
     let langid =
         LanguageIdentifier::from_iter(&mut iter, true).map_err(|_| ParserError::InvalidLanguage)?;
