@@ -13,7 +13,9 @@ pub struct LanguageIdentifier {
     language: Option<TinyStr8>,
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
-    variants: Box<[TinyStr8]>,
+    // We store it as an Option to allow for const constructor.
+    // Once const constructor for Box::new stabilizes, we can remove this.
+    variants: Option<Box<[TinyStr8]>>,
 }
 
 impl LanguageIdentifier {
@@ -39,18 +41,23 @@ impl LanguageIdentifier {
             None
         };
 
-        let mut vars = Vec::with_capacity(variants.len());
-        for variant in variants {
-            vars.push(subtags::parse_variant_subtag(variant.as_ref())?);
-        }
-        vars.sort();
-        vars.dedup();
+        let variants = if !variants.is_empty() {
+            let mut vars = Vec::with_capacity(variants.len());
+            for variant in variants {
+                vars.push(subtags::parse_variant_subtag(variant.as_ref())?);
+            }
+            vars.sort();
+            vars.dedup();
+            Some(vars.into_boxed_slice())
+        } else {
+            None
+        };
 
         Ok(Self {
             language,
             script,
             region,
-            variants: vars.into_boxed_slice(),
+            variants,
         })
     }
 
@@ -62,12 +69,12 @@ impl LanguageIdentifier {
             .map_err(std::convert::Into::into)
     }
 
-    pub fn into_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>) {
+    pub fn into_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>) {
         (
             self.language.map(|l| l.into()),
             self.script.map(|s| s.into()),
             self.region.map(|r| r.into()),
-            self.variants.iter().map(|v| (*v).into()).collect(),
+            self.variants.map(|v| v.iter().map(|v| (*v).into()).collect()),
         )
     }
 
@@ -76,7 +83,7 @@ impl LanguageIdentifier {
         language: Option<TinyStr8>,
         script: Option<TinyStr4>,
         region: Option<TinyStr4>,
-        variants: Box<[TinyStr8]>,
+        variants: Option<Box<[TinyStr8]>>,
     ) -> Self {
         Self {
             language,
@@ -148,18 +155,25 @@ impl LanguageIdentifier {
     }
 
     pub fn get_variants(&self) -> Vec<&str> {
-        self.variants.iter().map(|s| s.as_ref()).collect()
+        if let Some(variants) = &self.variants {
+            variants.iter().map(|s| s.as_ref()).collect()
+        } else {
+            vec![]
+        }
     }
 
     pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
-        let mut result = Vec::with_capacity(variants.len());
-        for variant in variants {
-            result.push(subtags::parse_variant_subtag(variant)?);
+        if variants.is_empty() {
+            self.variants = None;
+        } else {
+            let mut result = Vec::with_capacity(variants.len());
+            for variant in variants {
+                result.push(subtags::parse_variant_subtag(variant)?);
+            }
+            result.sort();
+            result.dedup();
+            self.variants = Some(result.into_boxed_slice());
         }
-        result.sort();
-        result.dedup();
-
-        self.variants = result.into_boxed_slice();
         Ok(())
     }
 }
@@ -188,8 +202,10 @@ impl std::fmt::Display for LanguageIdentifier {
         if let Some(region) = self.get_region() {
             subtags.push(region);
         }
-        for variant in self.variants.iter() {
-            subtags.push(variant);
+        if let Some(variants) = &self.variants {
+            for variant in variants.iter() {
+                subtags.push(variant);
+            }
         }
 
         f.write_str(&subtags.join("-"))
@@ -205,13 +221,22 @@ fn subtag_matches<P: PartialEq>(
     (as_range1 && subtag1.is_none()) || (as_range2 && subtag2.is_none()) || subtag1 == subtag2
 }
 
+fn is_option_empty<P: PartialEq>(subtag: &Option<Box<[P]>>) -> bool {
+    if let Some(subtag) = subtag {
+        subtag.is_empty()
+    } else {
+        false
+    }
+}
+
 fn subtags_match<P: PartialEq>(
-    subtag1: &[P],
-    subtag2: &[P],
+    subtag1: &Option<Box<[P]>>,
+    subtag2: &Option<Box<[P]>>,
     as_range1: bool,
     as_range2: bool,
 ) -> bool {
-    (as_range1 && subtag1.is_empty()) || (as_range2 && subtag2.is_empty()) || subtag1 == subtag2
+    // or is some and is empty!
+    (as_range1 && is_option_empty(subtag1)) || (as_range2 && is_option_empty(subtag2)) || subtag1 == subtag2
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {

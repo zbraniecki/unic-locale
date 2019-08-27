@@ -69,9 +69,11 @@ fn test_from_parts_unchecked() {
             script.map(|s| TinyStr4::new_unchecked(s)),
             region.map(|r| TinyStr4::new_unchecked(r)),
             variants
-                .into_iter()
-                .map(|v| TinyStr8::new_unchecked(*v))
-                .collect(),
+                .map(|v| {
+                    v.into_iter()
+                    .map(|v| TinyStr8::new_unchecked(*v))
+                    .collect()
+                }),
         )
     };
     assert_eq!(&langid.to_string(), "en-macos-nedis");
