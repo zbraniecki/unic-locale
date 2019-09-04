@@ -17,7 +17,7 @@ assert_eq!(loc.get_language(), "en");
 assert_eq!(loc.get_script(), None);
 assert_eq!(loc.get_region(), Some("US"));
 
-loc.set_extension(ExtensionType::Unicode, "ca", "buddhist")
+loc.extensions.unicode.set_keyword("ca", "buddhist")
     .expect("Setting extension failed.");
 
 assert_eq!(&loc.to_string(), "en-US-u-ca-buddhist-hc-h12");
