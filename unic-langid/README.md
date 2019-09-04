@@ -59,9 +59,8 @@ The macro allows for compile-time parsing and validation of literal language ide
 Status
 ------
 
-The crate is providing fundamental blocks, but is very basic.
-
-In particular, a lot can be done to improve performance and memory usage.
+The crate is mostly complete on the `well-formed` level. The next batch of work will go into
+API maturity.
 
 Get Involved
 ------------
