@@ -29,11 +29,15 @@ pub fn langid(input: TokenStream) -> TokenStream {
     } else {
         quote!(None)
     };
-    let variants: Vec<_> = variants
-        .iter()
-        .map(|v| quote!($crate::TinyStr8::new_unchecked(#v)))
-        .collect();
-    let variants = quote!(Box::new([#(#variants,)*]));
+    let variants = if let Some(variants) = variants {
+        let v: Vec<_> = variants
+            .iter()
+            .map(|v| quote!($crate::TinyStr8::new_unchecked(#v)))
+            .collect();
+        quote!(Some(Box::new([#(#v,)*])))
+    } else {
+        quote!(None)
+    };
 
     TokenStream::from(quote! {
         unsafe { $crate::LanguageIdentifier::from_raw_parts_unchecked(#lang, #script, #region, #variants) }

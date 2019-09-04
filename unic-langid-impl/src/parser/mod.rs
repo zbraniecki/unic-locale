@@ -57,14 +57,19 @@ pub fn parse_language_identifier_from_iter<'a>(
         }
     }
 
-    variants.sort();
-    variants.dedup();
+    let variants = if variants.is_empty() {
+        None
+    } else {
+        variants.sort();
+        variants.dedup();
+        Some(variants.into_boxed_slice())
+    };
 
     Ok(LanguageIdentifier {
         language,
         script,
         region,
-        variants: variants.into_boxed_slice(),
+        variants,
     })
 }
 

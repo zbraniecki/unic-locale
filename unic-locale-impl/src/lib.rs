@@ -14,7 +14,7 @@ pub struct Locale {
     pub extensions: extensions::ExtensionsMap,
 }
 
-type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Box<[u64]>, String);
+type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>, String);
 
 impl Locale {
     pub fn from_parts<S: AsRef<str>>(
@@ -41,7 +41,7 @@ impl Locale {
         language: Option<TinyStr8>,
         script: Option<TinyStr4>,
         region: Option<TinyStr4>,
-        variants: Box<[TinyStr8]>,
+        variants: Option<Box<[TinyStr8]>>,
         extensions: extensions::ExtensionsMap,
     ) -> Self {
         let langid =

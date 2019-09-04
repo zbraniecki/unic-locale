@@ -2,7 +2,7 @@ use super::parser::ParserError;
 use std::error::Error;
 use std::fmt::{self, Display};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum LanguageIdentifierError {
     Unknown,
     ParserError(ParserError),

@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fmt::{self, Display};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParserError {
     InvalidLanguage,
     InvalidSubtag,
