@@ -76,13 +76,9 @@ fn language_identifier_construct_bench(c: &mut Criterion) {
                                 language.map(|l| TinyStr8::new_unchecked(l)),
                                 script.map(|s| TinyStr4::new_unchecked(s)),
                                 region.map(|r| TinyStr4::new_unchecked(r)),
-                                variants
-                                    .as_ref()
-                                    .map(|v| {
-                                        v.into_iter()
-                                        .map(|v| TinyStr8::new_unchecked(*v))
-                                        .collect()
-                                    }),
+                                variants.as_ref().map(|v| {
+                                    v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()
+                                }),
                             )
                         };
                     }

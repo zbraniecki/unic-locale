@@ -42,9 +42,16 @@ Macros
 ```rust
 use unic_langid::langid;
 
-let lang = langid!("en-US");
+// The `const` assignment will currently work only
+// if the langid doesn't contain any variants.
+const EN_US: LanguageIdentifier = langid!("en-US");
 
-assert_eq!(&langid.to_string(), "en-US")
+fn main() {
+    let de_at = langid!("de-AT");
+
+    assert_eq!(&de_at.to_string(), "de-AT")
+    assert_eq!(&EN_US.to_string(), "en-US")
+}
 ```
 
 The macro allows for compile-time parsing and validation of literal language identifiers.

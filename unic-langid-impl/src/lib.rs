@@ -42,9 +42,10 @@ impl LanguageIdentifier {
         };
 
         let variants = if !variants.is_empty() {
-            let mut vars = variants.into_iter().map(|v| {
-                subtags::parse_variant_subtag(v.as_ref())
-            }).collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
+            let mut vars = variants
+                .into_iter()
+                .map(|v| subtags::parse_variant_subtag(v.as_ref()))
+                .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             vars.sort();
             vars.dedup();
             Some(vars.into_boxed_slice())
@@ -73,7 +74,8 @@ impl LanguageIdentifier {
             self.language.map(|l| l.into()),
             self.script.map(|s| s.into()),
             self.region.map(|r| r.into()),
-            self.variants.map(|v| v.iter().map(|v| (*v).into()).collect()),
+            self.variants
+                .map(|v| v.iter().map(|v| (*v).into()).collect()),
         )
     }
 
@@ -165,9 +167,10 @@ impl LanguageIdentifier {
         if variants.is_empty() {
             self.variants = None;
         } else {
-            let mut result = variants.into_iter().map(|v| {
-                subtags::parse_variant_subtag(v.as_ref())
-            }).collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
+            let mut result = variants
+                .into_iter()
+                .map(|v| subtags::parse_variant_subtag(v.as_ref()))
+                .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             result.sort();
             result.dedup();
             self.variants = Some(result.into_boxed_slice());
@@ -230,7 +233,9 @@ fn subtags_match<P: PartialEq>(
     as_range2: bool,
 ) -> bool {
     // or is some and is empty!
-    (as_range1 && is_option_empty(subtag1)) || (as_range2 && is_option_empty(subtag2)) || subtag1 == subtag2
+    (as_range1 && is_option_empty(subtag1))
+        || (as_range2 && is_option_empty(subtag2))
+        || subtag1 == subtag2
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {

@@ -1,7 +1,7 @@
 use tinystr::{TinyStr4, TinyStr8};
-use unic_langid_impl::parser::parse_language_identifier;
 use unic_langid_impl::parser::errors::ParserError;
-use unic_langid_impl::{LanguageIdentifier, errors::LanguageIdentifierError};
+use unic_langid_impl::parser::parse_language_identifier;
+use unic_langid_impl::{errors::LanguageIdentifierError, LanguageIdentifier};
 
 fn assert_language_identifier(
     loc: &LanguageIdentifier,
@@ -62,9 +62,13 @@ fn test_sorted_variants() {
 
 #[test]
 fn test_from_parts() {
-    let langid =
-        LanguageIdentifier::from_parts(Some("en"), None, None, &["1", "macos"]);
-    assert_eq!(langid, Err(LanguageIdentifierError::ParserError(ParserError::InvalidSubtag)));
+    let langid = LanguageIdentifier::from_parts(Some("en"), None, None, &["1", "macos"]);
+    assert_eq!(
+        langid,
+        Err(LanguageIdentifierError::ParserError(
+            ParserError::InvalidSubtag
+        ))
+    );
 }
 
 #[test]
@@ -76,12 +80,7 @@ fn test_from_parts_unchecked() {
             lang.map(|l| TinyStr8::new_unchecked(l)),
             script.map(|s| TinyStr4::new_unchecked(s)),
             region.map(|r| TinyStr4::new_unchecked(r)),
-            variants
-                .map(|v| {
-                    v.into_iter()
-                    .map(|v| TinyStr8::new_unchecked(*v))
-                    .collect()
-                }),
+            variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
         )
     };
     assert_eq!(&langid.to_string(), "en-macos-nedis");

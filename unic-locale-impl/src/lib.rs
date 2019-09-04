@@ -14,7 +14,13 @@ pub struct Locale {
     pub extensions: extensions::ExtensionsMap,
 }
 
-type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>, String);
+type RawPartsTuple = (
+    Option<u64>,
+    Option<u32>,
+    Option<u32>,
+    Option<Box<[u64]>>,
+    String,
+);
 
 impl Locale {
     pub fn from_parts<S: AsRef<str>>(

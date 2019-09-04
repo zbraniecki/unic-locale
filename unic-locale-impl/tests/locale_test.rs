@@ -74,12 +74,7 @@ fn test_from_parts_unchecked() {
             lang.map(|l| TinyStr8::new_unchecked(l)),
             script.map(|s| TinyStr4::new_unchecked(s)),
             region.map(|r| TinyStr4::new_unchecked(r)),
-            variants
-                .map(|v| {
-                    v.into_iter()
-                    .map(|v| TinyStr8::new_unchecked(*v))
-                    .collect()
-                }),
+            variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
             extensions.parse().unwrap(),
         )
     };

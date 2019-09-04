@@ -2,18 +2,19 @@
 use unic_langid::langid;
 use unic_langid::LanguageIdentifier;
 
-// This will become possible when Box can be produced in a const fn
-// static LANGID: LanguageIdentifier = langid!("en-US");
+#[cfg(feature = "unic-langid-macros")]
+const EN_US: LanguageIdentifier = langid!("en-US");
 
 fn main() {
-    let langid: LanguageIdentifier = "en-US".parse().unwrap();
+    let langid: LanguageIdentifier = "fr-CA".parse().unwrap();
     println!("{:#?}", langid);
-    assert_eq!(langid.get_language(), "en");
+    assert_eq!(langid.get_language(), "fr");
 
     #[cfg(feature = "unic-langid-macros")]
     {
         let langid = langid!("de-AT");
         println!("{:#?}", langid);
         assert_eq!(langid.get_language(), "de");
+        assert_eq!(EN_US.get_language(), "en");
     }
 }
