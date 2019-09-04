@@ -42,10 +42,9 @@ impl LanguageIdentifier {
         };
 
         let variants = if !variants.is_empty() {
-            let mut vars = Vec::with_capacity(variants.len());
-            for variant in variants {
-                vars.push(subtags::parse_variant_subtag(variant.as_ref())?);
-            }
+            let mut vars = variants.into_iter().map(|v| {
+                subtags::parse_variant_subtag(v.as_ref())
+            }).collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             vars.sort();
             vars.dedup();
             Some(vars.into_boxed_slice())
@@ -166,10 +165,9 @@ impl LanguageIdentifier {
         if variants.is_empty() {
             self.variants = None;
         } else {
-            let mut result = Vec::with_capacity(variants.len());
-            for variant in variants {
-                result.push(subtags::parse_variant_subtag(variant)?);
-            }
+            let mut result = variants.into_iter().map(|v| {
+                subtags::parse_variant_subtag(v.as_ref())
+            }).collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             result.sort();
             result.dedup();
             self.variants = Some(result.into_boxed_slice());
@@ -222,11 +220,7 @@ fn subtag_matches<P: PartialEq>(
 }
 
 fn is_option_empty<P: PartialEq>(subtag: &Option<Box<[P]>>) -> bool {
-    if let Some(subtag) = subtag {
-        subtag.is_empty()
-    } else {
-        false
-    }
+    subtag.as_ref().map(|t| t.is_empty()).unwrap_or(false)
 }
 
 fn subtags_match<P: PartialEq>(

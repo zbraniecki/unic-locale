@@ -1,6 +1,7 @@
 use tinystr::{TinyStr4, TinyStr8};
 use unic_langid_impl::parser::parse_language_identifier;
-use unic_langid_impl::LanguageIdentifier;
+use unic_langid_impl::parser::errors::ParserError;
+use unic_langid_impl::{LanguageIdentifier, errors::LanguageIdentifierError};
 
 fn assert_language_identifier(
     loc: &LanguageIdentifier,
@@ -57,6 +58,13 @@ fn test_sorted_variants() {
     let langid =
         LanguageIdentifier::from_parts(Some("en"), None, None, &["nedis", "macos"]).unwrap();
     assert_eq!(&langid.to_string(), "en-macos-nedis");
+}
+
+#[test]
+fn test_from_parts() {
+    let langid =
+        LanguageIdentifier::from_parts(Some("en"), None, None, &["1", "macos"]);
+    assert_eq!(langid, Err(LanguageIdentifierError::ParserError(ParserError::InvalidSubtag)));
 }
 
 #[test]
