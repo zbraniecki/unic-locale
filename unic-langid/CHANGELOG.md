@@ -4,6 +4,11 @@
 
   - …
 
+## unic-langid 0.5.0 (September 4, 2019)
+
+  - Migrate unic-langid to TinyStr.
+  - Enable `langid!` macro to work in const (unless it has variants).
+
 ## unic-langid 0.4.2 (August 2, 2019)
 
   - Update the macros to 0.3.0.
