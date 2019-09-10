@@ -134,3 +134,13 @@ fn test_set_fields() {
     langid.set_variants(&[]).expect("Setting variants failed");
     assert_eq!(&langid.to_string(), "und");
 }
+
+#[test]
+fn test_matches_as_range() {
+    let langid: LanguageIdentifier = "en-US".parse().unwrap();
+    let langid2: LanguageIdentifier = "en-US-windows".parse().unwrap();
+    assert_eq!(langid.matches(&langid2, false, false), false);
+    assert_eq!(langid.matches(&langid2, true, false), true);
+    assert_eq!(langid.matches(&langid2, false, true), false);
+    assert_eq!(langid.matches(&langid2, true, true), true);
+}
