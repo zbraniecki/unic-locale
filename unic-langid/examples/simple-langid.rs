@@ -1,5 +1,6 @@
 #[cfg(feature = "unic-langid-macros")]
 use unic_langid::langid;
+use unic_langid::LangId;
 use unic_langid::LanguageIdentifier;
 
 #[cfg(feature = "unic-langid-macros")]

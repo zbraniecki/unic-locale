@@ -6,7 +6,9 @@ use errors::LocaleError;
 pub use extensions::{ExtensionType, ExtensionsMap};
 use std::str::FromStr;
 use tinystr::{TinyStr4, TinyStr8};
+use unic_langid_impl::LangId;
 pub use unic_langid_impl::LanguageIdentifier;
+use unic_langid_impl::LanguageIdentifierError;
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Locale {
@@ -55,55 +57,86 @@ impl Locale {
         Self { langid, extensions }
     }
 
-    pub fn matches<O: AsRef<Self>>(
-        &self,
-        other: &O,
-        self_as_range: bool,
-        other_as_range: bool,
-    ) -> bool {
-        let other = other.as_ref();
+    pub fn get_language(&self) -> &str {
+        LangId::get_language(self)
+    }
+
+    pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError> {
+        LangId::set_language(self, language)
+    }
+
+    pub fn get_script(&self) -> Option<&str> {
+        LangId::get_script(self)
+    }
+
+    pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
+        LangId::set_script(self, script)
+    }
+
+    pub fn get_region(&self) -> Option<&str> {
+        LangId::get_region(self)
+    }
+
+    pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
+        LangId::set_region(self, region)
+    }
+
+    pub fn get_variants(&self) -> Vec<&str> {
+        LangId::get_variants(self)
+    }
+
+    pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
+        LangId::set_variants(self, variants)
+    }
+
+    pub fn matches(&self, other: &Locale, self_as_range: bool, other_as_range: bool) -> bool {
         if !self.extensions.private.is_empty() || !other.extensions.private.is_empty() {
             return false;
         }
-        self.langid
-            .matches(&other.langid, self_as_range, other_as_range)
+        LangId::matches(self, other, self_as_range, other_as_range)
+    }
+}
+
+impl LangId for Locale {
+    fn matches<O: LangId>(&self, other: &O, self_as_range: bool, other_as_range: bool) -> bool {
+        self.langid.matches(other, self_as_range, other_as_range)
     }
 
-    pub fn get_language(&self) -> &str {
+    fn get_language(&self) -> &str {
         self.langid.get_language()
     }
 
-    pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LocaleError> {
+    fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError> {
         self.langid
             .set_language(language)
             .map_err(std::convert::Into::into)
     }
 
-    pub fn get_script(&self) -> Option<&str> {
+    fn get_script(&self) -> Option<&str> {
         self.langid.get_script()
     }
 
-    pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LocaleError> {
+    fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
         self.langid
             .set_script(script)
             .map_err(std::convert::Into::into)
     }
 
-    pub fn get_region(&self) -> Option<&str> {
+    fn get_region(&self) -> Option<&str> {
         self.langid.get_region()
     }
 
-    pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LocaleError> {
+    fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
         self.langid
             .set_region(region)
             .map_err(std::convert::Into::into)
     }
 
-    pub fn get_variants(&self) -> Vec<&str> {
+    fn get_variants(&self) -> Vec<&str> {
         self.langid.get_variants()
     }
 
-    pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LocaleError> {
+    fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
         self.langid
             .set_variants(variants)
             .map_err(std::convert::Into::into)
@@ -130,6 +163,12 @@ impl From<LanguageIdentifier> for Locale {
 impl Into<LanguageIdentifier> for Locale {
     fn into(self) -> LanguageIdentifier {
         self.langid
+    }
+}
+
+impl Into<LanguageIdentifier> for &Locale {
+    fn into(self) -> LanguageIdentifier {
+        self.langid.clone()
     }
 }
 

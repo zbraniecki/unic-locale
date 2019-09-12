@@ -2,11 +2,27 @@ pub mod errors;
 pub mod parser;
 pub mod subtags;
 
-use crate::errors::LanguageIdentifierError;
+pub use crate::errors::LanguageIdentifierError;
 use std::iter::Peekable;
 use std::str::FromStr;
 
 use tinystr::{TinyStr4, TinyStr8};
+
+pub trait LangId {
+    fn get_language(&self) -> &str;
+    fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError>;
+
+    fn get_script(&self) -> Option<&str>;
+    fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError>;
+
+    fn get_region(&self) -> Option<&str>;
+    fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError>;
+
+    fn get_variants(&self) -> Vec<&str>;
+    fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError>;
+
+    fn matches<O: LangId>(&self, other: &O, self_as_range: bool, other_as_range: bool) -> bool;
+}
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct LanguageIdentifier {
@@ -94,33 +110,49 @@ impl LanguageIdentifier {
         }
     }
 
-    pub fn matches<O: AsRef<Self>>(
-        &self,
-        other: &O,
-        self_as_range: bool,
-        other_as_range: bool,
-    ) -> bool {
-        let other = other.as_ref();
-        subtag_matches(
-            &self.language,
-            &other.language,
-            self_as_range,
-            other_as_range,
-        ) && subtag_matches(&self.script, &other.script, self_as_range, other_as_range)
-            && subtag_matches(&self.region, &other.region, self_as_range, other_as_range)
-            && subtags_match(
-                &self.variants,
-                &other.variants,
-                self_as_range,
-                other_as_range,
-            )
-    }
-
     pub fn get_language(&self) -> &str {
-        self.language.as_ref().map(|s| s.as_ref()).unwrap_or("und")
+        LangId::get_language(self)
     }
 
     pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError> {
+        LangId::set_language(self, language)
+    }
+
+    pub fn get_script(&self) -> Option<&str> {
+        LangId::get_script(self)
+    }
+
+    pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
+        LangId::set_script(self, script)
+    }
+
+    pub fn get_region(&self) -> Option<&str> {
+        LangId::get_region(self)
+    }
+
+    pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
+        LangId::set_region(self, region)
+    }
+
+    pub fn get_variants(&self) -> Vec<&str> {
+        LangId::get_variants(self)
+    }
+
+    pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
+        LangId::set_variants(self, variants)
+    }
+
+    pub fn matches<O: LangId>(&self, other: &O, self_as_range: bool, other_as_range: bool) -> bool {
+        LangId::matches(self, other, self_as_range, other_as_range)
+    }
+}
+
+impl LangId for LanguageIdentifier {
+    fn get_language(&self) -> &str {
+        self.language.as_ref().map(|s| s.as_ref()).unwrap_or("und")
+    }
+
+    fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError> {
         self.language = if let Some(lang) = language {
             subtags::parse_language_subtag(lang)?
         } else {
@@ -129,11 +161,11 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    pub fn get_script(&self) -> Option<&str> {
+    fn get_script(&self) -> Option<&str> {
         self.script.as_ref().map(|s| s.as_ref())
     }
 
-    pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
+    fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
         self.script = if let Some(script) = script {
             Some(subtags::parse_script_subtag(script)?)
         } else {
@@ -142,11 +174,11 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    pub fn get_region(&self) -> Option<&str> {
+    fn get_region(&self) -> Option<&str> {
         self.region.as_ref().map(|s| s.as_ref())
     }
 
-    pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
+    fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
         self.region = if let Some(region) = region {
             Some(subtags::parse_region_subtag(region)?)
         } else {
@@ -155,7 +187,7 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    pub fn get_variants(&self) -> Vec<&str> {
+    fn get_variants(&self) -> Vec<&str> {
         if let Some(variants) = &self.variants {
             variants.iter().map(|s| s.as_ref()).collect()
         } else {
@@ -163,7 +195,7 @@ impl LanguageIdentifier {
         }
     }
 
-    pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
+    fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
         if variants.is_empty() {
             self.variants = None;
         } else {
@@ -177,6 +209,30 @@ impl LanguageIdentifier {
         }
         Ok(())
     }
+
+    fn matches<O: LangId>(&self, other: &O, self_as_range: bool, other_as_range: bool) -> bool {
+        lang_matches(
+            self.get_language(),
+            other.get_language(),
+            self_as_range,
+            other_as_range,
+        ) && subtag_matches(
+            self.get_script(),
+            other.get_script(),
+            self_as_range,
+            other_as_range,
+        ) && subtag_matches(
+            self.get_region(),
+            other.get_region(),
+            self_as_range,
+            other_as_range,
+        ) && subtags_match(
+            &self.get_variants(),
+            &other.get_variants(),
+            self_as_range,
+            other_as_range,
+        )
+    }
 }
 
 impl FromStr for LanguageIdentifier {
@@ -184,6 +240,12 @@ impl FromStr for LanguageIdentifier {
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
         parser::parse_language_identifier(source).map_err(std::convert::Into::into)
+    }
+}
+
+impl Into<LanguageIdentifier> for &LanguageIdentifier {
+    fn into(self) -> LanguageIdentifier {
+        self.clone()
     }
 }
 
@@ -213,29 +275,21 @@ impl std::fmt::Display for LanguageIdentifier {
     }
 }
 
-fn subtag_matches<P: PartialEq>(
-    subtag1: &Option<P>,
-    subtag2: &Option<P>,
+fn lang_matches(lang1: &str, lang2: &str, as_range1: bool, as_range2: bool) -> bool {
+    (lang1 == "und" && as_range1) || (lang2 == "und" && as_range2) || lang1 == lang2
+}
+
+fn subtag_matches(
+    subtag1: Option<&str>,
+    subtag2: Option<&str>,
     as_range1: bool,
     as_range2: bool,
 ) -> bool {
-    (as_range1 && subtag1.is_none()) || (as_range2 && subtag2.is_none()) || subtag1 == subtag2
+    (subtag1.is_none() && as_range1) || (subtag2.is_none() && as_range2) || subtag1 == subtag2
 }
 
-fn is_option_empty<P: PartialEq>(subtag: &Option<Box<[P]>>) -> bool {
-    subtag.as_ref().map(|t| t.is_empty()).unwrap_or(true)
-}
-
-fn subtags_match<P: PartialEq>(
-    subtag1: &Option<Box<[P]>>,
-    subtag2: &Option<Box<[P]>>,
-    as_range1: bool,
-    as_range2: bool,
-) -> bool {
-    // or is some and is empty!
-    (as_range1 && is_option_empty(subtag1))
-        || (as_range2 && is_option_empty(subtag2))
-        || subtag1 == subtag2
+fn subtags_match(subtag1: &[&str], subtag2: &[&str], as_range1: bool, as_range2: bool) -> bool {
+    (subtag1.is_empty() && as_range1) || (subtag2.is_empty() && as_range2) || subtag1 == subtag2
 }
 
 pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {

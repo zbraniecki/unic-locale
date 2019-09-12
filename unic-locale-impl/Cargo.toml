@@ -10,13 +10,17 @@ license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-unic-langid-impl = "0.5"
+unic-langid-impl = { path = "../unic-langid-impl" }
 tinystr = "0.3"
 
 [dev-dependencies]
 criterion = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
+[[bench]]
+name = "locale"
+harness = false
 
 [[bench]]
 name = "parser"
