@@ -1,0 +1,41 @@
+use criterion::criterion_group;
+use criterion::criterion_main;
+use criterion::Criterion;
+
+use unic_langid::LanguageIdentifier;
+use unic_langid_likelysubtags::add_likely_subtags;
+
+static STRINGS: &[&str] = &[
+    "en-US",
+    "en-GB",
+    "es-AR",
+    "it",
+    "zh-Hans-CN",
+    "de-AT",
+    "pl",
+    "fr-FR",
+    "de-AT",
+    "sr-Cyrl-SR",
+    "nb-NO",
+    "fr-FR",
+    "mk",
+    "uk",
+];
+
+fn language_identifier_parser_bench(c: &mut Criterion) {
+    let langids: Vec<LanguageIdentifier> = STRINGS
+        .iter()
+        .map(|s| -> LanguageIdentifier { s.parse().unwrap() })
+        .collect();
+
+    c.bench_function("language_identifier_parser", move |b| {
+        b.iter(|| {
+            for s in &langids {
+                let _ = add_likely_subtags(&s);
+            }
+        })
+    });
+}
+
+criterion_group!(benches, language_identifier_parser_bench,);
+criterion_main!(benches);
