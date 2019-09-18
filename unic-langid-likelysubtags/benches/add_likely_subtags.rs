@@ -43,13 +43,13 @@ static STRINGS: &[&str] = &[
     "kk-Arab",
 ];
 
-fn language_identifier_parser_bench(c: &mut Criterion) {
+fn add_likely_subtags_bench(c: &mut Criterion) {
     let langids: Vec<LanguageIdentifier> = STRINGS
         .iter()
         .map(|s| -> LanguageIdentifier { s.parse().unwrap() })
         .collect();
 
-    c.bench_function("language_identifier_parser", move |b| {
+    c.bench_function("add_likely_subtags", move |b| {
         b.iter(|| {
             for s in &langids {
                 let _ = add_likely_subtags(&s);
@@ -58,5 +58,5 @@ fn language_identifier_parser_bench(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, language_identifier_parser_bench,);
+criterion_group!(benches, add_likely_subtags_bench,);
 criterion_main!(benches);
