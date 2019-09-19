@@ -12,9 +12,7 @@ fn get_lang_from_parts(
     let lang = unsafe { lang.or(input.0).map(|l| TinyStr8::new_unchecked(l)) };
     let script = unsafe { script.or(input.1).map(|s| TinyStr4::new_unchecked(s)) };
     let region = unsafe { region.or(input.2).map(|r| TinyStr4::new_unchecked(r)) };
-    return Some(unsafe {
-        LanguageIdentifier::from_raw_parts_unchecked(lang, script, region, None)
-    });
+    Some(unsafe { LanguageIdentifier::from_raw_parts_unchecked(lang, script, region, None) })
 }
 
 pub fn add_likely_subtags(langid: &LanguageIdentifier) -> Option<LanguageIdentifier> {

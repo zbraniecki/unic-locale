@@ -1,3 +1,6 @@
+#![allow(clippy::type_complexity)]
+#![allow(clippy::unreadable_literal)]
+
 pub const LANG_ONLY: &[(u64, (Option<u64>, Option<u32>, Option<u32>))] = &[
     (24929, (Some(24929), Some(1853120844), Some(21573))),
     (24930, (Some(24930), Some(1819441475), Some(21842))),

@@ -4,33 +4,15 @@ use std::str::FromStr;
 use tinystr::{TinyStr4, TinyStr8};
 use unic_langid::LanguageIdentifier;
 
-fn get_lang_option(l: &str) -> Option<&str> {
-    if l == "und" {
-        None
-    } else {
-        Some(l)
-    }
-}
+type LangIdSubTags = (Option<u64>, Option<u32>, Option<u32>);
 
-fn serialize_val(input: (Option<u64>, Option<u32>, Option<u32>)) -> String {
+fn serialize_val(input: LangIdSubTags) -> String {
     format!(
         "({}, {}, {})",
         serialize_lang_option(input.0),
         serialize_script_option(input.1),
         serialize_region_option(input.2)
     )
-}
-
-fn serialize_script(l: String) -> String {
-    let ts: TinyStr4 = l.parse().expect("Script should parse as TinyStr4.");
-    let ts_u: u32 = ts.into();
-    format!("{}", ts_u)
-}
-
-fn serialize_region(l: String) -> String {
-    let ts: TinyStr4 = l.parse().expect("Region should parse as TinyStr4.");
-    let ts_u: u32 = ts.into();
-    format!("{}", ts_u)
 }
 
 fn serialize_lang_option(l: Option<u64>) -> String {
@@ -57,26 +39,18 @@ fn serialize_region_option(r: Option<u32>) -> String {
     }
 }
 
-fn serialize_subtag(l: Option<String>) -> String {
-    if let Some(l) = l {
-        format!("Some(\"{}\")", l)
-    } else {
-        String::from("None")
-    }
-}
-
 fn main() {
     let contents = fs::read_to_string("./data/likelySubtags.json")
         .expect("Something went wrong reading the file");
     let v: Value = serde_json::from_str(&contents).unwrap();
     let values = v["supplemental"]["likelySubtags"].as_object().unwrap();
 
-    let mut lang_only: Vec<(u64, (Option<u64>, Option<u32>, Option<u32>))> = vec![];
-    let mut lang_region: Vec<(u64, u32, (Option<u64>, Option<u32>, Option<u32>))> = vec![];
-    let mut lang_script: Vec<(u64, u32, (Option<u64>, Option<u32>, Option<u32>))> = vec![];
-    let mut script_region: Vec<(u32, u32, (Option<u64>, Option<u32>, Option<u32>))> = vec![];
-    let mut region_only: Vec<(u32, (Option<u64>, Option<u32>, Option<u32>))> = vec![];
-    let mut script_only: Vec<(u32, (Option<u64>, Option<u32>, Option<u32>))> = vec![];
+    let mut lang_only: Vec<(u64, LangIdSubTags)> = vec![];
+    let mut lang_region: Vec<(u64, u32, LangIdSubTags)> = vec![];
+    let mut lang_script: Vec<(u64, u32, LangIdSubTags)> = vec![];
+    let mut script_region: Vec<(u32, u32, LangIdSubTags)> = vec![];
+    let mut region_only: Vec<(u32, LangIdSubTags)> = vec![];
+    let mut script_only: Vec<(u32, LangIdSubTags)> = vec![];
 
     for (k, v) in values {
         let key_langid: LanguageIdentifier = k.parse().expect("Failed to parse a key.");
@@ -125,6 +99,9 @@ fn main() {
             }
         }
     }
+
+    println!("#![allow(clippy::type_complexity)]");
+    println!("#![allow(clippy::unreadable_literal)\n");
 
     println!("pub const LANG_ONLY: &[(u64, (Option<u64>, Option<u32>, Option<u32>))] = &[");
     lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
