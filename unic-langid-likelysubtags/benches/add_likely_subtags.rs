@@ -41,6 +41,10 @@ static STRINGS: &[&str] = &[
     "ng",
     "klx",
     "kk-Arab",
+    "en-Cyrl",
+    "und-Cyrl-UK",
+    "und-Arab",
+    "und-Arab-FO",
 ];
 
 fn add_likely_subtags_bench(c: &mut Criterion) {
