@@ -11,11 +11,15 @@ categories = ["internationalization"]
 
 [dependencies]
 tinystr = "0.3"
+unic-langid-likelysubtags = { path = "../unic-langid-likelysubtags", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
+[features]
+likelysubtags = ["unic-langid-likelysubtags"]
 
 [[bench]]
 name = "parser"
@@ -27,4 +31,8 @@ harness = false
 
 [[bench]]
 name = "canonicalize"
+harness = false
+
+[[bench]]
+name = "add_likely_subtags"
 harness = false

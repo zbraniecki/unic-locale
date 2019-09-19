@@ -2,7 +2,7 @@ use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
 
-use unic_langid::LanguageIdentifier;
+use tinystr::{TinyStr4, TinyStr8};
 use unic_langid_likelysubtags::add_likely_subtags;
 
 static STRINGS: &[&str] = &[
@@ -47,16 +47,33 @@ static STRINGS: &[&str] = &[
     "und-Arab-FO",
 ];
 
+fn extract_input(s: &str) -> (Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>) {
+    let chunks: Vec<&str> = s.split("-").collect();
+    let mut lang: Option<TinyStr8> = chunks.get(0).map(|s| s.parse().unwrap());
+    let mut script: Option<TinyStr4> = chunks.get(1).map(|s| s.parse().unwrap());
+    let mut region: Option<TinyStr4> = chunks.get(2).map(|s| s.parse().unwrap());
+    if let Some(l) = lang {
+        if l.as_str() == "und" {
+            lang = None;
+        }
+    }
+    if let Some(s) = script {
+        if s.as_str().chars().count() == 2 {
+            region = script;
+            script = None;
+        }
+    }
+    (lang, script, region)
+}
+
 fn add_likely_subtags_bench(c: &mut Criterion) {
-    let langids: Vec<LanguageIdentifier> = STRINGS
-        .iter()
-        .map(|s| -> LanguageIdentifier { s.parse().unwrap() })
-        .collect();
+    let entries: Vec<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> =
+        STRINGS.iter().map(|s| extract_input(s)).collect();
 
     c.bench_function("add_likely_subtags", move |b| {
         b.iter(|| {
-            for s in &langids {
-                let _ = add_likely_subtags(&s);
+            for (lang, script, region) in &entries {
+                let _ = add_likely_subtags(lang.clone(), script.clone(), region.clone());
             }
         })
     });

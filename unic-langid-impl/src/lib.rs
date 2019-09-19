@@ -6,6 +6,9 @@ use crate::errors::LanguageIdentifierError;
 use std::iter::Peekable;
 use std::str::FromStr;
 
+#[cfg(feature="likelysubtags")]
+use unic_langid_likelysubtags::add_likely_subtags;
+
 use tinystr::{TinyStr4, TinyStr8};
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
@@ -176,6 +179,18 @@ impl LanguageIdentifier {
             self.variants = Some(result.into_boxed_slice());
         }
         Ok(())
+    }
+
+    #[cfg(feature="likelysubtags")]
+    pub fn add_likely_subtags(&mut self) -> bool {
+        if let Some(new_li) = add_likely_subtags(self.language, self.region, self.script) {
+            self.language = new_li.0;
+            self.script = new_li.1;
+            self.region = new_li.2;
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

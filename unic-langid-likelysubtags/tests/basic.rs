@@ -1,4 +1,4 @@
-use unic_langid::LanguageIdentifier;
+use tinystr::{TinyStr4, TinyStr8};
 use unic_langid_likelysubtags::add_likely_subtags;
 
 static STRINGS: &[(&str, Option<&str>)] = &[
@@ -41,14 +41,46 @@ static STRINGS: &[(&str, Option<&str>)] = &[
     ("und-Cyrl-UK", Some("ru-Cyrl-UK")),
     ("und-Arab", Some("ar-Arab-EG")),
     ("und-Arab-FO", Some("ar-Arab-FO")),
-    ("und-Arab-FO-macos", Some("ar-Arab-FO-macos")),
 ];
+
+fn extract_input(s: &str) -> (Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>) {
+    let chunks: Vec<&str> = s.split("-").collect();
+    let mut lang: Option<TinyStr8> = chunks.get(0).map(|s| s.parse().unwrap());
+    let mut script: Option<TinyStr4> = chunks.get(1).map(|s| s.parse().unwrap());
+    let mut region: Option<TinyStr4> = chunks.get(2).map(|s| s.parse().unwrap());
+    if let Some(l) = lang {
+        if l.as_str() == "und" {
+            lang = None;
+        }
+    }
+    if let Some(s) = script {
+        if s.as_str().chars().count() == 2 {
+            region = script;
+            script = None;
+        }
+    }
+    (lang, script, region)
+}
+
+fn extract_output(
+    s: Option<&str>,
+) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
+    s.map(|s| {
+        let chunks: Vec<&str> = s.split("-").collect();
+        (
+            chunks.get(0).map(|s| s.parse().unwrap()),
+            chunks.get(1).map(|s| s.parse().unwrap()),
+            chunks.get(2).map(|s| s.parse().unwrap()),
+        )
+    })
+}
 
 #[test]
 fn sanity_check() {
     for i in STRINGS {
-        let en: LanguageIdentifier = i.0.parse().unwrap();
-        let result = add_likely_subtags(&en).map(|l| l.to_string());
-        assert_eq!(result.as_ref().map(String::as_str), i.1);
+        let chunks = extract_input(i.0);
+        println!("{:#?}", chunks);
+        let result = add_likely_subtags(chunks.0, chunks.1, chunks.2);
+        assert_eq!(extract_output(i.1), result);
     }
 }

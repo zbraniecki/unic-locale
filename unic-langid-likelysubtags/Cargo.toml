@@ -5,7 +5,6 @@ authors = ["Zibi Braniecki <zibi@braniecki.net>"]
 edition = "2018"
 
 [dependencies]
-unic-langid = "0.5"
 tinystr = "0.3"
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
