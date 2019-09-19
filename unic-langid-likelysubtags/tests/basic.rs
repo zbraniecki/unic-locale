@@ -41,6 +41,7 @@ static STRINGS: &[(&str, Option<&str>)] = &[
     ("und-Cyrl-UK", Some("ru-Cyrl-UK")),
     ("und-Arab", Some("ar-Arab-EG")),
     ("und-Arab-FO", Some("ar-Arab-FO")),
+    ("und-Arab-FO-macos", Some("ar-Arab-FO-macos")),
 ];
 
 #[test]
