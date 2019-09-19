@@ -21,3 +21,4 @@ default = []
 
 # Provide macros.
 macros = ["unic-langid-macros"]
+likelysubtags = ["unic-langid-impl/likelysubtags"]
