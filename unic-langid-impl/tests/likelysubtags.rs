@@ -1,5 +1,5 @@
 use tinystr::{TinyStr4, TinyStr8};
-use unic_langid_likelysubtags::add_likely_subtags;
+use unic_langid_impl::likelysubtags::{add_likely_subtags, CLDR_VERSION};
 
 static STRINGS: &[(&str, Option<&str>)] = &[
     ("en-US", Some("en-Latn-US")),
@@ -83,4 +83,9 @@ fn sanity_check() {
         let result = add_likely_subtags(chunks.0, chunks.1, chunks.2);
         assert_eq!(extract_output(i.1), result);
     }
+}
+
+#[test]
+fn version_works() {
+    assert_eq!(CLDR_VERSION, "35.0");
 }

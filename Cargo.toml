@@ -4,7 +4,6 @@ members = [
     "unic-langid-impl",
     "unic-langid-macros",
     "unic-langid-macros-impl",
-    "unic-langid-likelysubtags",
     "unic-locale",
     "unic-locale-impl",
     "unic-locale-macros",

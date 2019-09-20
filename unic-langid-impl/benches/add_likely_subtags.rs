@@ -1,8 +1,9 @@
+use criterion::black_box;
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
-use criterion::black_box;
 
+use tinystr::{TinyStr4, TinyStr8};
 use unic_langid_impl::LanguageIdentifier;
 
 static STRINGS: &[&str] = &[
@@ -48,7 +49,6 @@ static STRINGS: &[&str] = &[
 ];
 
 fn add_likely_subtags_bench(c: &mut Criterion) {
-
     c.bench_function("add_likely_subtags", move |b| {
         b.iter(|| {
             let langids: Vec<LanguageIdentifier> = STRINGS
@@ -56,7 +56,6 @@ fn add_likely_subtags_bench(c: &mut Criterion) {
                 .map(|s| -> LanguageIdentifier { s.parse().unwrap() })
                 .collect();
             for mut s in langids {
-                #[cfg(feature="likelysubtags")]
                 s.add_likely_subtags();
                 let _ = black_box(s.to_string());
             }
@@ -64,5 +63,45 @@ fn add_likely_subtags_bench(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, add_likely_subtags_bench,);
+fn extract_input(s: &str) -> (Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>) {
+    let chunks: Vec<&str> = s.split("-").collect();
+    let mut lang: Option<TinyStr8> = chunks.get(0).map(|s| s.parse().unwrap());
+    let mut script: Option<TinyStr4> = chunks.get(1).map(|s| s.parse().unwrap());
+    let mut region: Option<TinyStr4> = chunks.get(2).map(|s| s.parse().unwrap());
+    if let Some(l) = lang {
+        if l.as_str() == "und" {
+            lang = None;
+        }
+    }
+    if let Some(s) = script {
+        if s.as_str().chars().count() == 2 {
+            region = script;
+            script = None;
+        }
+    }
+    (lang, script, region)
+}
+
+fn raw_add_likely_subtags_bench(c: &mut Criterion) {
+    let entries: Vec<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> =
+        STRINGS.iter().map(|s| extract_input(s)).collect();
+
+    c.bench_function("raw_add_likely_subtags", move |b| {
+        b.iter(|| {
+            for (lang, script, region) in &entries {
+                let _ = unic_langid_impl::likelysubtags::add_likely_subtags(
+                    lang.clone(),
+                    script.clone(),
+                    region.clone(),
+                );
+            }
+        })
+    });
+}
+
+criterion_group!(
+    benches,
+    add_likely_subtags_bench,
+    raw_add_likely_subtags_bench
+);
 criterion_main!(benches);

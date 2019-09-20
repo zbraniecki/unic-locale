@@ -1,13 +1,12 @@
 pub mod errors;
+#[cfg(feature = "likelysubtags")]
+pub mod likelysubtags;
 pub mod parser;
 pub mod subtags;
 
 use crate::errors::LanguageIdentifierError;
 use std::iter::Peekable;
 use std::str::FromStr;
-
-#[cfg(feature="likelysubtags")]
-use unic_langid_likelysubtags::add_likely_subtags;
 
 use tinystr::{TinyStr4, TinyStr8};
 
@@ -181,9 +180,11 @@ impl LanguageIdentifier {
         Ok(())
     }
 
-    #[cfg(feature="likelysubtags")]
+    #[cfg(feature = "likelysubtags")]
     pub fn add_likely_subtags(&mut self) -> bool {
-        if let Some(new_li) = add_likely_subtags(self.language, self.region, self.script) {
+        if let Some(new_li) =
+            likelysubtags::add_likely_subtags(self.language, self.region, self.script)
+        {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;

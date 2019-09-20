@@ -1,4 +1,6 @@
-pub mod tables;
+mod tables;
+
+pub use tables::CLDR_VERSION;
 
 use tinystr::{TinyStr4, TinyStr8};
 

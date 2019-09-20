@@ -2,7 +2,7 @@ use serde_json::Value;
 use std::fs;
 use std::str::FromStr;
 use tinystr::{TinyStr4, TinyStr8};
-use unic_langid::LanguageIdentifier;
+use unic_langid_impl::LanguageIdentifier;
 
 type LangIdSubTags = (Option<u64>, Option<u32>, Option<u32>);
 
@@ -102,6 +102,11 @@ fn main() {
 
     println!("#![allow(clippy::type_complexity)]");
     println!("#![allow(clippy::unreadable_literal)\n");
+
+    let version = v["supplemental"]["version"]["_cldrVersion"]
+        .as_str()
+        .unwrap();
+    println!("pub const CLDR_VERSION: &str = \"{}\";", version);
 
     println!("pub const LANG_ONLY: &[(u64, (Option<u64>, Option<u32>, Option<u32>))] = &[");
     lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
