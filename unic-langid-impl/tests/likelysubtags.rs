@@ -1,5 +1,5 @@
 use tinystr::{TinyStr4, TinyStr8};
-use unic_langid_impl::likelysubtags::{add_likely_subtags, CLDR_VERSION};
+use unic_langid_impl::likelysubtags::{add_likely_subtags, remove_likely_subtags, CLDR_VERSION};
 
 static STRINGS: &[(&str, Option<&str>)] = &[
     ("en-US", Some("en-Latn-US")),
@@ -41,6 +41,7 @@ static STRINGS: &[(&str, Option<&str>)] = &[
     ("und-Cyrl-UK", Some("ru-Cyrl-UK")),
     ("und-Arab", Some("ar-Arab-EG")),
     ("und-Arab-FO", Some("ar-Arab-FO")),
+    ("zh-TW", Some("zh-Hant-TW")),
 ];
 
 fn extract_input(s: &str) -> (Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>) {
@@ -76,10 +77,9 @@ fn extract_output(
 }
 
 #[test]
-fn sanity_check() {
+fn add_likely_subtags_test() {
     for i in STRINGS {
         let chunks = extract_input(i.0);
-        println!("{:#?}", chunks);
         let result = add_likely_subtags(chunks.0, chunks.1, chunks.2);
         assert_eq!(extract_output(i.1), result);
     }
@@ -88,4 +88,12 @@ fn sanity_check() {
 #[test]
 fn version_works() {
     assert_eq!(CLDR_VERSION, "35.0");
+}
+
+#[test]
+fn remove_likely_subtags_test() {
+    let lang: TinyStr8 = "zh".parse().unwrap();
+    let script: TinyStr4 = "Hant".parse().unwrap();
+    let result = remove_likely_subtags(Some(lang), Some(script), None);
+    assert_eq!(result, Some(extract_input("zh-TW")));
 }

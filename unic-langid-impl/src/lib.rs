@@ -193,6 +193,20 @@ impl LanguageIdentifier {
             return false;
         }
     }
+
+    #[cfg(feature = "likelysubtags")]
+    pub fn remove_likely_subtags(&mut self) -> bool {
+        if let Some(new_li) =
+            likelysubtags::remove_likely_subtags(self.language, self.region, self.script)
+        {
+            self.language = new_li.0;
+            self.script = new_li.1;
+            self.region = new_li.2;
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 impl FromStr for LanguageIdentifier {

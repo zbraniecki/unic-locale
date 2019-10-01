@@ -83,3 +83,34 @@ pub fn add_likely_subtags(
 
     None
 }
+
+pub fn remove_likely_subtags(
+    lang: Option<TinyStr8>,
+    script: Option<TinyStr4>,
+    region: Option<TinyStr4>,
+) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
+    let max_langid = add_likely_subtags(lang, script, region)?;
+
+    if let Some(trial) = add_likely_subtags(max_langid.0, None, None) {
+        if trial == max_langid {
+            return Some((max_langid.0, None, None));
+        }
+    }
+
+    if max_langid.2.is_some() {
+        if let Some(trial) = add_likely_subtags(max_langid.0, None, max_langid.2) {
+            if trial == max_langid {
+                return Some((max_langid.0, None, max_langid.2));
+            }
+        }
+    }
+
+    if max_langid.1.is_some() {
+        if let Some(trial) = add_likely_subtags(max_langid.0, max_langid.1, None) {
+            if trial == max_langid {
+                return Some((max_langid.0, max_langid.1, None));
+            }
+        }
+    }
+    None
+}
