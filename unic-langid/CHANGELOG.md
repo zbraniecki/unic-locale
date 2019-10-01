@@ -4,6 +4,10 @@
 
   - …
 
+## unic-langid 0.5.2 (October 1, 2019)
+
+  - Add CLDR 35 backed `add_likely_subtags` and `remove_likely_subtags`.
+
 ## unic-langid 0.5.0 (September 4, 2019)
 
   - Migrate unic-langid to TinyStr.
