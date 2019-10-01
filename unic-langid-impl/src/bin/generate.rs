@@ -94,8 +94,7 @@ fn main() {
                 (val_lang, val_script, val_region),
             )),
             _ => {
-                println!("{:#?}", key_langid);
-                panic!()
+                panic!("{:#?}", key_langid);
             }
         }
     }

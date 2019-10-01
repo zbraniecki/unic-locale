@@ -10,9 +10,9 @@ fn get_lang_from_parts(
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
 ) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
-    let lang = unsafe { lang.or_else(|| input.0.map(|l| TinyStr8::new_unchecked(l))) };
-    let script = unsafe { script.or_else(|| input.1.map(|s| TinyStr4::new_unchecked(s))) };
-    let region = unsafe { region.or_else(|| input.2.map(|r| TinyStr4::new_unchecked(r))) };
+    let lang = lang.or_else(|| input.0.map(|l| unsafe { TinyStr8::new_unchecked(l) }));
+    let script = script.or_else(|| input.1.map(|s| unsafe { TinyStr4::new_unchecked(s) }));
+    let region = region.or_else(|| input.2.map(|r| unsafe { TinyStr4::new_unchecked(r) }));
     Some((lang, script, region))
 }
 
