@@ -1,4 +1,6 @@
 pub mod errors;
+#[cfg(feature = "likelysubtags")]
+pub mod likelysubtags;
 pub mod parser;
 pub mod subtags;
 
@@ -176,6 +178,34 @@ impl LanguageIdentifier {
             self.variants = Some(result.into_boxed_slice());
         }
         Ok(())
+    }
+
+    #[cfg(feature = "likelysubtags")]
+    pub fn add_likely_subtags(&mut self) -> bool {
+        if let Some(new_li) =
+            likelysubtags::add_likely_subtags(self.language, self.region, self.script)
+        {
+            self.language = new_li.0;
+            self.script = new_li.1;
+            self.region = new_li.2;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    #[cfg(feature = "likelysubtags")]
+    pub fn remove_likely_subtags(&mut self) -> bool {
+        if let Some(new_li) =
+            likelysubtags::remove_likely_subtags(self.language, self.region, self.script)
+        {
+            self.language = new_li.0;
+            self.script = new_li.1;
+            self.region = new_li.2;
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

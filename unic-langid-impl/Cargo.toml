@@ -8,14 +8,30 @@ readme = "README.md"
 repository = "https://github.com/zbraniecki/unic-locale"
 license = "MIT/Apache-2.0"
 categories = ["internationalization"]
+exclude = ["data/**/*.json"]
 
 [dependencies]
 tinystr = "0.3"
+serde = { version = "1.0", optional = true }
+serde_json = { version = "1.0", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
+[features]
+likelysubtags = []
+binary = ["serde", "serde_json"]
+
+[[bin]]
+name = "generate"
+required-features = ["binary"]
+
+[[test]]
+name = "likelysubtags"
+path = "tests/likelysubtags.rs"
+required-features = ["likelysubtags"]
 
 [[bench]]
 name = "parser"
@@ -28,3 +44,8 @@ harness = false
 [[bench]]
 name = "canonicalize"
 harness = false
+
+[[bench]]
+name = "add_likely_subtags"
+harness = false
+required-features = ["likelysubtags"]
