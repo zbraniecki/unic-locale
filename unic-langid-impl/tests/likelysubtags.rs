@@ -87,7 +87,7 @@ fn add_likely_subtags_test() {
 
 #[test]
 fn version_works() {
-    assert_eq!(CLDR_VERSION, "35.0");
+    assert_eq!(CLDR_VERSION, "35.1");
 }
 
 #[test]

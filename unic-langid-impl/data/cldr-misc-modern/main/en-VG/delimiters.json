@@ -1,0 +1,20 @@
+{
+  "main": {
+    "en-VG": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14770 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "en",
+        "territory": "VG"
+      },
+      "delimiters": {
+        "quotationStart": "“",
+        "quotationEnd": "”",
+        "alternateQuotationStart": "‘",
+        "alternateQuotationEnd": "’"
+      }
+    }
+  }
+}

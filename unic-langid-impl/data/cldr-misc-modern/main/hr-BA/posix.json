@@ -1,0 +1,20 @@
+{
+  "main": {
+    "hr-BA": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14771 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "hr",
+        "territory": "BA"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "da:d",
+          "nostr": "ne:n"
+        }
+      }
+    }
+  }
+}

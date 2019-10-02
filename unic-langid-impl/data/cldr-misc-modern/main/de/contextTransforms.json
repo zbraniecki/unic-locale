@@ -1,0 +1,19 @@
+{
+  "main": {
+    "de": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14842 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "de"
+      },
+      "contextTransforms": {
+        "typographicNames": {
+          "stand-alone": "titlecase-firstword",
+          "uiListOrMenu": "titlecase-firstword"
+        }
+      }
+    }
+  }
+}

@@ -1,14 +1,22 @@
-pub mod errors;
+mod errors;
+mod layout_table;
 #[cfg(feature = "likelysubtags")]
 pub mod likelysubtags;
 pub mod parser;
-pub mod subtags;
+mod subtags;
 
-use crate::errors::LanguageIdentifierError;
+pub use crate::errors::LanguageIdentifierError;
+use layout_table::CHARACTER_DIRECTION_RTL;
 use std::iter::Peekable;
 use std::str::FromStr;
 
 use tinystr::{TinyStr4, TinyStr8};
+
+#[derive(Debug, PartialEq)]
+pub enum CharacterDirection {
+    RTL,
+    LTR,
+}
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct LanguageIdentifier {
@@ -205,6 +213,15 @@ impl LanguageIdentifier {
             return true;
         } else {
             return false;
+        }
+    }
+
+    pub fn get_character_direction(&self) -> CharacterDirection {
+        match self.language {
+            Some(lang) if CHARACTER_DIRECTION_RTL.contains(&(lang.into())) => {
+                CharacterDirection::RTL
+            }
+            _ => CharacterDirection::LTR,
         }
     }
 }

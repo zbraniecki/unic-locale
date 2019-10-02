@@ -1,7 +1,8 @@
 use tinystr::{TinyStr4, TinyStr8};
 use unic_langid_impl::parser::errors::ParserError;
 use unic_langid_impl::parser::parse_language_identifier;
-use unic_langid_impl::{errors::LanguageIdentifierError, LanguageIdentifier};
+use unic_langid_impl::CharacterDirection;
+use unic_langid_impl::{LanguageIdentifier, LanguageIdentifierError};
 
 fn assert_language_identifier(
     loc: &LanguageIdentifier,
@@ -143,4 +144,12 @@ fn test_matches_as_range() {
     assert_eq!(langid.matches(&langid2, true, false), true);
     assert_eq!(langid.matches(&langid2, false, true), false);
     assert_eq!(langid.matches(&langid2, true, true), true);
+}
+
+#[test]
+fn test_character_direction() {
+    let langid: LanguageIdentifier = "en-US".parse().unwrap();
+    let langid2: LanguageIdentifier = "ar-AF".parse().unwrap();
+    assert_eq!(langid.get_character_direction(), CharacterDirection::LTR);
+    assert_eq!(langid2.get_character_direction(), CharacterDirection::RTL);
 }

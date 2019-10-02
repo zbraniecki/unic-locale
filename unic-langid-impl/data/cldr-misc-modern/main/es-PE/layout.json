@@ -1,0 +1,20 @@
+{
+  "main": {
+    "es-PE": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14783 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "es",
+        "territory": "PE"
+      },
+      "layout": {
+        "orientation": {
+          "characterOrder": "left-to-right",
+          "lineOrder": "top-to-bottom"
+        }
+      }
+    }
+  }
+}

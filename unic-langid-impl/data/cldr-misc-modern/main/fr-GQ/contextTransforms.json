@@ -1,0 +1,35 @@
+{
+  "main": {
+    "fr-GQ": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14770 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "fr",
+        "territory": "GQ"
+      },
+      "contextTransforms": {
+        "day-format-except-narrow": {
+          "stand-alone": "titlecase-firstword"
+        },
+        "day-standalone-except-narrow": {
+          "stand-alone": "titlecase-firstword"
+        },
+        "languages": {
+          "uiListOrMenu": "titlecase-firstword"
+        },
+        "month-format-except-narrow": {
+          "stand-alone": "titlecase-firstword"
+        },
+        "month-standalone-except-narrow": {
+          "stand-alone": "titlecase-firstword"
+        },
+        "typographicNames": {
+          "stand-alone": "titlecase-firstword",
+          "uiListOrMenu": "titlecase-firstword"
+        }
+      }
+    }
+  }
+}

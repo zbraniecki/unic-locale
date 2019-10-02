@@ -1,0 +1,20 @@
+{
+  "main": {
+    "fr-HT": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14770 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "fr",
+        "territory": "HT"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "oui:o",
+          "nostr": "non:n"
+        }
+      }
+    }
+  }
+}

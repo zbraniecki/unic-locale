@@ -1,0 +1,19 @@
+{
+  "main": {
+    "sk": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14842 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "sk"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "áno:a",
+          "nostr": "nie:n"
+        }
+      }
+    }
+  }
+}

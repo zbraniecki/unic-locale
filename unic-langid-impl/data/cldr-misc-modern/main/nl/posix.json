@@ -1,0 +1,19 @@
+{
+  "main": {
+    "nl": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14982 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "nl"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "ja:j",
+          "nostr": "nee:n"
+        }
+      }
+    }
+  }
+}

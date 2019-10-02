@@ -1,0 +1,20 @@
+{
+  "main": {
+    "fa-AF": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14786 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "fa",
+        "territory": "AF"
+      },
+      "delimiters": {
+        "quotationStart": "«",
+        "quotationEnd": "»",
+        "alternateQuotationStart": "‹",
+        "alternateQuotationEnd": "›"
+      }
+    }
+  }
+}

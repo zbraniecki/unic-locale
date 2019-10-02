@@ -1,0 +1,19 @@
+{
+  "main": {
+    "fi": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14842 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "fi"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "kyllä:k",
+          "nostr": "ei:e"
+        }
+      }
+    }
+  }
+}

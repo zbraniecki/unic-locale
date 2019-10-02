@@ -1,0 +1,21 @@
+{
+  "main": {
+    "sr-Cyrl-ME": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14771 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "sr",
+        "script": "Cyrl",
+        "territory": "ME"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "да:д",
+          "nostr": "не:н"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "main": {
+    "en-GG": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14769 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "en",
+        "territory": "GG"
+      },
+      "layout": {
+        "orientation": {
+          "characterOrder": "left-to-right",
+          "lineOrder": "top-to-bottom"
+        }
+      }
+    }
+  }
+}

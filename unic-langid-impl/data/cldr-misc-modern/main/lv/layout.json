@@ -1,0 +1,19 @@
+{
+  "main": {
+    "lv": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14843 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "lv"
+      },
+      "layout": {
+        "orientation": {
+          "characterOrder": "left-to-right",
+          "lineOrder": "top-to-bottom"
+        }
+      }
+    }
+  }
+}

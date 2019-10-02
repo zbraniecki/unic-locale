@@ -1,0 +1,20 @@
+{
+  "main": {
+    "ar-SO": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14769 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "ar",
+        "territory": "SO"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "نعم:ن",
+          "nostr": "لا:ل"
+        }
+      }
+    }
+  }
+}

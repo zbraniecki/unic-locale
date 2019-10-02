@@ -1,0 +1,19 @@
+{
+  "main": {
+    "ps": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14982 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "ps"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "هو:ه",
+          "nostr": "نه:ن"
+        }
+      }
+    }
+  }
+}

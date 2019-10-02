@@ -1,0 +1,20 @@
+{
+  "main": {
+    "en-IL": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14769 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "en",
+        "territory": "IL"
+      },
+      "posix": {
+        "messages": {
+          "yesstr": "yes:y",
+          "nostr": "no:n"
+        }
+      }
+    }
+  }
+}

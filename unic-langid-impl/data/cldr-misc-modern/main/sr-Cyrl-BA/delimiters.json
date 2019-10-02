@@ -1,0 +1,21 @@
+{
+  "main": {
+    "sr-Cyrl-BA": {
+      "identity": {
+        "version": {
+          "_number": "$Revision: 14786 $",
+          "_cldrVersion": "35.1"
+        },
+        "language": "sr",
+        "script": "Cyrl",
+        "territory": "BA"
+      },
+      "delimiters": {
+        "quotationStart": "„",
+        "quotationEnd": "“",
+        "alternateQuotationStart": "‘",
+        "alternateQuotationEnd": "‘"
+      }
+    }
+  }
+}
