@@ -191,7 +191,7 @@ impl LanguageIdentifier {
     #[cfg(feature = "likelysubtags")]
     pub fn add_likely_subtags(&mut self) -> bool {
         if let Some(new_li) =
-            likelysubtags::add_likely_subtags(self.language, self.region, self.script)
+            likelysubtags::add_likely_subtags(self.language, self.script, self.region)
         {
             self.language = new_li.0;
             self.script = new_li.1;
@@ -205,7 +205,7 @@ impl LanguageIdentifier {
     #[cfg(feature = "likelysubtags")]
     pub fn remove_likely_subtags(&mut self) -> bool {
         if let Some(new_li) =
-            likelysubtags::remove_likely_subtags(self.language, self.region, self.script)
+            likelysubtags::remove_likely_subtags(self.language, self.script, self.region)
         {
             self.language = new_li.0;
             self.script = new_li.1;

@@ -6,6 +6,7 @@ use errors::LocaleError;
 pub use extensions::{ExtensionType, ExtensionsMap};
 use std::str::FromStr;
 use tinystr::{TinyStr4, TinyStr8};
+pub use unic_langid_impl::CharacterDirection;
 pub use unic_langid_impl::LanguageIdentifier;
 
 #[derive(Debug, Default, PartialEq, Clone)]
@@ -107,6 +108,20 @@ impl Locale {
         self.langid
             .set_variants(variants)
             .map_err(std::convert::Into::into)
+    }
+
+    #[cfg(feature = "likelysubtags")]
+    pub fn add_likely_subtags(&mut self) -> bool {
+        self.langid.add_likely_subtags()
+    }
+
+    #[cfg(feature = "likelysubtags")]
+    pub fn remove_likely_subtags(&mut self) -> bool {
+        self.langid.remove_likely_subtags()
+    }
+
+    pub fn get_character_direction(&self) -> CharacterDirection {
+        self.langid.get_character_direction()
     }
 }
 

@@ -1,6 +1,6 @@
 use unic_langid_impl::LanguageIdentifier;
 use unic_locale_impl::parser::parse_locale;
-use unic_locale_impl::{ExtensionsMap, Locale};
+use unic_locale_impl::{CharacterDirection, ExtensionsMap, Locale};
 
 use tinystr::{TinyStr4, TinyStr8};
 
@@ -128,4 +128,33 @@ fn test_set_fields() {
     assert_eq!(&loc.to_string(), "und-macos");
     loc.set_variants(&[]).expect("Setting variants failed");
     assert_eq!(&loc.to_string(), "und");
+}
+
+#[cfg(feature = "likelysubtags")]
+#[test]
+fn test_likelysubtags() {
+    let mut loc_en: Locale = "en-u-hc-h12".parse().unwrap();
+    assert_eq!(loc_en.add_likely_subtags(), true);
+    assert_eq!(loc_en.to_string(), "en-Latn-US-u-hc-h12");
+
+    let mut loc_sr: Locale = "sr-Cyrl-u-hc-h12".parse().unwrap();
+    assert_eq!(loc_sr.add_likely_subtags(), true);
+    assert_eq!(loc_sr.to_string(), "sr-Cyrl-RS-u-hc-h12");
+
+    let mut loc_zh_hans: Locale = "zh-Hans-u-hc-h12".parse().unwrap();
+    assert_eq!(loc_zh_hans.remove_likely_subtags(), true);
+    assert_eq!(loc_zh_hans.to_string(), "zh-u-hc-h12");
+
+    let mut loc_zh_hant: Locale = "zh-Hant-u-hc-h12".parse().unwrap();
+    assert_eq!(loc_zh_hant.remove_likely_subtags(), true);
+    assert_eq!(loc_zh_hant.to_string(), "zh-TW-u-hc-h12");
+}
+
+#[test]
+fn test_get_character_direction() {
+    let loc_en: Locale = "en-u-hc-h12".parse().unwrap();
+    assert_eq!(loc_en.get_character_direction(), CharacterDirection::LTR);
+
+    let loc_ar: Locale = "ar-AF-u-hc-h12".parse().unwrap();
+    assert_eq!(loc_ar.get_character_direction(), CharacterDirection::RTL);
 }
