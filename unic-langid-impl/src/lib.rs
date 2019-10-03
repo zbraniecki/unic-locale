@@ -1,3 +1,4 @@
+
 mod errors;
 mod layout_table;
 #[cfg(feature = "likelysubtags")]
@@ -18,6 +19,49 @@ pub enum CharacterDirection {
     LTR,
 }
 
+/// `LanguageIdentifier` is a core struct representing a Unicode Language Identifier.
+///
+/// # Examples
+///
+/// ```
+/// use unic_langid::LanguageIdentifier;
+///
+/// let li: LanguageIdentifier = "en-US".parse()
+///     .expect("Failed to parse.");
+///
+/// assert_eq!(li.get_language(), "en");
+/// assert_eq!(li.get_script(), None);
+/// assert_eq!(li.get_region(), Some("US"));
+/// assert_eq!(li.get_variants().len(), 0);
+/// ```
+///
+/// # Parsing
+///
+/// Unicode recognizes three levels of standard conformance for any language identifier:
+///
+///  * well-formed - all subtags conform to the specification.
+///  * valid - well-formed plus all subtags are registered in ISO database.
+///  * canonical - valid plus converted from grandfathered to modern subtags.
+///
+/// At the moment parsing normalizes a well-formed language identifier converting
+/// `_` separators to `-` and adjusting casing to conform to the Unicode standard.
+///
+/// Any bogus subtags will cause the parsing to fail with an error.
+/// No subtag validation is performed.
+///
+/// # Eamples:
+///
+/// ```
+/// use unic_langid::LanguageIdentifier;
+///
+/// let li: LanguageIdentifier = "eN_latn_Us-Valencia".parse()
+///     .expect("Failed to parse.");
+///
+/// assert_eq!(li.get_language(), "en");
+/// assert_eq!(li.get_script(), Some("Latn"));
+/// assert_eq!(li.get_region(), Some("US"));
+/// assert_eq!(li.get_variants(), &["valencia"]);
+/// ```
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct LanguageIdentifier {
     language: Option<TinyStr8>,

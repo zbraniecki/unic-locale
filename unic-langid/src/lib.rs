@@ -1,7 +1,31 @@
+//! `unic-langid` is a core API for parsing, manipulating, and serializing Unicode Language
+//! Identifiers.
+//!
+//! The crate provides algorithms for parsing a string into a well-formed language identifier
+//! as defined by LDML UTS #35.
+//!
+//! # Examples
+//!
+//! ```
+//! use unic_langid::LanguageIdentifier;
+//!
+//! let li: LanguageIdentifier = "en-US".parse()
+//!     .expect("Failed to parse.");
+//!
+//! assert_eq!(li.get_language(), "en");
+//! assert_eq!(li.get_script(), None);
+//! assert_eq!(li.get_region(), Some("US"));
+//! assert_eq!(li.get_variants().len(), 0);
+//! ```
+//!
+//! For more details, see `LanguageIdentifier`.
+
 pub use unic_langid_impl::*;
 
 #[cfg(feature = "unic-langid-macros")]
 pub use unic_langid_macros::langid;
+
+
 
 #[cfg(feature = "unic-langid-macros")]
 #[macro_export]
