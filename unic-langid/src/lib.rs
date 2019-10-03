@@ -2,7 +2,7 @@
 //! Identifiers.
 //!
 //! The crate provides algorithms for parsing a string into a well-formed language identifier
-//! as defined by LDML UTS #35.
+//! as defined by [`UTS #35: Unicode LDML 3.1 Unicode Language Identifier`].
 //!
 //! # Examples
 //!
@@ -23,7 +23,10 @@
 //! assert_eq!(li.to_string(), "en-GB");
 //! ```
 //!
-//! For more details, see `LanguageIdentifier`.
+//! For more details, see [`LanguageIdentifier`].
+//!
+//! [`UTS #35: Unicode LDML 3.1 Unicode Language Identifier`]: https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier
+//! [`LanguageIdentifier`]: ./struct.LanguageIdentifier.html
 
 pub use unic_langid_impl::*;
 
