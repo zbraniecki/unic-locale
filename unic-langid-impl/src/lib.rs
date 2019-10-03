@@ -1,8 +1,8 @@
-
 mod errors;
 mod layout_table;
 #[cfg(feature = "likelysubtags")]
 pub mod likelysubtags;
+#[doc(hidden)]
 pub mod parser;
 mod subtags;
 
@@ -24,7 +24,7 @@ pub enum CharacterDirection {
 /// # Examples
 ///
 /// ```
-/// use unic_langid::LanguageIdentifier;
+/// use unic_langid_impl::LanguageIdentifier;
 ///
 /// let li: LanguageIdentifier = "en-US".parse()
 ///     .expect("Failed to parse.");
@@ -52,7 +52,7 @@ pub enum CharacterDirection {
 /// # Eamples:
 ///
 /// ```
-/// use unic_langid::LanguageIdentifier;
+/// use unic_langid_impl::LanguageIdentifier;
 ///
 /// let li: LanguageIdentifier = "eN_latn_Us-Valencia".parse()
 ///     .expect("Failed to parse.");

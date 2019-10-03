@@ -9,13 +9,18 @@
 //! ```
 //! use unic_langid::LanguageIdentifier;
 //!
-//! let li: LanguageIdentifier = "en-US".parse()
+//! let mut li: LanguageIdentifier = "en-US".parse()
 //!     .expect("Failed to parse.");
 //!
 //! assert_eq!(li.get_language(), "en");
 //! assert_eq!(li.get_script(), None);
 //! assert_eq!(li.get_region(), Some("US"));
 //! assert_eq!(li.get_variants().len(), 0);
+//!
+//! li.set_region(Some("GB"))
+//!     .expect("Region parsing failed.");
+//!
+//! assert_eq!(li.to_string(), "en-GB");
 //! ```
 //!
 //! For more details, see `LanguageIdentifier`.
@@ -24,8 +29,6 @@ pub use unic_langid_impl::*;
 
 #[cfg(feature = "unic-langid-macros")]
 pub use unic_langid_macros::langid;
-
-
 
 #[cfg(feature = "unic-langid-macros")]
 #[macro_export]
