@@ -2,9 +2,12 @@ use super::parser::ParserError;
 use std::error::Error;
 use std::fmt::{self, Display};
 
+/// Enum with errors that can be returned by LanguageIdentifier.
 #[derive(Debug, PartialEq)]
 pub enum LanguageIdentifierError {
+    /// An unknown error - currently covers all-but parser errors.
     Unknown,
+    /// A parser error.
     ParserError(ParserError),
 }
 
