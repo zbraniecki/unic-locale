@@ -1,3 +1,4 @@
+
 mod errors;
 mod layout_table;
 #[cfg(feature = "likelysubtags")]
@@ -46,9 +47,9 @@ pub enum CharacterDirection {
 ///
 /// Unicode recognizes three levels of standard conformance for any language identifier:
 ///
-///  * well-formed - all subtags conform to the specification.
-///  * valid - well-formed plus all subtags are registered in ISO database.
-///  * canonical - valid plus converted from grandfathered to modern subtags.
+///  * *well-formed* - syntactically correct
+///  * *valid* - well-formed and only uses registered language subtags, extensions, keywords, types...
+///  * *canonical* - valid and no deprecated codes or structure.
 ///
 /// At the moment parsing normalizes a well-formed language identifier converting
 /// `_` separators to `-` and adjusting casing to conform to the Unicode standard.
@@ -516,6 +517,21 @@ impl LanguageIdentifier {
         }
     }
 
+    /// Returns character direction of the `LanguageIdentifier`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::{LanguageIdentifier, CharacterDirection};
+    ///
+    /// let li1: LanguageIdentifier = "es-AR".parse()
+    ///     .expect("Parsing failed.");
+    /// let li2: LanguageIdentifier = "fa".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(li1.get_character_direction(), CharacterDirection::LTR);
+    /// assert_eq!(li2.get_character_direction(), CharacterDirection::RTL);
+    /// ```
     pub fn get_character_direction(&self) -> CharacterDirection {
         match self.language {
             Some(lang) if CHARACTER_DIRECTION_RTL.contains(&(lang.into())) => {
@@ -585,6 +601,18 @@ fn subtags_match<P: PartialEq>(
         || subtag1 == subtag2
 }
 
+/// This is a best-effort operation that performs all available levels of canonicalization.
+///
+/// At the moment the operation will normalize casing and the separator, but in the future
+/// it may also validate and update from deprecated subtags to canonical ones.
+///
+/// # Examples
+///
+/// ```
+/// use unic_langid_impl::canonicalize;
+///
+/// assert_eq!(canonicalize("pL_latn_pl"), Ok("pl-Latn-PL".to_string()));
+/// ```
 pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {
     let lang_id: LanguageIdentifier = input.parse()?;
     Ok(lang_id.to_string())
