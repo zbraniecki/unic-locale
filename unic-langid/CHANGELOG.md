@@ -4,6 +4,12 @@
 
   - …
 
+## unic-langid 0.5.3 (October 3, 2019)
+
+  - Add CLDR 35 backed `get_character_direction`.
+  - Fix a bug in likely subtags.
+  - Add basic documentation.
+
 ## unic-langid 0.5.2 (October 1, 2019)
 
   - Add CLDR 35 backed `add_likely_subtags` and `remove_likely_subtags`.
