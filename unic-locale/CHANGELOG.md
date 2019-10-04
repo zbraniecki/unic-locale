@@ -4,7 +4,7 @@
 
   - …
 
-## unic-locale 0.5.2 (October 3, 2019)
+## unic-locale 0.5.3 (October 3, 2019)
 
   - Add `add_likely_subtags` and `remove_likely_subtags`.
   - Add `get_character_direction`.
