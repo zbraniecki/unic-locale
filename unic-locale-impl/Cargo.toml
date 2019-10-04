@@ -1,7 +1,7 @@
 [package]
 name = "unic-locale-impl"
 description = "API for managing Unicode Locale Identifiers"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
 readme = "README.md"
@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-unic-langid-impl = "0.5.2"
+unic-langid-impl = "0.5.3"
 tinystr = "0.3"
 
 [dev-dependencies]
