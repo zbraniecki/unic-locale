@@ -3,8 +3,7 @@
     "bg": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14842 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "bg"
       },
@@ -37,13 +36,13 @@
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
           "end": "{0} и {1}",
-          "2": "{0} и{1}"
+          "2": "{0}, {1}"
         },
         "listPattern-type-standard-short": {
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
           "end": "{0} и {1}",
-          "2": "{0} и{1}"
+          "2": "{0} и {1}"
         },
         "listPattern-type-unit": {
           "start": "{0}, {1}",

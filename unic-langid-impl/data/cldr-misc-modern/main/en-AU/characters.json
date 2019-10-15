@@ -3,8 +3,7 @@
     "en-AU": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14843 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "en",
         "territory": "AU"
@@ -14,7 +13,7 @@
         "auxiliary": "[á à ă â å ä ã ā æ ç é è ĕ ê ë ē í ì ĭ î ï ī ñ ó ò ŏ ô ö ø ō œ ú ù ŭ û ü ū ÿ]",
         "index": "[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z]",
         "numbers": "[↑]",
-        "punctuation": "[\\\\- ‐ – — , ; \\\\: ! ? . … ' ‘ ’ \\\" “ ” ( ) \\\\[ \\\\] § @ * / \\\\& # † ‡ ′ ″]",
+        "punctuation": "[\\\\- ‐ ‑ – — , ; \\\\: ! ? . … ' ‘ ’ \\\" “ ” ( ) \\\\[ \\\\] § @ * / \\\\& # † ‡ ′ ″]",
         "ellipsis": {
           "final": "{0}…",
           "initial": "…{0}",

@@ -3,8 +3,7 @@
     "kn": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14817 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "kn"
       },
@@ -36,8 +35,8 @@
         "listPattern-type-standard-narrow": {
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
-          "end": "{0}, ಮತ್ತು {1}",
-          "2": "{0} ಮತ್ತು {1}"
+          "end": "{0}, {1}",
+          "2": "{0}, {1}"
         },
         "listPattern-type-standard-short": {
           "start": "{0}, {1}",

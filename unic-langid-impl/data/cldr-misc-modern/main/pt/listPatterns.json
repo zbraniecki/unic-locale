@@ -3,8 +3,7 @@
     "pt": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14842 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "pt"
       },
@@ -52,10 +51,10 @@
           "2": "{0} e {1}"
         },
         "listPattern-type-unit-narrow": {
-          "start": "{0}, {1}",
-          "middle": "{0}, {1}",
-          "end": "{0} e {1}",
-          "2": "{0} e {1}"
+          "start": "{0} {1}",
+          "middle": "{0} {1}",
+          "end": "{0} {1}",
+          "2": "{0} {1}"
         },
         "listPattern-type-unit-short": {
           "start": "{0}, {1}",

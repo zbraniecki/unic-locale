@@ -3,8 +3,7 @@
     "sw-KE": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14771 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "sw",
         "territory": "KE"
@@ -25,13 +24,13 @@
         "listPattern-type-or-narrow": {
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
-          "end": "{0} au {1}",
+          "end": "{0}, au {1}",
           "2": "{0} au {1}"
         },
         "listPattern-type-or-short": {
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
-          "end": "{0} au {1}",
+          "end": "{0}, au {1}",
           "2": "{0} au {1}"
         },
         "listPattern-type-standard-narrow": {

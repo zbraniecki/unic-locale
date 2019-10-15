@@ -3,8 +3,7 @@
     "en-AU": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14843 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "en",
         "territory": "AU"
@@ -44,7 +43,7 @@
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
           "end": "{0} and {1}",
-          "2": "{0} & {1}"
+          "2": "{0} and {1}"
         },
         "listPattern-type-unit": {
           "start": "{0}, {1}",

@@ -3,8 +3,7 @@
     "ur-IN": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14771 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "ur",
         "territory": "IN"
@@ -37,8 +36,8 @@
         "listPattern-type-standard-narrow": {
           "start": "{0}، {1}",
           "middle": "{0}، {1}",
-          "end": "{0}، اور {1}",
-          "2": "{0} اور {1}"
+          "end": "{0}، {1}",
+          "2": "{0}، {1}"
         },
         "listPattern-type-standard-short": {
           "start": "{0}، {1}",

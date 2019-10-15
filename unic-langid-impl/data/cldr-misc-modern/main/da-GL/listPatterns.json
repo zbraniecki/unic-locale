@@ -3,8 +3,7 @@
     "da-GL": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14769 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "da",
         "territory": "GL"
@@ -25,14 +24,14 @@
         "listPattern-type-or-narrow": {
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
-          "end": "{0} eller {1}",
-          "2": "{0} eller {1}"
+          "end": "{0} el. {1}",
+          "2": "{0} el. {1}"
         },
         "listPattern-type-or-short": {
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
-          "end": "{0} eller {1}",
-          "2": "{0} eller {1}"
+          "end": "{0} el. {1}",
+          "2": "{0} el. {1}"
         },
         "listPattern-type-standard-narrow": {
           "start": "{0}, {1}",

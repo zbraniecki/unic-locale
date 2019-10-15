@@ -3,8 +3,7 @@
     "tk": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14982 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "tk"
       },
@@ -49,7 +48,7 @@
           "start": "{0}, {1}",
           "middle": "{0}, {1}",
           "end": "{0}, {1}",
-          "2": "{0} we {1}"
+          "2": "{0}, {1}"
         },
         "listPattern-type-unit-narrow": {
           "start": "{0} {1}",

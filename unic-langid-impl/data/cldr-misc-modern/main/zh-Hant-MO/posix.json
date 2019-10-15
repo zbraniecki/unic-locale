@@ -3,8 +3,7 @@
     "zh-Hant-MO": {
       "identity": {
         "version": {
-          "_number": "$Revision: 14786 $",
-          "_cldrVersion": "35.1"
+          "_cldrVersion": "36"
         },
         "language": "zh",
         "script": "Hant",
@@ -12,8 +11,8 @@
       },
       "posix": {
         "messages": {
-          "yesstr": "是",
-          "nostr": "否"
+          "yesstr": "是:確定",
+          "nostr": "否:不"
         }
       }
     }

@@ -100,7 +100,7 @@ fn main() {
     }
 
     println!("#![allow(clippy::type_complexity)]");
-    println!("#![allow(clippy::unreadable_literal)\n");
+    println!("#![allow(clippy::unreadable_literal)]\n");
 
     let version = v["supplemental"]["version"]["_cldrVersion"]
         .as_str()
@@ -113,7 +113,7 @@ fn main() {
     );
     lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     for (key_lang, val) in lang_only {
-        println!("   ({}, {}),", key_lang, serialize_val(val),);
+        println!("    ({}, {}),", key_lang, serialize_val(val),);
     }
     println!("];");
 
@@ -127,7 +127,12 @@ fn main() {
             .then_with(|| a.1.partial_cmp(&b.1).unwrap())
     });
     for (key_lang, key_region, val) in lang_region {
-        println!("   ({}, {}, {}),", key_lang, key_region, serialize_val(val),);
+        println!(
+            "    ({}, {}, {}),",
+            key_lang,
+            key_region,
+            serialize_val(val),
+        );
     }
     println!("];");
     println!(
@@ -140,7 +145,12 @@ fn main() {
             .then_with(|| a.1.partial_cmp(&b.1).unwrap())
     });
     for (key_lang, key_script, val) in lang_script {
-        println!("   ({}, {}, {}),", key_lang, key_script, serialize_val(val),);
+        println!(
+            "    ({}, {}, {}),",
+            key_lang,
+            key_script,
+            serialize_val(val),
+        );
     }
     println!("];");
     println!(
@@ -154,7 +164,7 @@ fn main() {
     });
     for (key_script, key_region, val) in script_region {
         println!(
-            "   ({}, {}, {}),",
+            "    ({}, {}, {}),",
             key_script,
             key_region,
             serialize_val(val),
@@ -167,7 +177,7 @@ fn main() {
     );
     script_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     for (key_script, val) in script_only {
-        println!("   ({}, {}),", key_script, serialize_val(val),);
+        println!("    ({}, {}),", key_script, serialize_val(val),);
     }
     println!("];");
     println!(
@@ -176,7 +186,7 @@ fn main() {
     );
     region_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     for (key_region, val) in region_only {
-        println!("   ({}, {}),", key_region, serialize_val(val),);
+        println!("    ({}, {}),", key_region, serialize_val(val),);
     }
     println!("];");
 }
