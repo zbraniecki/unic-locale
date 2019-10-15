@@ -8,7 +8,10 @@ use tinystr::{TinyStr4, TinyStr8};
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct UnicodeExtensionList {
+    // Canonical: sort by key (BTreeMap is already) / remove value 'true'
     keywords: BTreeMap<TinyStr4, Vec<TinyStr8>>,
+
+    // Canonical: sort / dudup
     attributes: Vec<TinyStr8>,
 }
 
@@ -23,13 +26,22 @@ fn parse_key(key: &str) -> Result<TinyStr4, ParserError> {
     Ok(key.to_ascii_lowercase())
 }
 
-fn parse_type(t: &str) -> Result<TinyStr8, ParserError> {
+fn parse_type(t: &str) -> Result<Option<TinyStr8>, ParserError> {
     let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
     if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
 
-    Ok(s.to_ascii_lowercase())
+    let s = s.to_ascii_lowercase();
+
+    // This could be a global const
+    let type_true: TinyStr8 = "true".parse().unwrap();
+
+    if s == type_true {
+        return Ok(None);
+    }
+
+    Ok(Some(s))
 }
 
 fn parse_attribute(t: &str) -> Result<TinyStr8, ParserError> {
@@ -61,7 +73,9 @@ impl UnicodeExtensionList {
 
         let mut t = Vec::with_capacity(value.len());
         for val in value {
-            t.push(parse_type(val)?);
+            if let Some(ty) = parse_type(val)? {
+                t.push(ty);
+            }
         }
 
         self.keywords.insert(key, t);
@@ -69,7 +83,11 @@ impl UnicodeExtensionList {
     }
 
     pub fn set_attribute(&mut self, value: &str) -> Result<(), LocaleError> {
-        self.attributes.push(parse_attribute(value)?);
+        let value = parse_attribute(value)?;
+        let idx = self.attributes.binary_search(&value);
+        if idx.is_err() {
+            self.attributes.insert(idx.unwrap_err(), value);
+        }
         Ok(())
     }
 
@@ -93,7 +111,9 @@ impl UnicodeExtensionList {
                 current_keyword = Some(parse_key(subtag)?);
                 iter.next();
             } else if current_keyword.is_some() && is_type(subtag) {
-                current_types.push(parse_type(subtag)?);
+                if let Some(ty) = parse_type(subtag)? {
+                    current_types.push(ty);
+                }
                 iter.next();
             } else if is_attribute(subtag) {
                 uext.attributes.push(parse_attribute(subtag)?);
@@ -108,6 +128,9 @@ impl UnicodeExtensionList {
             uext.keywords.insert(current_keyword, current_types);
         }
 
+        uext.attributes.sort();
+        uext.attributes.dedup();
+
         Ok(uext)
     }
 }
@@ -120,15 +143,15 @@ impl std::fmt::Display for UnicodeExtensionList {
 
         f.write_str("-u")?;
 
+        for attr in &self.attributes {
+            write!(f, "-{}", attr)?;
+        }
+
         for (k, t) in &self.keywords {
             write!(f, "-{}", k)?;
             for v in t {
                 write!(f, "-{}", v)?;
             }
-        }
-
-        for attr in &self.attributes {
-            write!(f, "-{}", attr)?;
         }
         Ok(())
     }

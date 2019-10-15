@@ -158,3 +158,12 @@ fn test_get_character_direction() {
     let loc_ar: Locale = "ar-AF-u-hc-h12".parse().unwrap();
     assert_eq!(loc_ar.get_character_direction(), CharacterDirection::RTL);
 }
+
+#[test]
+fn test_unicode_attributes_ordering() {
+    let mut loc: Locale = "en-u-foo-bar".parse().unwrap();
+    assert_eq!(&loc.to_string(), "en-u-bar-foo");
+
+    loc.extensions.unicode.set_attribute("baz").expect("Can't set attribute");
+    assert_eq!(&loc.to_string(), "en-u-bar-baz-foo");
+}

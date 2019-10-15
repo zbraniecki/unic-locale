@@ -11,6 +11,8 @@ use tinystr::{TinyStr4, TinyStr8};
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct TransformExtensionList {
     tlang: Option<LanguageIdentifier>,
+
+    // Canonical: sort by key (BTreeMap is already) / remove value 'true'
     tfields: BTreeMap<TinyStr4, Vec<TinyStr8>>,
 }
 
@@ -25,13 +27,22 @@ fn parse_tkey(key: &str) -> Result<TinyStr4, ParserError> {
     Ok(tkey.to_ascii_lowercase())
 }
 
-fn parse_tvalue(t: &str) -> Result<TinyStr8, ParserError> {
+fn parse_tvalue(t: &str) -> Result<Option<TinyStr8>, ParserError> {
     let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
     if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
 
-    Ok(s.to_ascii_lowercase())
+    let s = s.to_ascii_lowercase();
+
+    // This could be a global const
+    let type_true: TinyStr8 = "true".parse().unwrap();
+
+    if s == type_true {
+        return Ok(None);
+    }
+
+    Ok(Some(s))
 }
 
 fn is_language_subtag(t: &str) -> bool {
@@ -53,7 +64,9 @@ impl TransformExtensionList {
         let tkey = parse_tkey(tkey)?;
         let mut t = Vec::with_capacity(tvalue.len());
         for val in tvalue {
-            t.push(parse_tvalue(val)?);
+            if let Some(tval) = parse_tvalue(val)? {
+                t.push(tval);
+            }
         }
 
         self.tfields.insert(tkey, t);
@@ -83,7 +96,9 @@ impl TransformExtensionList {
                 current_tkey = Some(parse_tkey(subtag)?);
                 iter.next();
             } else if current_tkey.is_some() {
-                current_tvalue.push(parse_tvalue(subtag)?);
+                if let Some(tval) = parse_tvalue(subtag)? {
+                    current_tvalue.push(tval);
+                }
                 iter.next();
             } else if is_language_subtag(subtag) {
                 text.tlang = Some(
