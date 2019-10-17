@@ -20,4 +20,8 @@ fn test_canonicalize_locale() {
         "en-US-u-CA-Buddhist-t-ES-ar-x-foo",
         "en-US-u-ca-buddhist-t-es-AR-x-foo",
     );
+    assert_canonicalize(
+        "fr-t-t0-windows-h0-hybrid-k0-googlevk-extended",
+        "fr-t-h0-hybrid-k0-googlevk-extended-t0-windows",
+    );
 }

@@ -72,16 +72,19 @@ impl TransformExtensionList {
 
         while let Some(subtag) = st_peek {
             let slen = subtag.len();
-
             if slen == 2
                 && subtag.as_bytes()[0].is_ascii_alphabetic()
                 && subtag.as_bytes()[1].is_ascii_digit()
             {
-                let tkey: TinyStr4 = subtag.parse().map_err(|_| ParserError::InvalidSubtag)?;
-                current_tkey = Some(tkey);
+                if let Some(current_tkey) = current_tkey {
+                    text.tfields.insert(current_tkey, current_tvalue);
+                    current_tvalue = vec![];
+                }
+                current_tkey = Some(parse_tkey(subtag)?);
                 iter.next();
             } else if current_tkey.is_some() {
                 current_tvalue.push(parse_tvalue(subtag)?);
+                iter.next();
             } else if is_language_subtag(subtag) {
                 text.tlang = Some(
                     LanguageIdentifier::try_from_iter(&mut iter, true)
@@ -91,6 +94,10 @@ impl TransformExtensionList {
                 break;
             }
             st_peek = iter.peek();
+        }
+
+        if let Some(current_keyword) = current_tkey {
+            text.tfields.insert(current_keyword, current_tvalue);
         }
 
         Ok(text)
