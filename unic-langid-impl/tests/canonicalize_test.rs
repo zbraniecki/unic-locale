@@ -9,4 +9,5 @@ fn test_canonicalize() {
     assert_canonicalize("Pl", "pl");
     assert_canonicalize("eN-uS", "en-US");
     assert_canonicalize("ZH_hans_hK", "zh-Hans-HK");
+    assert_canonicalize("en-scouse-fonipa", "en-fonipa-scouse");
 }

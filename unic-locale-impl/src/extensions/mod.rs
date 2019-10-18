@@ -105,7 +105,8 @@ impl FromStr for ExtensionsMap {
 
 impl std::fmt::Display for ExtensionsMap {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}{}{}", self.unicode, self.transform, self.private)?;
+        // Alphabetic by singleton (t, u, x)
+        write!(f, "{}{}{}", self.transform, self.unicode, self.private)?;
 
         Ok(())
     }
