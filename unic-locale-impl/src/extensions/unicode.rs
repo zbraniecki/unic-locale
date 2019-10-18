@@ -26,6 +26,8 @@ fn parse_key(key: &str) -> Result<TinyStr4, ParserError> {
     Ok(key.to_ascii_lowercase())
 }
 
+const TRUE_TYPE: TinyStr8 = unsafe{ TinyStr8::new_unchecked(1702195828u64) }; // "true"
+
 fn parse_type(t: &str) -> Result<Option<TinyStr8>, ParserError> {
     let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
     if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
@@ -34,14 +36,11 @@ fn parse_type(t: &str) -> Result<Option<TinyStr8>, ParserError> {
 
     let s = s.to_ascii_lowercase();
 
-    // This could be a global const
-    let type_true: TinyStr8 = "true".parse().unwrap();
-
-    if s == type_true {
-        return Ok(None);
+    if s == TRUE_TYPE {
+        Ok(None)
+    } else {
+        Ok(Some(s))
     }
-
-    Ok(Some(s))
 }
 
 fn parse_attribute(t: &str) -> Result<TinyStr8, ParserError> {
