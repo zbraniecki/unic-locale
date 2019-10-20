@@ -20,6 +20,11 @@ assert_eq!(loc.get_region(), Some("US"));
 loc.extensions.unicode.set_keyword("ca", "buddhist")
     .expect("Setting extension failed.");
 
+let val = loc.extensions.unicode.get_keyword("ca")
+    .expect("Getting extension value failed.");
+
+assert_eq!(val, vec!["buddhist"]);
+
 assert_eq!(&loc.to_string(), "en-US-u-ca-buddhist-hc-h12");
 ```
 

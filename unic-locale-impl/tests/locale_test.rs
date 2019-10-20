@@ -40,6 +40,42 @@ fn test_locale_identifier() {
     extensions.unicode.set_keyword("hc", &["h12"]).unwrap();
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
+    extensions.unicode.set_attribute("foo").unwrap();
+    assert_parsed_locale_identifier("pl-u-foo-hc-h12", &extensions);
+
+    let val = extensions.unicode.get_keyword("hc").unwrap().collect::<Vec<_>>();
+    assert_eq!(val, &["h12"]);
+
+    let val = extensions.unicode.get_keyword("aa").unwrap().collect::<Vec<_>>();
+    assert_eq!(val.is_empty(), true);
+
+    let val = extensions.unicode.remove_keyword("hc").unwrap();
+    assert_eq!(val, true);
+    assert_parsed_locale_identifier("pl-u-foo", &extensions);
+
+    let val = extensions.unicode.has_attribute("foo").unwrap();
+    assert_eq!(val, true);
+
+    let val = extensions.unicode.has_attribute("aaa").unwrap();
+    assert_eq!(val, false);
+
+    let val = extensions.unicode.remove_attribute("foo").unwrap();
+    assert_eq!(val, true);
+    assert_parsed_locale_identifier("pl", &extensions);
+
+    extensions.transform.set_tfield("m0", &["foo"]).unwrap();
+    assert_parsed_locale_identifier("pl-t-m0-foo", &extensions);
+
+    let val = extensions.transform.get_tfield("m0").unwrap().collect::<Vec<_>>();
+    assert_eq!(val, &["foo"]);
+
+    let val = extensions.transform.get_tfield("x0").unwrap().collect::<Vec<_>>();
+    assert_eq!(val.is_empty(), true);
+
+    let val = extensions.transform.remove_tfield("m0").unwrap();
+    assert_eq!(val, true);
+    assert_parsed_locale_identifier("pl", &extensions);
+
     let mut extensions = ExtensionsMap::default();
     extensions.private.add_tag("testing").unwrap();
     assert_parsed_locale_identifier("und-x-testing", &extensions);

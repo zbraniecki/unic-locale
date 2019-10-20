@@ -60,10 +60,80 @@ fn is_type(t: &[u8]) -> bool {
 }
 
 impl UnicodeExtensionList {
+    /// Returns `true` if there are no keywords and no attributes in
+    /// the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-foo".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.is_empty(), false);
+    /// ```
     pub fn is_empty(&self) -> bool {
         self.keywords.is_empty() && self.attributes.is_empty()
     }
 
+    /// Returns the value of keyword in the `UnicodeExtensionList`.
+    ///
+    /// NB: value here is referred to as type in UTS #35.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-ca-buddhist".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.get_keyword("ca")
+    ///                .expect("Getting keyword failed.")
+    ///                .collect::<Vec<_>>(),
+    ///            &["buddhist"]);
+    ///
+    /// // Here keyword with key "aa" is not available
+    /// assert_eq!(lo.extensions.unicode.get_keyword("aa")
+    ///                .expect("Getting keyword failed.")
+    ///                .collect::<Vec<_>>()
+    ///                .is_empty(),
+    ///            true);
+    /// ```
+    pub fn get_keyword<S: AsRef<[u8]>>(&self, key: S)
+            -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
+        let keywords: &[_] = match self.keywords.get(&parse_key(key.as_ref())?) {
+            Some(ref v) => &**v,
+            None => &[],
+        };
+
+        Ok(keywords.iter().map(|s| s.as_ref()))
+    }
+
+    /// Adds a keyword to the `UnicodeExtensionList` or sets value for key if
+    /// keyword is already included in the `UnicodeExtensionList`.
+    ///
+    /// NB: value here is referred to as type in UTS #35.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.unicode.set_keyword("ca", &["buddhist"])
+    ///     .expect("Setting keyword failed.");
+    ///
+    /// assert_eq!(lo.to_string(), "en-US-u-ca-buddhist");
+    ///
+    /// lo.extensions.unicode.set_keyword("ca", &["chinese"])
+    ///     .expect("Setting keyword failed.");
+    ///
+    /// assert_eq!(lo.to_string(), "en-US-u-ca-chinese");
+    /// ```
     pub fn set_keyword<S: AsRef<[u8]>>(&mut self, key: S, value: &[S]) -> Result<(), LocaleError> {
         let key = parse_key(key.as_ref())?;
 
@@ -78,12 +148,132 @@ impl UnicodeExtensionList {
         Ok(())
     }
 
-    pub fn set_attribute<S: AsRef<[u8]>>(&mut self, value: S) -> Result<(), LocaleError> {
-        let value = parse_attribute(value.as_ref())?;
-        if let Err(idx) = self.attributes.binary_search(&value) {
-            self.attributes.insert(idx, value);
+    /// Removes a keyword from the `UnicodeExtensionList`.
+    ///
+    /// Returns `true` if keyword was included in the `UnicodeExtensionList`
+    /// before removal.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-ca-buddhist".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.remove_keyword("ca")
+    ///                .expect("Removing tag failed."),
+    ///            true);
+    ///
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn remove_keyword<S: AsRef<[u8]>>(&mut self, key: S) -> Result<bool, LocaleError> {
+        Ok(self.keywords.remove(&parse_key(key.as_ref())?).is_some())
+    }
+
+    /// Clears all keywords from the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-ca-buddhist".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.unicode.clear_keywords();
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn clear_keywords(&mut self) {
+        self.keywords.clear();
+    }
+
+    /// Returns `true` if attribute is included in the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-foo".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.has_attribute("foo")
+    ///                .expect("Getting attribute failed."),
+    ///            true);
+    /// ```
+    pub fn has_attribute<S: AsRef<[u8]>>(&self, attribute: S) -> Result<bool, LocaleError> {
+        Ok(self.attributes.contains(&parse_attribute(attribute.as_ref())?))
+    }
+
+    /// Sets an attribute on the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.unicode.set_attribute("foo")
+    ///     .expect("Setting attribute failed.");
+    ///
+    /// assert_eq!(lo.to_string(), "en-US-u-foo");
+    /// ```
+    pub fn set_attribute<S: AsRef<[u8]>>(&mut self, attribute: S) -> Result<(), LocaleError> {
+        let attribute = parse_attribute(attribute.as_ref())?;
+        if let Err(idx) = self.attributes.binary_search(&attribute) {
+            self.attributes.insert(idx, attribute);
         }
         Ok(())
+    }
+
+    /// Removes an attribute from the `UnicodeExtensionList`.
+    ///
+    /// Returns `true` if attribute was included in the `UnicodeExtensionList`
+    /// before removal.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-foo".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.remove_attribute("foo")
+    ///                .expect("Removing attribute failed."),
+    ///            true);
+    ///
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn remove_attribute<S: AsRef<[u8]>>(&mut self, attribute: S) -> Result<bool, LocaleError> {
+        let attribute = parse_attribute(attribute.as_ref())?;
+        match self.attributes.binary_search(&attribute) {
+            Ok(idx) => {
+                self.attributes.remove(idx);
+                Ok(true)
+            },
+            Err(_) => Ok(false)
+        }
+    }
+
+    /// Clears all attributes from the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-foo".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.unicode.clear_attributes();
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn clear_attributes(&mut self) {
+        self.attributes.clear();
     }
 
     pub(crate) fn try_from_iter<'a>(
