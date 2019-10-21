@@ -8,6 +8,7 @@ mod subtags;
 
 pub use crate::errors::LanguageIdentifierError;
 use layout_table::CHARACTER_DIRECTION_RTL;
+use std::fmt::Write;
 use std::iter::Peekable;
 use std::str::FromStr;
 
@@ -558,20 +559,26 @@ impl AsRef<LanguageIdentifier> for LanguageIdentifier {
 
 impl std::fmt::Display for LanguageIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut subtags = vec![self.get_language()];
-        if let Some(script) = self.get_script() {
-            subtags.push(script);
+        if let Some(ref lang) = self.language {
+            f.write_str(lang)?;
+        } else {
+            f.write_str("und")?;
         }
-        if let Some(region) = self.get_region() {
-            subtags.push(region);
+        if let Some(ref script) = self.script {
+            f.write_char('-')?;
+            f.write_str(script)?;
+        }
+        if let Some(ref region) = self.region {
+            f.write_char('-')?;
+            f.write_str(region)?;
         }
         if let Some(variants) = &self.variants {
             for variant in variants.iter() {
-                subtags.push(variant);
+                f.write_char('-')?;
+                f.write_str(variant)?;
             }
         }
-
-        f.write_str(&subtags.join("-"))
+        Ok(())
     }
 }
 
@@ -585,7 +592,7 @@ fn subtag_matches<P: PartialEq>(
 }
 
 fn is_option_empty<P: PartialEq>(subtag: &Option<Box<[P]>>) -> bool {
-    subtag.as_ref().map(|t| t.is_empty()).unwrap_or(true)
+    subtag.as_ref().map_or(true, |t| t.is_empty())
 }
 
 fn subtags_match<P: PartialEq>(

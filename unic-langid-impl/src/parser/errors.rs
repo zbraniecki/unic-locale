@@ -15,6 +15,6 @@ impl Display for ParserError {
             ParserError::InvalidLanguage => "The given language subtag is invalid",
             ParserError::InvalidSubtag => "Invalid subtag",
         };
-        write!(f, "{}", value)
+        f.write_str(value)
     }
 }
