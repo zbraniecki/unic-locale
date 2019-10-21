@@ -96,4 +96,10 @@ fn remove_likely_subtags_test() {
     let script: TinyStr4 = "Hant".parse().unwrap();
     let result = remove_likely_subtags(Some(lang), Some(script), None);
     assert_eq!(result, Some(extract_input("zh-TW")));
+
+    let lang: TinyStr8 = "en".parse().unwrap();
+    let script: TinyStr4 = "Latn".parse().unwrap();
+    let region: TinyStr4 = "US".parse().unwrap();
+    let result = remove_likely_subtags(Some(lang), Some(script), Some(region));
+    assert_eq!(result, Some(extract_input("en")));
 }
