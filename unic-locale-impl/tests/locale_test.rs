@@ -164,6 +164,9 @@ fn test_unicode_attributes_ordering() {
     let mut loc: Locale = "en-u-foo-bar".parse().unwrap();
     assert_eq!(&loc.to_string(), "en-u-bar-foo");
 
-    loc.extensions.unicode.set_attribute("baz").expect("Can't set attribute");
+    loc.extensions
+        .unicode
+        .set_attribute("baz")
+        .expect("Can't set attribute");
     assert_eq!(&loc.to_string(), "en-u-bar-baz-foo");
 }

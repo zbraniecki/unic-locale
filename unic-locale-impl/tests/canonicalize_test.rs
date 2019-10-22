@@ -28,10 +28,7 @@ fn test_canonicalize_locale() {
         "en-u-foo-bar-nu-thai-ca-buddhist-kk-true",
         "en-u-bar-foo-ca-buddhist-kk-nu-thai",
     );
-    assert_canonicalize(
-        "en-US-u-foo-t-es-AR-x-bar",
-        "en-US-t-es-AR-u-foo-x-bar",
-    );
+    assert_canonicalize("en-US-u-foo-t-es-AR-x-bar", "en-US-t-es-AR-u-foo-x-bar");
     assert_canonicalize("de-u-kn-true", "de-u-kn");
     assert_canonicalize("fr-t-t0-windows-True", "fr-t-t0-windows");
 }

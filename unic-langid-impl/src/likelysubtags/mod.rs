@@ -89,15 +89,13 @@ pub fn remove_likely_subtags(
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
 ) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
-
     // add_likely_subtags returns None when all 3 components are
     // already filled so don't call it in that case.
-    let max_langid;
-    if lang.is_some() && script.is_some() && region.is_some() {
-        max_langid = (lang, script, region);
+    let max_langid = if lang.is_some() && script.is_some() && region.is_some() {
+        (lang, script, region)
     } else {
-        max_langid = add_likely_subtags(lang, script, region)?;
-    }
+        add_likely_subtags(lang, script, region)?
+    };
 
     if let Some(trial) = add_likely_subtags(max_langid.0, None, None) {
         if trial == max_langid {
