@@ -118,7 +118,7 @@ impl LanguageIdentifier {
 
         let variants = if !variants.is_empty() {
             let mut vars = variants
-                .into_iter()
+                .iter()
                 .map(|v| subtags::parse_variant_subtag(v.as_ref()))
                 .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             vars.sort();
@@ -451,8 +451,8 @@ impl LanguageIdentifier {
             self.variants = None;
         } else {
             let mut result = variants
-                .into_iter()
-                .map(|v| subtags::parse_variant_subtag(v.as_ref()))
+                .iter()
+                .map(|v| subtags::parse_variant_subtag(v))
                 .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             result.sort();
             result.dedup();
@@ -483,9 +483,9 @@ impl LanguageIdentifier {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 
@@ -511,9 +511,9 @@ impl LanguageIdentifier {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 

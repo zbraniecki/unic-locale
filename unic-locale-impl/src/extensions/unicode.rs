@@ -26,7 +26,7 @@ fn parse_key(key: &str) -> Result<TinyStr4, ParserError> {
     Ok(key.to_ascii_lowercase())
 }
 
-const TRUE_TYPE: TinyStr8 = unsafe { TinyStr8::new_unchecked(1702195828u64) }; // "true"
+const TRUE_TYPE: TinyStr8 = unsafe { TinyStr8::new_unchecked(1_702_195_828u64) }; // "true"
 
 fn parse_type(t: &str) -> Result<Option<TinyStr8>, ParserError> {
     let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
@@ -83,9 +83,8 @@ impl UnicodeExtensionList {
 
     pub fn set_attribute(&mut self, value: &str) -> Result<(), LocaleError> {
         let value = parse_attribute(value)?;
-        let idx = self.attributes.binary_search(&value);
-        if idx.is_err() {
-            self.attributes.insert(idx.unwrap_err(), value);
+        if let Err(idx) = self.attributes.binary_search(&value) {
+            self.attributes.insert(idx, value);
         }
         Ok(())
     }
