@@ -104,35 +104,27 @@ fn test_set_fields() {
     let mut langid = LanguageIdentifier::default();
     assert_eq!(&langid.to_string(), "und");
 
-    langid
-        .set_language(Some("pl"))
-        .expect("Setting language failed");
+    langid.set_language("pl").expect("Setting language failed");
     assert_eq!(&langid.to_string(), "pl");
 
-    langid
-        .set_language(Some("de"))
-        .expect("Setting language failed");
+    langid.set_language("de").expect("Setting language failed");
     assert_eq!(&langid.to_string(), "de");
-    langid
-        .set_region(Some("AT"))
-        .expect("Setting region failed");
+    langid.set_region("AT").expect("Setting region failed");
     assert_eq!(&langid.to_string(), "de-AT");
-    langid
-        .set_script(Some("Latn"))
-        .expect("Setting script failed");
+    langid.set_script("Latn").expect("Setting script failed");
     assert_eq!(&langid.to_string(), "de-Latn-AT");
     langid
         .set_variants(&["macos"])
         .expect("Setting variants failed");
     assert_eq!(&langid.to_string(), "de-Latn-AT-macos");
 
-    langid.set_language(None).expect("Setting language failed");
+    langid.clear_language();
     assert_eq!(&langid.to_string(), "und-Latn-AT-macos");
-    langid.set_region(None).expect("Setting region failed");
+    langid.clear_region();
     assert_eq!(&langid.to_string(), "und-Latn-macos");
-    langid.set_script(None).expect("Setting script failed");
+    langid.clear_script();
     assert_eq!(&langid.to_string(), "und-macos");
-    langid.set_variants(&[]).expect("Setting variants failed");
+    langid.clear_variants();
     assert_eq!(&langid.to_string(), "und");
 }
 

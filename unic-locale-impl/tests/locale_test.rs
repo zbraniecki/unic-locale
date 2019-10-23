@@ -105,28 +105,26 @@ fn test_set_fields() {
     let mut loc = Locale::default();
     assert_eq!(&loc.to_string(), "und");
 
-    loc.set_language(Some("pl"))
-        .expect("Setting language failed");
+    loc.set_language("pl").expect("Setting language failed");
     assert_eq!(&loc.to_string(), "pl");
 
-    loc.set_language(Some("de"))
-        .expect("Setting language failed");
+    loc.set_language("de").expect("Setting language failed");
     assert_eq!(&loc.to_string(), "de");
-    loc.set_region(Some("AT")).expect("Setting region failed");
+    loc.set_region("AT").expect("Setting region failed");
     assert_eq!(&loc.to_string(), "de-AT");
-    loc.set_script(Some("Latn")).expect("Setting script failed");
+    loc.set_script("Latn").expect("Setting script failed");
     assert_eq!(&loc.to_string(), "de-Latn-AT");
     loc.set_variants(&["macos"])
         .expect("Setting variants failed");
     assert_eq!(&loc.to_string(), "de-Latn-AT-macos");
 
-    loc.set_language(None).expect("Setting language failed");
+    loc.clear_language();
     assert_eq!(&loc.to_string(), "und-Latn-AT-macos");
-    loc.set_region(None).expect("Setting region failed");
+    loc.clear_region();
     assert_eq!(&loc.to_string(), "und-Latn-macos");
-    loc.set_script(None).expect("Setting script failed");
+    loc.clear_script();
     assert_eq!(&loc.to_string(), "und-macos");
-    loc.set_variants(&[]).expect("Setting variants failed");
+    loc.clear_variants();
     assert_eq!(&loc.to_string(), "und");
 }
 
