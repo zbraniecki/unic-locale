@@ -11,7 +11,7 @@ categories = ["internationalization"]
 
 [dependencies]
 unic-langid-impl = { path = "../unic-langid-impl" }
-tinystr = "0.3"
+tinystr = { git = "https://github.com/zbraniecki/tinystr", branch = "u8" }
 
 [dev-dependencies]
 criterion = "0.3"

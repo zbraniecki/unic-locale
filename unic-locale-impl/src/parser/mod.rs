@@ -5,10 +5,8 @@ use super::extensions::ExtensionsMap;
 use super::Locale;
 use unic_langid_impl::LanguageIdentifier;
 
-static SEPARATORS: &[char] = &['-', '_'];
-
-pub fn parse_locale(t: &str) -> Result<Locale, ParserError> {
-    let mut iter = t.split(|c| SEPARATORS.contains(&c)).peekable();
+pub fn parse_locale<S: AsRef<[u8]>>(t: S) -> Result<Locale, ParserError> {
+    let mut iter = t.as_ref().split(|c| *c == b'-' || *c == b'_').peekable();
 
     let langid = LanguageIdentifier::try_from_iter(&mut iter, true)
         .map_err(|_| ParserError::InvalidLanguage)?;

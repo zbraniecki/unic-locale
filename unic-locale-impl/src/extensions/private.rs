@@ -6,8 +6,8 @@ use tinystr::TinyStr8;
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct PrivateExtensionList(Vec<TinyStr8>);
 
-fn parse_value(t: &str) -> Result<TinyStr8, ParserError> {
-    let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
+fn parse_value(t: &[u8]) -> Result<TinyStr8, ParserError> {
+    let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
     if t.is_empty() || t.len() > 8 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
@@ -20,14 +20,14 @@ impl PrivateExtensionList {
         self.0.is_empty()
     }
 
-    pub fn add_tag(&mut self, tag: &str) -> Result<(), LocaleError> {
-        self.0.push(parse_value(tag)?);
+    pub fn add_tag<S: AsRef<[u8]>>(&mut self, tag: S) -> Result<(), LocaleError> {
+        self.0.push(parse_value(tag.as_ref())?);
         self.0.sort();
         Ok(())
     }
 
-    pub fn try_from_iter<'a>(
-        iter: &mut impl Iterator<Item = &'a str>,
+    pub(crate) fn try_from_iter<'a>(
+        iter: &mut impl Iterator<Item = &'a [u8]>,
     ) -> Result<Self, ParserError> {
         let mut pext = Self::default();
 

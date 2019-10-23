@@ -81,7 +81,24 @@ pub struct LanguageIdentifier {
 }
 
 impl LanguageIdentifier {
-    /// A constructor which takes optional subtags as `&str`, parses them and
+    /// A constructor which takes a utf8 slice, parses it and
+    /// produces a well-formed `LanguageIdentifier`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let li = LanguageIdentifier::from_bytes("en-US".as_bytes())
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(li.to_string(), "en-US");
+    /// ```
+    pub fn from_bytes(v: &[u8]) -> Result<Self, LanguageIdentifierError> {
+        parser::parse_language_identifier(v).map_err(std::convert::Into::into)
+    }
+
+    /// A constructor which takes optional subtags as `AsRef<[u8]>`, parses them and
     /// produces a well-formed `LanguageIdentifier`.
     ///
     /// # Examples
@@ -94,7 +111,7 @@ impl LanguageIdentifier {
     ///
     /// assert_eq!(li.to_string(), "fr-CA");
     /// ```
-    pub fn from_parts<S: AsRef<str>>(
+    pub fn from_parts<S: AsRef<[u8]>>(
         language: Option<S>,
         script: Option<S>,
         region: Option<S>,
@@ -142,7 +159,7 @@ impl LanguageIdentifier {
     ///
     /// Not stable.
     pub fn try_from_iter<'a>(
-        iter: &mut Peekable<impl Iterator<Item = &'a str>>,
+        iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
         allow_extension: bool,
     ) -> Result<LanguageIdentifier, LanguageIdentifierError> {
         parser::parse_language_identifier_from_iter(iter, allow_extension)
@@ -296,7 +313,30 @@ impl LanguageIdentifier {
 
     /// Sets the language subtag of the `LanguageIdentifier`.
     ///
-    /// If `None` is passed, the field will be set to `None` and returned as `"und"`.
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut li: LanguageIdentifier = "de-Latn-AT".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// li.set_language("fr")
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(li.to_string(), "fr-Latn-AT");
+    /// ```
+    pub fn set_language<S: AsRef<[u8]>>(
+        &mut self,
+        language: S,
+    ) -> Result<(), LanguageIdentifierError> {
+        self.language = subtags::parse_language_subtag(language.as_ref())?;
+        Ok(())
+    }
+
+    /// Clears the language subtag of the `LanguageIdentifier`.
+    ///
+    /// An empty language subtag is serialized to `und`.
     ///
     /// # Examples
     ///
@@ -306,15 +346,10 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "de-Latn-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_language("fr");
+    /// li.clear_language();
     ///
-    /// assert_eq!(li.to_string(), "fr-Latn-AT");
+    /// assert_eq!(li.to_string(), "und-Latn-AT");
     /// ```
-    pub fn set_language(&mut self, language: &str) -> Result<(), LanguageIdentifierError> {
-        self.language = subtags::parse_language_subtag(language)?;
-        Ok(())
-    }
-
     pub fn clear_language(&mut self) {
         self.language = None;
     }
@@ -350,15 +385,30 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "sr-Latn".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_script("Cyrl");
+    /// li.set_script("Cyrl")
+    ///     .expect("Parsing failed.");
     ///
     /// assert_eq!(li.to_string(), "sr-Cyrl");
     /// ```
-    pub fn set_script(&mut self, script: &str) -> Result<(), LanguageIdentifierError> {
-        self.script = Some(subtags::parse_script_subtag(script)?);
+    pub fn set_script<S: AsRef<[u8]>>(&mut self, script: S) -> Result<(), LanguageIdentifierError> {
+        self.script = Some(subtags::parse_script_subtag(script.as_ref())?);
         Ok(())
     }
 
+    /// Clears the script subtag of the `LanguageIdentifier`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut li: LanguageIdentifier = "sr-Latn".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// li.clear_script();
+    ///
+    /// assert_eq!(li.to_string(), "sr");
+    /// ```
     pub fn clear_script(&mut self) {
         self.script = None;
     }
@@ -394,15 +444,30 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "fr-FR".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_region("CA");
+    /// li.set_region("CA")
+    ///     .expect("Parsing failed.");
     ///
     /// assert_eq!(li.to_string(), "fr-CA");
     /// ```
-    pub fn set_region(&mut self, region: &str) -> Result<(), LanguageIdentifierError> {
-        self.region = Some(subtags::parse_region_subtag(region)?);
+    pub fn set_region<S: AsRef<[u8]>>(&mut self, region: S) -> Result<(), LanguageIdentifierError> {
+        self.region = Some(subtags::parse_region_subtag(region.as_ref())?);
         Ok(())
     }
 
+    /// Clears the region subtag of the `LanguageIdentifier`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut li: LanguageIdentifier = "fr-FR".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// li.clear_region();
+    ///
+    /// assert_eq!(li.to_string(), "fr");
+    /// ```
     pub fn clear_region(&mut self) {
         self.region = None;
     }
@@ -442,17 +507,21 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "ca-ES".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_variants(&["valencia"]);
+    /// li.set_variants(&["valencia"])
+    ///     .expect("Parsing failed.");
     ///
     /// assert_eq!(li.to_string(), "ca-ES-valencia");
     /// ```
-    pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LanguageIdentifierError> {
+    pub fn set_variants<S: AsRef<[u8]>>(
+        &mut self,
+        variants: &[S],
+    ) -> Result<(), LanguageIdentifierError> {
         if variants.is_empty() {
             self.variants = None;
         } else {
             let mut result = variants
                 .iter()
-                .map(|v| subtags::parse_variant_subtag(v))
+                .map(|v| subtags::parse_variant_subtag(v.as_ref()))
                 .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
             result.sort();
             result.dedup();
@@ -461,6 +530,20 @@ impl LanguageIdentifier {
         Ok(())
     }
 
+    /// Clears variant subtags of the `LanguageIdentifier`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut li: LanguageIdentifier = "ca-ES-valencia".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// li.clear_variants();
+    ///
+    /// assert_eq!(li.to_string(), "ca-ES");
+    /// ```
     pub fn clear_variants(&mut self) {
         self.variants = None;
     }
@@ -550,7 +633,7 @@ impl FromStr for LanguageIdentifier {
     type Err = LanguageIdentifierError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        parser::parse_language_identifier(source).map_err(std::convert::Into::into)
+        Self::from_bytes(source.as_bytes())
     }
 }
 
@@ -623,7 +706,7 @@ fn subtags_match<P: PartialEq>(
 ///
 /// assert_eq!(canonicalize("pL_latn_pl"), Ok("pl-Latn-PL".to_string()));
 /// ```
-pub fn canonicalize(input: &str) -> Result<String, LanguageIdentifierError> {
-    let lang_id: LanguageIdentifier = input.parse()?;
+pub fn canonicalize<S: AsRef<[u8]>>(input: S) -> Result<String, LanguageIdentifierError> {
+    let lang_id = LanguageIdentifier::from_bytes(input.as_ref())?;
     Ok(lang_id.to_string())
 }

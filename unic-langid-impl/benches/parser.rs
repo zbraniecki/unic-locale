@@ -1,3 +1,4 @@
+use criterion::black_box;
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
@@ -21,10 +22,12 @@ fn language_identifier_parser_bench(c: &mut Criterion) {
         "mk",
         "uk",
     ];
-    c.bench_function("language_identifier_parser", move |b| {
+
+    c.bench_function("language_identifier_parser", |b| {
+        let slices: Vec<&[u8]> = strings.iter().map(|s| s.as_bytes()).collect();
         b.iter(|| {
-            for s in strings {
-                let _ = parse_language_identifier(s);
+            for s in &slices {
+                let _ = parse_language_identifier(black_box(s));
             }
         })
     });
@@ -47,10 +50,11 @@ fn language_identifier_parser_casing_bench(c: &mut Criterion) {
         "Mk",
         "uK",
     ];
-    c.bench_function("language_identifier_parser_casing", move |b| {
+    c.bench_function("language_identifier_parser_casing", |b| {
+        let slices: Vec<&[u8]> = strings.iter().map(|s| s.as_bytes()).collect();
         b.iter(|| {
-            for s in strings {
-                let _ = parse_language_identifier(s);
+            for s in &slices {
+                let _ = parse_language_identifier(black_box(s));
             }
         })
     });

@@ -46,14 +46,14 @@ fn read_locale_testsets<P: AsRef<Path>>(path: P) -> Result<Vec<LocaleTestSet>, B
 fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> ExtensionsMap {
     let mut result = ExtensionsMap::default();
     for (key, map) in map {
-        let t: ExtensionType = ExtensionType::from_char(key.chars().nth(0).unwrap())
+        let t: ExtensionType = ExtensionType::from_byte(key.chars().nth(0).unwrap() as u8)
             .expect("Failed to format extension type.");
         match t {
             ExtensionType::Unicode => {
                 for (key, value) in map {
                     result
                         .unicode
-                        .set_keyword(&key, vec![value.as_str()])
+                        .set_keyword(&key, vec![&value])
                         .expect("Setting extension value failed.");
                 }
             }
@@ -95,7 +95,7 @@ fn test_locale_fixtures(path: &str) {
                     locale
                         .extensions
                         .unicode
-                        .set_keyword(&key, vec![value.as_str()])
+                        .set_keyword(&key, vec![&value])
                         .expect("Failed to set extension value.");
                 }
             }

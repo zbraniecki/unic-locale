@@ -24,14 +24,13 @@ pub enum ExtensionType {
 }
 
 impl ExtensionType {
-    pub fn from_char(key: char) -> Result<Self, ParserError> {
+    pub fn from_byte(key: u8) -> Result<Self, ParserError> {
+        let key = key.to_ascii_lowercase();
         match key {
-            'u' => Ok(ExtensionType::Unicode),
-            't' => Ok(ExtensionType::Transform),
-            'x' => Ok(ExtensionType::Private),
-            sign if sign.is_ascii_alphanumeric() => {
-                Ok(ExtensionType::Other(sign.to_ascii_lowercase()))
-            }
+            b'u' => Ok(ExtensionType::Unicode),
+            b't' => Ok(ExtensionType::Transform),
+            b'x' => Ok(ExtensionType::Private),
+            sign if sign.is_ascii_alphanumeric() => Ok(ExtensionType::Other(char::from(sign))),
             _ => Err(ParserError::InvalidExtension),
         }
     }
@@ -58,24 +57,30 @@ pub struct ExtensionsMap {
 }
 
 impl ExtensionsMap {
-    pub fn try_from_iter<'a>(
-        iter: &mut Peekable<impl Iterator<Item = &'a str>>,
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, ParserError> {
+        let mut iterator = bytes.split(|c| *c == b'-' || *c == b'_').peekable();
+        Self::try_from_iter(&mut iterator)
+    }
+
+    pub(crate) fn try_from_iter<'a>(
+        iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
     ) -> Result<Self, ParserError> {
         let mut result = ExtensionsMap::default();
 
         let mut st = iter.next();
         while let Some(subtag) = st {
-            let subtag = subtag.to_ascii_lowercase();
+            if subtag.is_empty() {
+                break;
+            }
 
-            match subtag.as_str() {
-                "" => break,
-                "u" => {
+            match ExtensionType::from_byte(subtag[0]) {
+                Ok(ExtensionType::Unicode) => {
                     result.unicode = UnicodeExtensionList::try_from_iter(iter)?;
                 }
-                "t" => {
+                Ok(ExtensionType::Transform) => {
                     result.transform = TransformExtensionList::try_from_iter(iter)?;
                 }
-                "x" => {
+                Ok(ExtensionType::Private) => {
                     result.private = PrivateExtensionList::try_from_iter(iter)?;
                 }
                 _ => unimplemented!(),
@@ -92,14 +97,11 @@ impl ExtensionsMap {
     }
 }
 
-static SEPARATORS: &[char] = &['-', '_'];
-
 impl FromStr for ExtensionsMap {
     type Err = ParserError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        let mut iterator = source.split(|c| SEPARATORS.contains(&c)).peekable();
-        Self::try_from_iter(&mut iterator)
+        Self::from_bytes(source.as_bytes())
     }
 }
 
