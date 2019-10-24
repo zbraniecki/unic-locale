@@ -64,11 +64,7 @@ impl UnicodeExtensionList {
         self.keywords.is_empty() && self.attributes.is_empty()
     }
 
-    pub fn set_keyword<S: AsRef<[u8]>>(
-        &mut self,
-        key: S,
-        value: &[S],
-    ) -> Result<(), LocaleError> {
+    pub fn set_keyword<S: AsRef<[u8]>>(&mut self, key: S, value: &[S]) -> Result<(), LocaleError> {
         let key = parse_key(key.as_ref())?;
 
         let mut t = Vec::with_capacity(value.len());

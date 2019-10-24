@@ -14,7 +14,10 @@ fn assert_language_identifier(
     assert_eq!(loc.get_language(), language.unwrap_or("und"));
     assert_eq!(loc.get_script(), script);
     assert_eq!(loc.get_region(), region);
-    assert_eq!(loc.get_variants(), variants.unwrap_or(&[]));
+    assert_eq!(
+        loc.get_variants().collect::<Vec<_>>(),
+        variants.unwrap_or(&[])
+    );
 }
 
 fn assert_parsed_language_identifier(

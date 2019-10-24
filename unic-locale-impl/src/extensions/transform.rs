@@ -56,11 +56,7 @@ impl TransformExtensionList {
         Ok(())
     }
 
-    pub fn set_tfield<S: AsRef<[u8]>>(
-        &mut self,
-        tkey: S,
-        tvalue: &[S],
-    ) -> Result<(), LocaleError> {
+    pub fn set_tfield<S: AsRef<[u8]>>(&mut self, tkey: S, tvalue: &[S]) -> Result<(), LocaleError> {
         let tkey = parse_tkey(tkey.as_ref())?;
         let mut t = Vec::with_capacity(tvalue.len());
         for val in tvalue {
