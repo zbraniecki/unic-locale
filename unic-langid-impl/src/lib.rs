@@ -230,7 +230,7 @@ impl LanguageIdentifier {
     /// assert_eq!(li2.to_string(), "en-US");
     /// ```
     #[inline(always)]
-    pub const unsafe fn from_raw_parts_unchecked(
+    pub const fn from_raw_parts_unchecked(
         language: Option<TinyStr8>,
         script: Option<TinyStr4>,
         region: Option<TinyStr4>,
