@@ -6,10 +6,8 @@ pub use self::errors::ParserError;
 use crate::subtags;
 use crate::LanguageIdentifier;
 
-static SEPARATORS: &[char] = &['-', '_'];
-
 pub fn parse_language_identifier_from_iter<'a>(
-    iter: &mut Peekable<impl Iterator<Item = &'a str>>,
+    iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
     allow_extension: bool,
 ) -> Result<LanguageIdentifier, ParserError> {
     let mut position = 0;
@@ -73,7 +71,7 @@ pub fn parse_language_identifier_from_iter<'a>(
     })
 }
 
-pub fn parse_language_identifier(t: &str) -> Result<LanguageIdentifier, ParserError> {
-    let mut iter = t.split(|c| SEPARATORS.contains(&c)).peekable();
+pub fn parse_language_identifier(t: &[u8]) -> Result<LanguageIdentifier, ParserError> {
+    let mut iter = t.split(|c| *c == b'-' || *c == b'_').peekable();
     parse_language_identifier_from_iter(&mut iter, false)
 }

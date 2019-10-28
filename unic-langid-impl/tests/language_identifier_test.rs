@@ -24,7 +24,7 @@ fn assert_parsed_language_identifier(
     region: Option<&str>,
     variants: Option<&[&str]>,
 ) {
-    let langid = parse_language_identifier(input).unwrap();
+    let langid = parse_language_identifier(input.as_bytes()).unwrap();
     assert_language_identifier(&langid, language, script, region, variants);
 }
 

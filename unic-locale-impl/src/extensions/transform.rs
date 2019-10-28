@@ -16,21 +16,18 @@ pub struct TransformExtensionList {
     tfields: BTreeMap<TinyStr4, Vec<TinyStr8>>,
 }
 
-fn parse_tkey(key: &str) -> Result<TinyStr4, ParserError> {
-    if key.len() != 2
-        || !key.as_bytes()[0].is_ascii_alphabetic()
-        || !key.as_bytes()[1].is_ascii_digit()
-    {
+fn parse_tkey(key: &[u8]) -> Result<TinyStr4, ParserError> {
+    if key.len() != 2 || !key[0].is_ascii_alphabetic() || !key[1].is_ascii_digit() {
         return Err(ParserError::InvalidSubtag);
     }
-    let tkey: TinyStr4 = key.parse().map_err(|_| ParserError::InvalidSubtag)?;
+    let tkey = TinyStr4::from_bytes(key).map_err(|_| ParserError::InvalidSubtag)?;
     Ok(tkey.to_ascii_lowercase())
 }
 
 const TRUE_TVALUE: TinyStr8 = unsafe { TinyStr8::new_unchecked(1_702_195_828u64) }; // "true"
 
-fn parse_tvalue(t: &str) -> Result<Option<TinyStr8>, ParserError> {
-    let s: TinyStr8 = t.parse().map_err(|_| ParserError::InvalidSubtag)?;
+fn parse_tvalue(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
+    let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
     if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
@@ -44,9 +41,9 @@ fn parse_tvalue(t: &str) -> Result<Option<TinyStr8>, ParserError> {
     }
 }
 
-fn is_language_subtag(t: &str) -> bool {
+fn is_language_subtag(t: &[u8]) -> bool {
     let slen = t.len();
-    (slen >= 2 && slen <= 8 || slen == 4) && !t.contains(|c: char| !c.is_ascii_alphabetic())
+    (slen >= 2 && slen <= 8 || slen == 4) && !t.iter().any(|c: &u8| !c.is_ascii_alphabetic())
 }
 
 impl TransformExtensionList {
@@ -59,11 +56,15 @@ impl TransformExtensionList {
         Ok(())
     }
 
-    pub fn set_tfield(&mut self, tkey: &str, tvalue: Vec<&str>) -> Result<(), LocaleError> {
-        let tkey = parse_tkey(tkey)?;
+    pub fn set_tfield<S: AsRef<[u8]>>(
+        &mut self,
+        tkey: S,
+        tvalue: &[S],
+    ) -> Result<(), LocaleError> {
+        let tkey = parse_tkey(tkey.as_ref())?;
         let mut t = Vec::with_capacity(tvalue.len());
         for val in tvalue {
-            if let Some(tval) = parse_tvalue(val)? {
+            if let Some(tval) = parse_tvalue(val.as_ref())? {
                 t.push(tval);
             }
         }
@@ -72,8 +73,8 @@ impl TransformExtensionList {
         Ok(())
     }
 
-    pub fn try_from_iter<'a>(
-        mut iter: &mut Peekable<impl Iterator<Item = &'a str>>,
+    pub(crate) fn try_from_iter<'a>(
+        mut iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
 
@@ -84,10 +85,7 @@ impl TransformExtensionList {
 
         while let Some(subtag) = st_peek {
             let slen = subtag.len();
-            if slen == 2
-                && subtag.as_bytes()[0].is_ascii_alphabetic()
-                && subtag.as_bytes()[1].is_ascii_digit()
-            {
+            if slen == 2 && subtag[0].is_ascii_alphabetic() && subtag[1].is_ascii_digit() {
                 if let Some(current_tkey) = current_tkey {
                     text.tfields.insert(current_tkey, current_tvalue);
                     current_tvalue = vec![];

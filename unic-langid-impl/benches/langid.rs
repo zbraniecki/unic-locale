@@ -1,3 +1,4 @@
+use criterion::black_box;
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
@@ -33,7 +34,15 @@ fn language_identifier_construct_bench(c: &mut Criterion) {
         Fun::new("from_str", |b, _| {
             b.iter(|| {
                 for s in STRINGS {
-                    let _: Result<LanguageIdentifier, _> = s.parse();
+                    let _: Result<LanguageIdentifier, _> = black_box(s).parse();
+                }
+            })
+        }),
+        Fun::new("from_bytes", |b, _| {
+            let slices: Vec<&[u8]> = STRINGS.iter().map(|s| s.as_bytes()).collect();
+            b.iter(|| {
+                for s in &slices {
+                    let _ = LanguageIdentifier::from_bytes(black_box(s));
                 }
             })
         }),

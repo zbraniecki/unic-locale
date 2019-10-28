@@ -17,7 +17,7 @@
 //! assert_eq!(li.get_region(), Some("US"));
 //! assert_eq!(li.get_variants().len(), 0);
 //!
-//! li.set_region(Some("GB"))
+//! li.set_region("GB")
 //!     .expect("Region parsing failed.");
 //!
 //! assert_eq!(li.to_string(), "en-GB");

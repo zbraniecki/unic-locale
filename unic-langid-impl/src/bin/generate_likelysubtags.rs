@@ -57,7 +57,7 @@ fn main() {
         let v: &str = v.as_str().unwrap();
         let mut value_langid: LanguageIdentifier = v.parse().expect("Failed to parse a value.");
         if let Some("ZZ") = value_langid.get_region() {
-            value_langid.set_region(None).unwrap();
+            value_langid.clear_region();
         }
         let (val_lang, val_script, val_region, _) = value_langid.into_raw_parts();
 

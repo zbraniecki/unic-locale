@@ -24,7 +24,11 @@ type RawPartsTuple = (
 );
 
 impl Locale {
-    pub fn from_parts<S: AsRef<str>>(
+    pub fn from_bytes(v: &[u8]) -> Result<Self, LocaleError> {
+        parser::parse_locale(v).map_err(std::convert::Into::into)
+    }
+
+    pub fn from_parts<S: AsRef<[u8]>>(
         language: Option<S>,
         script: Option<S>,
         region: Option<S>,
@@ -74,7 +78,7 @@ impl Locale {
         self.langid.get_language()
     }
 
-    pub fn set_language(&mut self, language: &str) -> Result<(), LocaleError> {
+    pub fn set_language<S: AsRef<[u8]>>(&mut self, language: S) -> Result<(), LocaleError> {
         self.langid
             .set_language(language)
             .map_err(std::convert::Into::into)
@@ -88,7 +92,7 @@ impl Locale {
         self.langid.get_script()
     }
 
-    pub fn set_script(&mut self, script: &str) -> Result<(), LocaleError> {
+    pub fn set_script<S: AsRef<[u8]>>(&mut self, script: S) -> Result<(), LocaleError> {
         self.langid
             .set_script(script)
             .map_err(std::convert::Into::into)
@@ -102,7 +106,7 @@ impl Locale {
         self.langid.get_region()
     }
 
-    pub fn set_region(&mut self, region: &str) -> Result<(), LocaleError> {
+    pub fn set_region<S: AsRef<[u8]>>(&mut self, region: S) -> Result<(), LocaleError> {
         self.langid
             .set_region(region)
             .map_err(std::convert::Into::into)
@@ -116,7 +120,7 @@ impl Locale {
         self.langid.get_variants()
     }
 
-    pub fn set_variants(&mut self, variants: &[&str]) -> Result<(), LocaleError> {
+    pub fn set_variants<S: AsRef<[u8]>>(&mut self, variants: &[S]) -> Result<(), LocaleError> {
         self.langid
             .set_variants(variants)
             .map_err(std::convert::Into::into)
@@ -183,7 +187,7 @@ impl std::fmt::Display for Locale {
     }
 }
 
-pub fn canonicalize(input: &str) -> Result<String, LocaleError> {
-    let locale: Locale = input.parse()?;
+pub fn canonicalize<S: AsRef<[u8]>>(input: S) -> Result<String, LocaleError> {
+    let locale = Locale::from_bytes(input.as_ref())?;
     Ok(locale.to_string())
 }
