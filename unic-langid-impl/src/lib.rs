@@ -306,17 +306,17 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "de-Latn-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_language(Some("fr"));
+    /// li.set_language("fr");
     ///
     /// assert_eq!(li.to_string(), "fr-Latn-AT");
     /// ```
-    pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LanguageIdentifierError> {
-        self.language = if let Some(lang) = language {
-            subtags::parse_language_subtag(lang)?
-        } else {
-            None
-        };
+    pub fn set_language(&mut self, language: &str) -> Result<(), LanguageIdentifierError> {
+        self.language = subtags::parse_language_subtag(language)?;
         Ok(())
+    }
+
+    pub fn clear_language(&mut self) {
+        self.language = None;
     }
 
     /// Returns the script subtag of the `LanguageIdentifier`, if set.
@@ -350,17 +350,17 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "sr-Latn".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_script(Some("Cyrl"));
+    /// li.set_script("Cyrl");
     ///
     /// assert_eq!(li.to_string(), "sr-Cyrl");
     /// ```
-    pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LanguageIdentifierError> {
-        self.script = if let Some(script) = script {
-            Some(subtags::parse_script_subtag(script)?)
-        } else {
-            None
-        };
+    pub fn set_script(&mut self, script: &str) -> Result<(), LanguageIdentifierError> {
+        self.script = Some(subtags::parse_script_subtag(script)?);
         Ok(())
+    }
+
+    pub fn clear_script(&mut self) {
+        self.script = None;
     }
 
     /// Returns the region subtag of the `LanguageIdentifier`, if set.
@@ -394,17 +394,17 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "fr-FR".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// li.set_region(Some("CA"));
+    /// li.set_region("CA");
     ///
     /// assert_eq!(li.to_string(), "fr-CA");
     /// ```
-    pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LanguageIdentifierError> {
-        self.region = if let Some(region) = region {
-            Some(subtags::parse_region_subtag(region)?)
-        } else {
-            None
-        };
+    pub fn set_region(&mut self, region: &str) -> Result<(), LanguageIdentifierError> {
+        self.region = Some(subtags::parse_region_subtag(region)?);
         Ok(())
+    }
+
+    pub fn clear_region(&mut self) {
+        self.region = None;
     }
 
     /// Returns a vector of variants subtags of the `LanguageIdentifier`.
@@ -459,6 +459,10 @@ impl LanguageIdentifier {
             self.variants = Some(result.into_boxed_slice());
         }
         Ok(())
+    }
+
+    pub fn clear_variants(&mut self) {
+        self.variants = None;
     }
 
     /// Extends the `LanguageIdentifier` adding likely subtags based

@@ -74,30 +74,42 @@ impl Locale {
         self.langid.get_language()
     }
 
-    pub fn set_language(&mut self, language: Option<&str>) -> Result<(), LocaleError> {
+    pub fn set_language(&mut self, language: &str) -> Result<(), LocaleError> {
         self.langid
             .set_language(language)
             .map_err(std::convert::Into::into)
+    }
+
+    pub fn clear_language(&mut self) {
+        self.langid.clear_language()
     }
 
     pub fn get_script(&self) -> Option<&str> {
         self.langid.get_script()
     }
 
-    pub fn set_script(&mut self, script: Option<&str>) -> Result<(), LocaleError> {
+    pub fn set_script(&mut self, script: &str) -> Result<(), LocaleError> {
         self.langid
             .set_script(script)
             .map_err(std::convert::Into::into)
+    }
+
+    pub fn clear_script(&mut self) {
+        self.langid.clear_script()
     }
 
     pub fn get_region(&self) -> Option<&str> {
         self.langid.get_region()
     }
 
-    pub fn set_region(&mut self, region: Option<&str>) -> Result<(), LocaleError> {
+    pub fn set_region(&mut self, region: &str) -> Result<(), LocaleError> {
         self.langid
             .set_region(region)
             .map_err(std::convert::Into::into)
+    }
+
+    pub fn clear_region(&mut self) {
+        self.langid.clear_region()
     }
 
     pub fn get_variants(&self) -> Vec<&str> {
@@ -108,6 +120,10 @@ impl Locale {
         self.langid
             .set_variants(variants)
             .map_err(std::convert::Into::into)
+    }
+
+    pub fn clear_variants(&mut self) {
+        self.langid.clear_variants()
     }
 
     #[cfg(feature = "likelysubtags")]
