@@ -11,7 +11,7 @@ categories = ["internationalization"]
 exclude = ["data/*"]
 
 [dependencies]
-tinystr = { git = "https://github.com/zbraniecki/tinystr", branch = "u8" }
+tinystr = "0.3.2"
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
 

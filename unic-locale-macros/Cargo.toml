@@ -11,6 +11,6 @@ categories = ["internationalization"]
 
 [dependencies]
 proc-macro-hack = "0.5"
-tinystr = { git = "https://github.com/zbraniecki/tinystr", branch = "u8" }
+tinystr = "0.3.2"
 unic-locale-macros-impl = { path = "../unic-locale-macros-impl" }
 unic-locale-impl = { path = "../unic-locale-impl" }
