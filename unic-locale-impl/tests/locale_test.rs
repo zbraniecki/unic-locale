@@ -37,7 +37,7 @@ fn test_from_parts() {
 #[test]
 fn test_locale_identifier() {
     let mut extensions = ExtensionsMap::default();
-    extensions.unicode.set_keyword("hc", vec!["h12"]).unwrap();
+    extensions.unicode.set_keyword("hc", &["h12"]).unwrap();
     assert_parsed_locale_identifier("pl-u-hc-h12", &extensions);
 
     let mut extensions = ExtensionsMap::default();

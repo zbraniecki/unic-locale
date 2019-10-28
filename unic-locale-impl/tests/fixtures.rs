@@ -53,7 +53,7 @@ fn create_extensions_map(map: HashMap<String, HashMap<String, String>>) -> Exten
                 for (key, value) in map {
                     result
                         .unicode
-                        .set_keyword(&key, vec![&value])
+                        .set_keyword(&key, &[&value])
                         .expect("Setting extension value failed.");
                 }
             }
@@ -95,7 +95,7 @@ fn test_locale_fixtures(path: &str) {
                     locale
                         .extensions
                         .unicode
-                        .set_keyword(&key, vec![&value])
+                        .set_keyword(&key, &[&value])
                         .expect("Failed to set extension value.");
                 }
             }

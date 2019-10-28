@@ -25,7 +25,7 @@ type RawPartsTuple = (
 
 impl Locale {
     pub fn from_bytes(v: &[u8]) -> Result<Self, LocaleError> {
-        parser::parse_locale(v).map_err(std::convert::Into::into)
+        Ok(parser::parse_locale(v)?)
     }
 
     pub fn from_parts<S: AsRef<[u8]>>(
@@ -79,9 +79,7 @@ impl Locale {
     }
 
     pub fn set_language<S: AsRef<[u8]>>(&mut self, language: S) -> Result<(), LocaleError> {
-        self.langid
-            .set_language(language)
-            .map_err(std::convert::Into::into)
+        Ok(self.langid.set_language(language)?)
     }
 
     pub fn clear_language(&mut self) {
@@ -93,9 +91,7 @@ impl Locale {
     }
 
     pub fn set_script<S: AsRef<[u8]>>(&mut self, script: S) -> Result<(), LocaleError> {
-        self.langid
-            .set_script(script)
-            .map_err(std::convert::Into::into)
+        Ok(self.langid.set_script(script)?)
     }
 
     pub fn clear_script(&mut self) {
@@ -107,23 +103,22 @@ impl Locale {
     }
 
     pub fn set_region<S: AsRef<[u8]>>(&mut self, region: S) -> Result<(), LocaleError> {
-        self.langid
-            .set_region(region)
-            .map_err(std::convert::Into::into)
+        Ok(self.langid.set_region(region)?)
     }
 
     pub fn clear_region(&mut self) {
         self.langid.clear_region()
     }
 
-    pub fn get_variants(&self) -> Vec<&str> {
+    pub fn get_variants(&self) -> impl ExactSizeIterator<Item = &str> {
         self.langid.get_variants()
     }
 
-    pub fn set_variants<S: AsRef<[u8]>>(&mut self, variants: &[S]) -> Result<(), LocaleError> {
-        self.langid
-            .set_variants(variants)
-            .map_err(std::convert::Into::into)
+    pub fn set_variants<S: AsRef<[u8]>>(
+        &mut self,
+        variants: impl IntoIterator<Item = S>,
+    ) -> Result<(), LocaleError> {
+        Ok(self.langid.set_variants(variants)?)
     }
 
     pub fn clear_variants(&mut self) {
@@ -149,7 +144,7 @@ impl FromStr for Locale {
     type Err = LocaleError;
 
     fn from_str(source: &str) -> Result<Self, Self::Err> {
-        parser::parse_locale(source).map_err(std::convert::Into::into)
+        Ok(parser::parse_locale(source)?)
     }
 }
 

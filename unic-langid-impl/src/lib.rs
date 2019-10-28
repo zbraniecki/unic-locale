@@ -68,7 +68,7 @@ pub enum CharacterDirection {
 /// assert_eq!(li.get_language(), "en");
 /// assert_eq!(li.get_script(), Some("Latn"));
 /// assert_eq!(li.get_region(), Some("US"));
-/// assert_eq!(li.get_variants(), &["valencia"]);
+/// assert_eq!(li.get_variants().collect::<Vec<_>>(), &["valencia"]);
 /// ```
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct LanguageIdentifier {
@@ -95,7 +95,7 @@ impl LanguageIdentifier {
     /// assert_eq!(li.to_string(), "en-US");
     /// ```
     pub fn from_bytes(v: &[u8]) -> Result<Self, LanguageIdentifierError> {
-        parser::parse_language_identifier(v).map_err(std::convert::Into::into)
+        Ok(parser::parse_language_identifier(v)?)
     }
 
     /// A constructor which takes optional subtags as `AsRef<[u8]>`, parses them and
@@ -162,8 +162,10 @@ impl LanguageIdentifier {
         iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
         allow_extension: bool,
     ) -> Result<LanguageIdentifier, LanguageIdentifierError> {
-        parser::parse_language_identifier_from_iter(iter, allow_extension)
-            .map_err(std::convert::Into::into)
+        Ok(parser::parse_language_identifier_from_iter(
+            iter,
+            allow_extension,
+        )?)
     }
 
     /// Consumes `LanguageIdentifier` and produces raw internal representations
@@ -482,19 +484,20 @@ impl LanguageIdentifier {
     /// let li1: LanguageIdentifier = "ca-ES-valencia".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li1.get_variants(), &["valencia"]);
+    /// assert_eq!(li1.get_variants().collect::<Vec<_>>(), &["valencia"]);
     ///
     /// let li2: LanguageIdentifier = "de".parse()
     ///     .expect("Parsing failed.");
     ///
     /// assert_eq!(li2.get_variants().len(), 0);
     /// ```
-    pub fn get_variants(&self) -> Vec<&str> {
-        if let Some(variants) = &self.variants {
-            variants.iter().map(|s| s.as_ref()).collect()
-        } else {
-            vec![]
-        }
+    pub fn get_variants(&self) -> impl ExactSizeIterator<Item = &str> {
+        let variants: &[_] = match self.variants {
+            Some(ref v) => &**v,
+            None => &[],
+        };
+
+        variants.iter().map(|s| s.as_ref())
     }
 
     /// Sets variant subtags of the `LanguageIdentifier`.
@@ -514,18 +517,19 @@ impl LanguageIdentifier {
     /// ```
     pub fn set_variants<S: AsRef<[u8]>>(
         &mut self,
-        variants: &[S],
+        variants: impl IntoIterator<Item = S>,
     ) -> Result<(), LanguageIdentifierError> {
-        if variants.is_empty() {
+        let mut v = variants
+            .into_iter()
+            .map(|v| subtags::parse_variant_subtag(v.as_ref()))
+            .collect::<Result<Vec<_>, _>>()?;
+
+        if v.len() == 0 {
             self.variants = None;
         } else {
-            let mut result = variants
-                .iter()
-                .map(|v| subtags::parse_variant_subtag(v.as_ref()))
-                .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
-            result.sort();
-            result.dedup();
-            self.variants = Some(result.into_boxed_slice());
+            v.sort();
+            v.dedup();
+            self.variants = Some(v.into_boxed_slice());
         }
         Ok(())
     }

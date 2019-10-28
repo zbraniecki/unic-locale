@@ -7,7 +7,7 @@ fn main() {
     locale
         .extensions
         .unicode
-        .set_keyword("ca", vec!["buddhist"])
+        .set_keyword("ca", &["buddhist"])
         .expect("Setting extension failed.");
 
     println!("{:#?}", locale);

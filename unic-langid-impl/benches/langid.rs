@@ -61,7 +61,7 @@ fn language_identifier_construct_bench(c: &mut Criterion) {
                         lang,
                         langid.get_script(),
                         langid.get_region(),
-                        langid.get_variants(),
+                        langid.get_variants().collect::<Vec<_>>(),
                     )
                 })
                 .collect();
