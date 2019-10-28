@@ -10,19 +10,22 @@ rust:
   - nightly
   - beta
   - stable
+env:
+  - CARGO_EXTRA_ARGS="--all-features"
+  - CARGO_EXTRA_ARGS=""
 
 before_cache: |
-  if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]] && [[ "$CARGO_EXTRA_ARGS" == "--all-features" ]]; then
     cargo install cargo-tarpaulin -f
   fi
 
 script:
 - cargo clean
-- cargo build
-- cargo test
+- cargo build $CARGO_EXTRA_ARGS
+- cargo test $CARGO_EXTRA_ARGS
 
 
 after_success: |
-  if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]] && [[ "$CARGO_EXTRA_ARGS" == "--all-features" ]]; then
     cargo tarpaulin --ciserver travis-ci --coveralls $TRAVIS_JOB_ID
   fi
