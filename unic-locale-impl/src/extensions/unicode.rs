@@ -111,6 +111,23 @@ impl UnicodeExtensionList {
         Ok(keywords.iter().map(|s| s.as_ref()))
     }
 
+    /// Returns an iterator over all keys in the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-ca-buddhist-nu-thai".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.get_keyword_keys().collect::<Vec<_>>(),
+    ///            &["ca", "nu"]);
+    /// ```
+    pub fn get_keyword_keys(&self) -> impl ExactSizeIterator<Item = &str> {
+        self.keywords.keys().map(|s| s.as_ref())
+    }
+
     /// Adds a keyword to the `UnicodeExtensionList` or sets value for key if
     /// keyword is already included in the `UnicodeExtensionList`.
     ///
@@ -204,6 +221,23 @@ impl UnicodeExtensionList {
     /// ```
     pub fn has_attribute<S: AsRef<[u8]>>(&self, attribute: S) -> Result<bool, LocaleError> {
         Ok(self.attributes.contains(&parse_attribute(attribute.as_ref())?))
+    }
+
+    /// Returns an iterator over all attributes in the `UnicodeExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-u-foo-bar".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.unicode.get_attributes().collect::<Vec<_>>(),
+    ///            &["bar", "foo"]);
+    /// ```
+    pub fn get_attributes(&self) -> impl ExactSizeIterator<Item = &str> {
+        self.attributes.iter().map(|s| s.as_ref())
     }
 
     /// Sets an attribute on the `UnicodeExtensionList`.

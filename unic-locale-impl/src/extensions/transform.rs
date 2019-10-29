@@ -159,6 +159,23 @@ impl TransformExtensionList {
         Ok(tfields.iter().map(|s| s.as_ref()))
     }
 
+    /// Returns an iterator over all tkeys in the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-t-k0-dvorak-h0-hybrid".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.transform.get_tfield_tkeys().collect::<Vec<_>>(),
+    ///            &["h0", "k0"]);
+    /// ```
+    pub fn get_tfield_tkeys(&self) -> impl ExactSizeIterator<Item = &str> {
+        self.tfields.keys().map(|s| s.as_ref())
+    }
+
     /// Adds a tfield to the `TransformExtensionList` or sets tvalue for tkey if
     /// tfield is already included in the `TransformExtensionList`.
     ///

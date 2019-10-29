@@ -50,6 +50,23 @@ impl PrivateExtensionList {
         Ok(self.0.contains(&parse_value(tag.as_ref())?))
     }
 
+    /// Returns an iterator over all tags in the `PrivateExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-x-foo-bar".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.private.get_tags().collect::<Vec<_>>(),
+    ///            &["bar", "foo"]);
+    /// ```
+    pub fn get_tags(&self) -> impl ExactSizeIterator<Item = &str> {
+        self.0.iter().map(|s| s.as_ref())
+    }
+
     /// Adds a tag to the `PrivateExtensionList`.
     ///
     /// # Examples
