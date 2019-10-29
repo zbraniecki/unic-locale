@@ -47,15 +47,156 @@ fn is_language_subtag(t: &[u8]) -> bool {
 }
 
 impl TransformExtensionList {
+    /// Returns `true` if there are no tfields and no tlang in
+    /// the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-t-es-AR".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.transform.is_empty(), false);
+    /// ```
     pub fn is_empty(&self) -> bool {
         self.tlang.is_none() && self.tfields.is_empty()
     }
 
+    /// Gets tlang from the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut lo: Locale = "en-US-t-es-AR".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// let tlang: LanguageIdentifier = "es-AR".parse()
+    ///     .expect("Parsing failed on tlang.");
+    ///
+    /// assert_eq!(lo.extensions.transform.get_tlang(), &Some(tlang));
+    /// ```
+    pub fn get_tlang(&self) -> &Option<LanguageIdentifier> {
+        &self.tlang
+    }
+
+    /// Sets tlang on the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut lo: Locale = "en-US".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// let tlang: LanguageIdentifier = "es-AR".parse()
+    ///     .expect("Parsing failed on tlang.");
+    ///
+    /// lo.extensions.transform.set_tlang(tlang)
+    ///     .expect("Setting tlang failed.");
+    ///
+    /// assert_eq!(lo.to_string(), "en-US-t-es-AR");
+    /// ```
     pub fn set_tlang(&mut self, tlang: LanguageIdentifier) -> Result<(), LocaleError> {
         self.tlang = Some(tlang);
         Ok(())
     }
 
+    /// Clears tlang on the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut lo: Locale = "en-US-t-es-AR".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.transform.clear_tlang();
+    ///
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn clear_tlang(&mut self) {
+        self.tlang = None;
+    }
+
+    /// Returns the tvalue of tfield in the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-t-k0-dvorak".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.transform.get_tfield("k0")
+    ///                .expect("Getting tfield failed.")
+    ///                .collect::<Vec<_>>(),
+    ///            &["dvorak"]);
+    ///
+    /// // Here tfield with tkey "m0" is not available
+    /// assert_eq!(lo.extensions.transform.get_tfield("m0")
+    ///                .expect("Getting tfield failed.")
+    ///                .collect::<Vec<_>>()
+    ///                .is_empty(),
+    ///            true);
+    /// ```
+    pub fn get_tfield<S: AsRef<[u8]>>(&self, tkey: S)
+            -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
+        let tfields: &[_] = match self.tfields.get(&parse_tkey(tkey.as_ref())?) {
+            Some(ref v) => &**v,
+            None => &[],
+        };
+
+        Ok(tfields.iter().map(|s| s.as_ref()))
+    }
+
+    /// Returns an iterator over all tkeys in the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-t-k0-dvorak-h0-hybrid".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.transform.get_tfield_tkeys().collect::<Vec<_>>(),
+    ///            &["h0", "k0"]);
+    /// ```
+    pub fn get_tfield_tkeys(&self) -> impl ExactSizeIterator<Item = &str> {
+        self.tfields.keys().map(|s| s.as_ref())
+    }
+
+    /// Adds a tfield to the `TransformExtensionList` or sets tvalue for tkey if
+    /// tfield is already included in the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.transform.set_tfield("k0", &["dvorak"])
+    ///     .expect("Setting tfield failed.");
+    ///
+    /// assert_eq!(lo.to_string(), "en-US-t-k0-dvorak");
+    ///
+    /// lo.extensions.transform.set_tfield("k0", &["colemak"])
+    ///     .expect("Setting tfield failed.");
+    ///
+    /// assert_eq!(lo.to_string(), "en-US-t-k0-colemak");
+    /// ```
     pub fn set_tfield<S: AsRef<[u8]>>(&mut self, tkey: S, tvalue: &[S]) -> Result<(), LocaleError> {
         let tkey = parse_tkey(tkey.as_ref())?;
         let mut t = Vec::with_capacity(tvalue.len());
@@ -67,6 +208,46 @@ impl TransformExtensionList {
 
         self.tfields.insert(tkey, t);
         Ok(())
+    }
+
+    /// Removes a tfield from the `TransformExtensionList`.
+    ///
+    /// Returns `true` if tfield was included in the `TransformExtensionList`
+    /// before removal.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-t-k0-dvorak".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(lo.extensions.transform.remove_tfield("k0")
+    ///                .expect("Removing tfield failed."),
+    ///            true);
+    ///
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn remove_tfield<S: AsRef<[u8]>>(&mut self, tkey: S) -> Result<bool, LocaleError> {
+        Ok(self.tfields.remove(&parse_tkey(tkey.as_ref())?).is_some())
+    }
+
+    /// Clears all tfields from the `TransformExtensionList`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut lo: Locale = "en-US-t-k0-dvorak".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// lo.extensions.transform.clear_tfields();
+    /// assert_eq!(lo.to_string(), "en-US");
+    /// ```
+    pub fn clear_tfields(&mut self) {
+        self.tfields.clear();
     }
 
     pub(crate) fn try_from_iter<'a>(
