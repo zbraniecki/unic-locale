@@ -19,9 +19,9 @@ This allows the user to encode additional data. Examples: `"en-US-u-hc-h24"`, `"
 # Status
 
 The `unic-langid` crate is fully functional and should parse/manipulate/serialize in conformance with the standard.
-The Rust API is still rough and will change as we progress toward 1.0, and performance can be improved.
+The Rust API is considered close to stable.
 
-The `unic-locale` crate is incomplete with only several examples of extensions handled at the moment. The goal is to advance the coverage as the API progresses.
+The `unic-locale` crate is mostly complete with full support for unicode, transform and private extensions. The `other` extension type is not currently supported.
 The API shadows that of `unic-langid` and is intended to be a drop-in replacement for `unic-langid` so that users can start with a simple Language Identifier coverage and extend it to use `unic-locale` once needed.
 
 # Unicode Conformance
@@ -34,7 +34,7 @@ The API is intended to function similarly to [ICU Locale](http://icu-project.org
 
 In early tests the performance of parsing a set of language identifiers into a well formed struct, `unic-langid` is [~50 times faster](https://gist.github.com/zbraniecki/016f7bd35fc6e09aede997c5bc20222a) than ICU Locale.
 
-There's a lot of room for improvement since at the moment the crates use `String` fields which can be replaced with variants tailored for short strings, and the parser uses naive parsing, which can also be optimized later.
+Performance is consider close to optimal at the moment.
 
 # Meta-crate
 
