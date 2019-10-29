@@ -40,7 +40,7 @@ Performance is consider close to optimal at the moment.
 
 Whoa, I can see you saying, what is it about with all those crates here?
 
-Well, that's an excelent question!
+Well, that's an excellent question!
 
 Unless you want a deep dive into procedural macro and [proc-macro-hack](https://github.com/dtolnay/proc-macro-hack), let me just give you a tl;dr:
 
