@@ -31,7 +31,10 @@ pub use unic_langid_impl::LanguageIdentifier;
 /// assert_eq!(loc.get_script(), None);
 /// assert_eq!(loc.get_region(), Some("US"));
 /// assert_eq!(loc.get_variants().len(), 0);
-/// assert_eq!(loc.get_variants().len(), 0);
+/// assert_eq!(loc.extensions.unicode.get_keyword("ca")
+///     .expect("Getting keyword failed.")
+///     .collect::<Vec<_>>(),
+///     &["buddhist"]);
 /// ```
 ///
 /// # Parsing

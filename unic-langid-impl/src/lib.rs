@@ -27,6 +27,13 @@ pub enum CharacterDirection {
     LTR,
 }
 
+type RawPartsTuple = (
+    Option<u64>,
+    Option<u32>,
+    Option<u32>,
+    Option<Box<[u64]>>,
+);
+
 /// `LanguageIdentifier` is a core struct representing a Unicode Language Identifier.
 ///
 /// # Examples
@@ -194,7 +201,7 @@ impl LanguageIdentifier {
     ///
     /// assert_eq!(li2.to_string(), "en-US");
     /// ```
-    pub fn into_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>) {
+    pub fn into_raw_parts(self) -> RawPartsTuple {
         (
             self.language.map(|l| l.into()),
             self.script.map(|s| s.into()),
@@ -524,7 +531,7 @@ impl LanguageIdentifier {
             .map(|v| subtags::parse_variant_subtag(v.as_ref()))
             .collect::<Result<Vec<_>, _>>()?;
 
-        if v.len() == 0 {
+        if v.is_empty() {
             self.variants = None;
         } else {
             v.sort();

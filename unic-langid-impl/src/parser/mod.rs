@@ -59,10 +59,8 @@ pub fn parse_language_identifier_from_iter<'a>(
         st_peek = iter.peek();
     }
 
-    if let Some(_) = iter.peek() {
-        if !allow_extension {
-            return Err(ParserError::InvalidSubtag);
-        }
+    if !allow_extension && iter.peek().is_some() {
+        return Err(ParserError::InvalidSubtag);
     }
 
     let variants = if variants.is_empty() {

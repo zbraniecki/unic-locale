@@ -25,10 +25,10 @@
 //! assert_eq!(loc.get_region(), Some("US"));
 //! assert_eq!(loc.get_variants().len(), 0);
 //! assert_eq!(loc.extensions.unicode.get_keyword("hc")
-//!     .expect("")
+//!     .expect("Getting keyword failed.")
 //!     .collect::<Vec<_>>(), &["h12"]);
 //! assert_eq!(loc.extensions.transform.get_tfield("h0")
-//!     .expect("")
+//!     .expect("Getting tfield failed.")
 //!     .collect::<Vec<_>>(), &["hybrid"]);
 //!
 //! loc.clear_script();

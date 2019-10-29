@@ -1,0 +1,86 @@
+diff --git a/unic-langid-impl/src/lib.rs b/unic-langid-impl/src/lib.rs
+index 5912d4d..4477c26 100644
+--- a/unic-langid-impl/src/lib.rs
++++ b/unic-langid-impl/src/lib.rs
+@@ -27,6 +27,13 @@ pub enum CharacterDirection {
+     LTR,
+ }
+ 
++type RawPartsTuple = (
++    Option<u64>,
++    Option<u32>,
++    Option<u32>,
++    Option<Box<[u64]>>,
++);
++
+ /// `LanguageIdentifier` is a core struct representing a Unicode Language Identifier.
+ ///
+ /// # Examples
+@@ -194,7 +201,7 @@ impl LanguageIdentifier {
+     ///
+     /// assert_eq!(li2.to_string(), "en-US");
+     /// ```
+-    pub fn into_raw_parts(self) -> (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>) {
++    pub fn into_raw_parts(self) -> RawPartsTuple {
+         (
+             self.language.map(|l| l.into()),
+             self.script.map(|s| s.into()),
+@@ -524,7 +531,7 @@ impl LanguageIdentifier {
+             .map(|v| subtags::parse_variant_subtag(v.as_ref()))
+             .collect::<Result<Vec<_>, _>>()?;
+ 
+-        if v.len() == 0 {
++        if v.is_empty() {
+             self.variants = None;
+         } else {
+             v.sort();
+diff --git a/unic-langid-impl/src/parser/mod.rs b/unic-langid-impl/src/parser/mod.rs
+index 098ce2f..953e172 100644
+--- a/unic-langid-impl/src/parser/mod.rs
++++ b/unic-langid-impl/src/parser/mod.rs
+@@ -59,10 +59,8 @@ pub fn parse_language_identifier_from_iter<'a>(
+         st_peek = iter.peek();
+     }
+ 
+-    if let Some(_) = iter.peek() {
+-        if !allow_extension {
+-            return Err(ParserError::InvalidSubtag);
+-        }
++    if !allow_extension && iter.peek().is_some() {
++        return Err(ParserError::InvalidSubtag);
+     }
+ 
+     let variants = if variants.is_empty() {
+diff --git a/unic-locale-impl/src/lib.rs b/unic-locale-impl/src/lib.rs
+index e9b820b..f30bdf5 100644
+--- a/unic-locale-impl/src/lib.rs
++++ b/unic-locale-impl/src/lib.rs
+@@ -31,7 +31,10 @@ pub use unic_langid_impl::LanguageIdentifier;
+ /// assert_eq!(loc.get_script(), None);
+ /// assert_eq!(loc.get_region(), Some("US"));
+ /// assert_eq!(loc.get_variants().len(), 0);
+-/// assert_eq!(loc.get_variants().len(), 0);
++/// assert_eq!(loc.extensions.unicode.get_keyword("ca")
++///     .expect("Getting keyword failed.")
++///     .collect::<Vec<_>>(),
++///     &["buddhist"]);
+ /// ```
+ ///
+ /// # Parsing
+diff --git a/unic-locale/src/lib.rs b/unic-locale/src/lib.rs
+index 7d2bd10..da45b4a 100644
+--- a/unic-locale/src/lib.rs
++++ b/unic-locale/src/lib.rs
+@@ -25,10 +25,10 @@
+ //! assert_eq!(loc.get_region(), Some("US"));
+ //! assert_eq!(loc.get_variants().len(), 0);
+ //! assert_eq!(loc.extensions.unicode.get_keyword("hc")
+-//!     .expect("")
++//!     .expect("Getting keyword failed.")
+ //!     .collect::<Vec<_>>(), &["h12"]);
+ //! assert_eq!(loc.extensions.transform.get_tfield("h0")
+-//!     .expect("")
++//!     .expect("Getting tfield failed.")
+ //!     .collect::<Vec<_>>(), &["hybrid"]);
+ //!
+ //! loc.clear_script();
