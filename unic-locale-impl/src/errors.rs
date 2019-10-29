@@ -3,10 +3,14 @@ use std::error::Error;
 use std::fmt::{self, Display};
 use unic_langid_impl::LanguageIdentifierError;
 
-#[derive(Debug)]
+/// Enum with errors that can be returned by Locale.
+#[derive(Debug, PartialEq)]
 pub enum LocaleError {
+    /// An unknown error - currently covers all-but parser errors.
     Unknown,
+    /// A parser error.
     ParserError(ParserError),
+    /// An error from parsing LanguageIdentifier portion.
     LanguageIdentifierError(LanguageIdentifierError),
 }
 

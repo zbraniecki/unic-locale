@@ -15,7 +15,7 @@ use tinystr::TinyStr8;
 
 use crate::parser::ParserError;
 
-#[derive(PartialEq, Eq, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
 pub enum ExtensionType {
     Unicode,
     Transform,
@@ -48,7 +48,7 @@ impl std::fmt::Display for ExtensionType {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Hash)]
 pub struct ExtensionsMap {
     pub unicode: UnicodeExtensionList,
     pub transform: TransformExtensionList,

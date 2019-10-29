@@ -57,7 +57,7 @@ pub enum CharacterDirection {
 /// Any bogus subtags will cause the parsing to fail with an error.
 /// No subtag validation is performed.
 ///
-/// # Eamples:
+/// # Examples:
 ///
 /// ```
 /// use unic_langid_impl::LanguageIdentifier;

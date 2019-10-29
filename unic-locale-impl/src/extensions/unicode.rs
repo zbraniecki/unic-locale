@@ -6,7 +6,7 @@ use std::iter::Peekable;
 
 use tinystr::{TinyStr4, TinyStr8};
 
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
 pub struct UnicodeExtensionList {
     // Canonical: sort by key (BTreeMap is already) / remove value 'true'
     keywords: BTreeMap<TinyStr4, Vec<TinyStr8>>,

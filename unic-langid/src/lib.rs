@@ -30,7 +30,7 @@
 //! ## `langid!` and `langids!` macros
 //!
 //! If `feature = "macros"` is selected, the crate provides a procedural macro
-//! which allows to construct build-time validated language identifiers with zero-cost at runtime.
+//! which allows to construct build-time well-formed language identifiers with zero-cost at runtime.
 //!
 //! ``` ignore
 //! use unic_langid::{langid, langids};

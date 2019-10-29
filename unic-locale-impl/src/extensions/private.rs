@@ -3,7 +3,7 @@ use crate::parser::ParserError;
 
 use tinystr::TinyStr8;
 
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
 pub struct PrivateExtensionList(Vec<TinyStr8>);
 
 fn parse_value(t: &[u8]) -> Result<TinyStr8, ParserError> {

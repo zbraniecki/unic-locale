@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt::{self, Display};
 use unic_langid_impl::parser::ParserError as LangIdParserError;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParserError {
     InvalidLanguage,
     InvalidSubtag,
