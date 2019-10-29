@@ -21,7 +21,8 @@ loc.extensions.unicode.set_keyword("ca", "buddhist")
     .expect("Setting extension failed.");
 
 let val = loc.extensions.unicode.get_keyword("ca")
-    .expect("Getting extension value failed.");
+    .expect("Getting extension value failed.")
+    .collect::<Vec<_>>();
 
 assert_eq!(val, vec!["buddhist"]);
 
