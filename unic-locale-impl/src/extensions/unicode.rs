@@ -6,6 +6,29 @@ use std::iter::Peekable;
 
 use tinystr::{TinyStr4, TinyStr8};
 
+/// A list of [`Unicode BCP47 U Extensions`] as defined in [`Unicode Locale
+/// Identifier`] specification.
+///
+/// Unicode extensions provide subtags that specify language and/or locale-based behavior
+/// or refinements to language tags, according to work done by the Unicode Consortium.
+/// (See [`RFC 6067`] for details).
+///
+/// # Examples
+///
+/// ```
+/// use unic_locale_impl::Locale;
+///
+/// let mut loc: Locale = "de-u-hc-h12-ca-buddhist".parse()
+///     .expect("Parsing failed.");
+///
+/// assert_eq!(loc.extensions.unicode.get_keyword("ca")
+///               .expect("Getting keyword failed.")
+///               .collect::<Vec<_>>(),
+///            &["buddhist"]);
+/// ```
+/// [`Unicode BCP47 U Extensions`]: https://unicode.org/reports/tr35/#u_Extension
+/// [`RFC 6067`]: https://www.ietf.org/rfc/rfc6067.txt
+/// [`Unicode Locale Identifier`]: https://unicode.org/reports/tr35/#Unicode_locale_identifier
 #[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
 pub struct UnicodeExtensionList {
     // Canonical: sort by key (BTreeMap is already) / remove value 'true'
@@ -68,10 +91,10 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-foo".parse()
+    /// let mut loc: Locale = "en-US-u-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.is_empty(), false);
+    /// assert_eq!(loc.extensions.unicode.is_empty(), false);
     /// ```
     pub fn is_empty(&self) -> bool {
         self.keywords.is_empty() && self.attributes.is_empty()
@@ -79,30 +102,29 @@ impl UnicodeExtensionList {
 
     /// Returns the value of keyword in the `UnicodeExtensionList`.
     ///
-    /// NB: value here is referred to as type in UTS #35.
-    ///
     /// # Examples
     ///
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-ca-buddhist".parse()
+    /// let mut loc: Locale = "en-US-u-ca-buddhist".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.get_keyword("ca")
+    /// assert_eq!(loc.extensions.unicode.get_keyword("ca")
     ///                .expect("Getting keyword failed.")
     ///                .collect::<Vec<_>>(),
     ///            &["buddhist"]);
     ///
     /// // Here keyword with key "aa" is not available
-    /// assert_eq!(lo.extensions.unicode.get_keyword("aa")
-    ///                .expect("Getting keyword failed.")
-    ///                .collect::<Vec<_>>()
-    ///                .is_empty(),
-    ///            true);
+    /// assert_eq!(loc.extensions.unicode.get_keyword("aa")
+    ///               .expect("Getting keyword failed.")
+    ///               .len(),
+    ///            0);
     /// ```
-    pub fn get_keyword<S: AsRef<[u8]>>(&self, key: S)
-            -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
+    pub fn get_keyword<S: AsRef<[u8]>>(
+        &self,
+        key: S,
+    ) -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
         let keywords: &[_] = match self.keywords.get(&parse_key(key.as_ref())?) {
             Some(ref v) => &**v,
             None => &[],
@@ -118,10 +140,10 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-ca-buddhist-nu-thai".parse()
+    /// let mut loc: Locale = "en-US-u-ca-buddhist-nu-thai".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.get_keyword_keys().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.unicode.get_keyword_keys().collect::<Vec<_>>(),
     ///            &["ca", "nu"]);
     /// ```
     pub fn get_keyword_keys(&self) -> impl ExactSizeIterator<Item = &str> {
@@ -131,35 +153,31 @@ impl UnicodeExtensionList {
     /// Adds a keyword to the `UnicodeExtensionList` or sets value for key if
     /// keyword is already included in the `UnicodeExtensionList`.
     ///
-    /// NB: value here is referred to as type in UTS #35.
-    ///
     /// # Examples
     ///
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US".parse()
+    /// let mut loc: Locale = "en-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// lo.extensions.unicode.set_keyword("ca", &["buddhist"])
+    /// loc.extensions.unicode.set_keyword("ca", &["buddhist"])
     ///     .expect("Setting keyword failed.");
     ///
-    /// assert_eq!(lo.to_string(), "en-US-u-ca-buddhist");
+    /// assert_eq!(loc.to_string(), "en-US-u-ca-buddhist");
     ///
-    /// lo.extensions.unicode.set_keyword("ca", &["chinese"])
+    /// loc.extensions.unicode.set_keyword("ca", &["chinese"])
     ///     .expect("Setting keyword failed.");
     ///
-    /// assert_eq!(lo.to_string(), "en-US-u-ca-chinese");
+    /// assert_eq!(loc.to_string(), "en-US-u-ca-chinese");
     /// ```
     pub fn set_keyword<S: AsRef<[u8]>>(&mut self, key: S, value: &[S]) -> Result<(), LocaleError> {
         let key = parse_key(key.as_ref())?;
 
-        let mut t = Vec::with_capacity(value.len());
-        for val in value {
-            if let Some(ty) = parse_type(val.as_ref())? {
-                t.push(ty);
-            }
-        }
+        let t = value
+            .iter()
+            .filter_map(|t| parse_type(t.as_ref()).transpose())
+            .collect::<Result<Vec<_>, _>>()?;
 
         self.keywords.insert(key, t);
         Ok(())
@@ -175,14 +193,14 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-ca-buddhist".parse()
+    /// let mut loc: Locale = "en-US-u-ca-buddhist".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.remove_keyword("ca")
-    ///                .expect("Removing tag failed."),
+    /// assert_eq!(loc.extensions.unicode.remove_keyword("ca")
+    ///               .expect("Removing tag failed."),
     ///            true);
     ///
-    /// assert_eq!(lo.to_string(), "en-US");
+    /// assert_eq!(loc.to_string(), "en-US");
     /// ```
     pub fn remove_keyword<S: AsRef<[u8]>>(&mut self, key: S) -> Result<bool, LocaleError> {
         Ok(self.keywords.remove(&parse_key(key.as_ref())?).is_some())
@@ -195,11 +213,11 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-ca-buddhist".parse()
+    /// let mut loc: Locale = "en-US-u-ca-buddhist".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// lo.extensions.unicode.clear_keywords();
-    /// assert_eq!(lo.to_string(), "en-US");
+    /// loc.extensions.unicode.clear_keywords();
+    /// assert_eq!(loc.to_string(), "en-US");
     /// ```
     pub fn clear_keywords(&mut self) {
         self.keywords.clear();
@@ -212,15 +230,17 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-foo".parse()
+    /// let mut loc: Locale = "en-US-u-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.has_attribute("foo")
-    ///                .expect("Getting attribute failed."),
+    /// assert_eq!(loc.extensions.unicode.has_attribute("foo")
+    ///               .expect("Getting attribute failed."),
     ///            true);
     /// ```
     pub fn has_attribute<S: AsRef<[u8]>>(&self, attribute: S) -> Result<bool, LocaleError> {
-        Ok(self.attributes.contains(&parse_attribute(attribute.as_ref())?))
+        Ok(self
+            .attributes
+            .contains(&parse_attribute(attribute.as_ref())?))
     }
 
     /// Returns an iterator over all attributes in the `UnicodeExtensionList`.
@@ -230,10 +250,10 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-foo-bar".parse()
+    /// let mut loc: Locale = "en-US-u-foo-bar".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.get_attributes().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.unicode.get_attributes().collect::<Vec<_>>(),
     ///            &["bar", "foo"]);
     /// ```
     pub fn get_attributes(&self) -> impl ExactSizeIterator<Item = &str> {
@@ -247,13 +267,13 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US".parse()
+    /// let mut loc: Locale = "en-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// lo.extensions.unicode.set_attribute("foo")
+    /// loc.extensions.unicode.set_attribute("foo")
     ///     .expect("Setting attribute failed.");
     ///
-    /// assert_eq!(lo.to_string(), "en-US-u-foo");
+    /// assert_eq!(loc.to_string(), "en-US-u-foo");
     /// ```
     pub fn set_attribute<S: AsRef<[u8]>>(&mut self, attribute: S) -> Result<(), LocaleError> {
         let attribute = parse_attribute(attribute.as_ref())?;
@@ -273,14 +293,14 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-foo".parse()
+    /// let mut loc: Locale = "en-US-u-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.unicode.remove_attribute("foo")
-    ///                .expect("Removing attribute failed."),
+    /// assert_eq!(loc.extensions.unicode.remove_attribute("foo")
+    ///               .expect("Removing attribute failed."),
     ///            true);
     ///
-    /// assert_eq!(lo.to_string(), "en-US");
+    /// assert_eq!(loc.to_string(), "en-US");
     /// ```
     pub fn remove_attribute<S: AsRef<[u8]>>(&mut self, attribute: S) -> Result<bool, LocaleError> {
         let attribute = parse_attribute(attribute.as_ref())?;
@@ -288,8 +308,8 @@ impl UnicodeExtensionList {
             Ok(idx) => {
                 self.attributes.remove(idx);
                 Ok(true)
-            },
-            Err(_) => Ok(false)
+            }
+            Err(_) => Ok(false),
         }
     }
 
@@ -300,11 +320,11 @@ impl UnicodeExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-u-foo".parse()
+    /// let mut loc: Locale = "en-US-u-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// lo.extensions.unicode.clear_attributes();
-    /// assert_eq!(lo.to_string(), "en-US");
+    /// loc.extensions.unicode.clear_attributes();
+    /// assert_eq!(loc.to_string(), "en-US");
     /// ```
     pub fn clear_attributes(&mut self) {
         self.attributes.clear();

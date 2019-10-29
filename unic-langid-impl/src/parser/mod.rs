@@ -17,7 +17,9 @@ pub fn parse_language_identifier_from_iter<'a>(
     let mut region = None;
     let mut variants = vec![];
 
-    while let Some(subtag) = iter.next() {
+    let mut st_peek = iter.peek();
+
+    while let Some(subtag) = st_peek {
         if position == 0 {
             // Language
             language = subtags::parse_language_subtag(subtag)?;
@@ -29,29 +31,37 @@ pub fn parse_language_identifier_from_iter<'a>(
             } else if let Ok(s) = subtags::parse_region_subtag(subtag) {
                 region = Some(s);
                 position = 3;
-            } else {
-                variants.push(subtags::parse_variant_subtag(subtag)?);
+            } else if let Ok(v) = subtags::parse_variant_subtag(subtag) {
+                variants.push(v);
                 position = 3;
+            } else {
+                break;
             }
         } else if position == 2 {
             if let Ok(s) = subtags::parse_region_subtag(subtag) {
                 region = Some(s);
                 position = 3;
-            } else {
-                variants.push(subtags::parse_variant_subtag(subtag)?);
+            } else if let Ok(v) = subtags::parse_variant_subtag(subtag) {
+                variants.push(v);
                 position = 3;
+            } else {
+                break;
             }
         } else {
             // Variants
-            variants.push(subtags::parse_variant_subtag(subtag)?);
-        }
-
-        if allow_extension {
-            if let Some(st_peek) = iter.peek() {
-                if st_peek.len() == 1 {
-                    break;
-                }
+            if let Ok(v) = subtags::parse_variant_subtag(subtag) {
+                variants.push(v);
+            } else {
+                break;
             }
+        }
+        iter.next();
+        st_peek = iter.peek();
+    }
+
+    if let Some(_) = iter.peek() {
+        if !allow_extension {
+            return Err(ParserError::InvalidSubtag);
         }
     }
 
