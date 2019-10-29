@@ -534,6 +534,28 @@ impl LanguageIdentifier {
         Ok(())
     }
 
+    /// Tests if a variant subtag is present in the `LanguageIdentifier`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_langid_impl::LanguageIdentifier;
+    ///
+    /// let mut li: LanguageIdentifier = "ca-ES-macos".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(li.has_variant("valencia"), Ok(false));
+    /// assert_eq!(li.has_variant("macos"), Ok(true));
+    /// ```
+    pub fn has_variant<S: AsRef<[u8]>>(&self, variant: S) -> Result<bool, LanguageIdentifierError> {
+        let variant = subtags::parse_variant_subtag(variant.as_ref())?;
+        if let Some(variants) = &self.variants {
+            Ok(variants.contains(&variant))
+        } else {
+            Ok(false)
+        }
+    }
+
     /// Clears variant subtags of the `LanguageIdentifier`.
     ///
     /// # Examples

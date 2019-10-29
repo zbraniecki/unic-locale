@@ -450,6 +450,23 @@ impl Locale {
         Ok(self.langid.set_variants(variants)?)
     }
 
+    /// Tests if a variant subtag is present in the `Locale`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unic_locale_impl::Locale;
+    ///
+    /// let mut loc: Locale = "ca-ES-macos".parse()
+    ///     .expect("Parsing failed.");
+    ///
+    /// assert_eq!(loc.has_variant("valencia"), Ok(false));
+    /// assert_eq!(loc.has_variant("macos"), Ok(true));
+    /// ```
+    pub fn has_variant<S: AsRef<[u8]>>(&self, variant: S) -> Result<bool, LocaleError> {
+        Ok(self.langid.has_variant(variant)?)
+    }
+
     /// Clears variant subtags of the `Locale`.
     ///
     /// # Examples

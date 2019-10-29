@@ -121,6 +121,9 @@ fn test_set_fields() {
         .expect("Setting variants failed");
     assert_eq!(&langid.to_string(), "de-Latn-AT-macos");
 
+    assert_eq!(langid.has_variant("macos"), Ok(true));
+    assert_eq!(langid.has_variant("windows"), Ok(false));
+
     langid.clear_language();
     assert_eq!(&langid.to_string(), "und-Latn-AT-macos");
     langid.clear_region();
@@ -129,6 +132,8 @@ fn test_set_fields() {
     assert_eq!(&langid.to_string(), "und-macos");
     langid.clear_variants();
     assert_eq!(&langid.to_string(), "und");
+
+    assert_eq!(langid.has_variant("macos"), Ok(false));
 }
 
 #[test]
