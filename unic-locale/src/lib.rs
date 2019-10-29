@@ -4,12 +4,12 @@
 //! The crate provides algorithms for parsing a string into a well-formed locale identifier
 //! as defined by [`UTS #35: Unicode LDML 3.1 Unicode Locale Identifier`].
 //!
-//! # vs. LanguageIdentifier
+//! # Locale vs. LanguageIdentifier
 //!
 //! `LanguageIdentifier` is a subset of a `Locale` that only provides the basic
 //! subtags such as `language`, `script`, `region` and `variants`.
 //!
-//! `Locale` extends that with a set of extensions such as `transform`, `unicode` and `private.
+//! `Locale` extends that with a set of extensions such as `transform`, `unicode` and `private`.
 //!
 //!
 //! # Examples
@@ -17,18 +17,25 @@
 //! ```
 //! use unic_locale::Locale;
 //!
-//! let mut loc: Locale = "en-US".parse()
+//! let mut loc: Locale = "en-Latn-US-u-hc-h12-t-h0-hybrid".parse()
 //!     .expect("Failed to parse.");
 //!
 //! assert_eq!(loc.get_language(), "en");
-//! assert_eq!(loc.get_script(), None);
+//! assert_eq!(loc.get_script(), Some("Latn"));
 //! assert_eq!(loc.get_region(), Some("US"));
 //! assert_eq!(loc.get_variants().len(), 0);
+//! assert_eq!(loc.extensions.unicode.get_keyword("hc")
+//!     .expect("")
+//!     .collect::<Vec<_>>(), &["h12"]);
+//! assert_eq!(loc.extensions.transform.get_tfield("h0")
+//!     .expect("")
+//!     .collect::<Vec<_>>(), &["hybrid"]);
 //!
+//! loc.clear_script();
 //! loc.set_region("GB")
 //!     .expect("Region parsing failed.");
 //!
-//! assert_eq!(loc.to_string(), "en-GB");
+//! assert_eq!(loc.to_string(), "en-GB-t-h0-hybrid-u-hc-h12");
 //! ```
 //!
 //! For more details, see [`Locale`].

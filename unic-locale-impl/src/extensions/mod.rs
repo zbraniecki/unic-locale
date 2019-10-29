@@ -1,3 +1,12 @@
+//! Unicode Extensions provide a mechanism to extend the `LanguageIdentifier` with
+//! additional bits of information.
+//!
+//! There are four types of extensions:
+//!
+//!  * Unicode Extensions - marked as `u`.
+//!  * Transform Extensions - marked as `t`.
+//!  * Private Use Extensions - marked as `x`.
+//!  * Other extensions - marked as any `a-z` except of `u`, `t` and `x`.
 mod private;
 mod transform;
 mod unicode;
@@ -15,11 +24,16 @@ use tinystr::TinyStr8;
 
 use crate::parser::ParserError;
 
+/// Defines the type of extension.
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
 pub enum ExtensionType {
+    /// Unicode Extension Type marked as `u`.
     Unicode,
+    /// Transform Extension Type marked as `t`.
     Transform,
+    /// Other Extension Type marked as `a-z` except of `t`, `u` and `x`.
     Other(char),
+    /// Private Extension Type marked as `x`.
     Private,
 }
 
@@ -48,6 +62,7 @@ impl std::fmt::Display for ExtensionType {
     }
 }
 
+/// A map of extensions associated with a given `Locale.
 #[derive(Debug, Default, PartialEq, Eq, Clone, Hash)]
 pub struct ExtensionsMap {
     pub unicode: UnicodeExtensionList,

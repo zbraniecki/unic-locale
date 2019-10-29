@@ -3,6 +3,27 @@ use crate::parser::ParserError;
 
 use tinystr::TinyStr8;
 
+/// A list of [`Unicode Private Extensions`] as defined in [`Unicode Locale
+/// Identifier`] specification.
+///
+/// Those extensions are intended for `pass-through` use.
+///
+/// # Examples
+///
+/// ```
+/// use unic_locale_impl::Locale;
+///
+/// let mut loc: Locale = "en-US-x-foo-faa".parse()
+///     .expect("Parsing failed.");
+///
+/// assert_eq!(loc.extensions.private.has_tag("faa"), Ok(true));
+/// assert_eq!(loc.extensions.private.get_tags().next(), Some("faa")); // tags got sorted
+/// loc.extensions.private.clear_tags();
+/// assert_eq!(loc.to_string(), "en-US");
+/// ```
+///
+/// [`Unicode Private Extensions`]: https://unicode.org/reports/tr35/#pu_extensions
+/// [`Unicode Locale Identifier`]: https://unicode.org/reports/tr35/#Unicode_locale_identifier
 #[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
 pub struct PrivateExtensionList(Vec<TinyStr8>);
 
@@ -23,10 +44,10 @@ impl PrivateExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-x-foo".parse()
+    /// let mut loc: Locale = "en-US-x-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.private.is_empty(), false);
+    /// assert_eq!(loc.extensions.private.is_empty(), false);
     /// ```
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
@@ -39,11 +60,11 @@ impl PrivateExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-x-foo".parse()
+    /// let mut loc: Locale = "en-US-x-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.private.has_tag("foo")
-    ///                .expect("Getting tag failed."),
+    /// assert_eq!(loc.extensions.private.has_tag("foo")
+    ///               .expect("Getting tag failed."),
     ///            true);
     /// ```
     pub fn has_tag<S: AsRef<[u8]>>(&self, tag: S) -> Result<bool, LocaleError> {
@@ -57,10 +78,10 @@ impl PrivateExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-x-foo-bar".parse()
+    /// let mut loc: Locale = "en-US-x-foo-bar".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.private.get_tags().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.private.get_tags().collect::<Vec<_>>(),
     ///            &["bar", "foo"]);
     /// ```
     pub fn get_tags(&self) -> impl ExactSizeIterator<Item = &str> {
@@ -74,13 +95,13 @@ impl PrivateExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US".parse()
+    /// let mut loc: Locale = "en-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// lo.extensions.private.add_tag("foo")
+    /// loc.extensions.private.add_tag("foo")
     ///     .expect("Adding tag failed.");
     ///
-    /// assert_eq!(lo.to_string(), "en-US-x-foo");
+    /// assert_eq!(loc.to_string(), "en-US-x-foo");
     /// ```
     pub fn add_tag<S: AsRef<[u8]>>(&mut self, tag: S) -> Result<(), LocaleError> {
         self.0.push(parse_value(tag.as_ref())?);
@@ -98,14 +119,14 @@ impl PrivateExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-x-foo".parse()
+    /// let mut loc: Locale = "en-US-x-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(lo.extensions.private.remove_tag("foo")
-    ///                .expect("Removing tag failed."),
+    /// assert_eq!(loc.extensions.private.remove_tag("foo")
+    ///               .expect("Removing tag failed."),
     ///            true);
     ///
-    /// assert_eq!(lo.to_string(), "en-US");
+    /// assert_eq!(loc.to_string(), "en-US");
     /// ```
     pub fn remove_tag<S: AsRef<[u8]>>(&mut self, tag: S) -> Result<bool, LocaleError> {
         let value = parse_value(tag.as_ref())?;
@@ -113,8 +134,8 @@ impl PrivateExtensionList {
             Ok(idx) => {
                 self.0.remove(idx);
                 Ok(true)
-            },
-            Err(_) => Ok(false)
+            }
+            Err(_) => Ok(false),
         }
     }
 
@@ -125,11 +146,11 @@ impl PrivateExtensionList {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let mut lo: Locale = "en-US-x-foo".parse()
+    /// let mut loc: Locale = "en-US-x-foo".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// lo.extensions.private.clear_tags();
-    /// assert_eq!(lo.to_string(), "en-US");
+    /// loc.extensions.private.clear_tags();
+    /// assert_eq!(loc.to_string(), "en-US");
     /// ```
     pub fn clear_tags(&mut self) {
         self.0.clear();
