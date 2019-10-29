@@ -4,6 +4,15 @@
 
   - …
 
+## unic-locale 0.7.0 (October 29, 2019)
+
+  - Separate out `clear_*` methods.
+  - Switch the API to operate on `AsRef<[u8]>`.
+  - Switch set-based methods to use iterators.
+  - Update TinyStr to 0.3.2.
+  - Add extension managing methods (#30).
+  - Add documentation.
+
 ## unic-locale 0.6.0 (October 3, 2019)
 
   - Add `add_likely_subtags` and `remove_likely_subtags`.

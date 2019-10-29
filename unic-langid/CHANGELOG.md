@@ -4,6 +4,13 @@
 
   - …
 
+## unic-langid 0.7.0 (October 29, 2019)
+
+  - Separate out `clear_*` methods.
+  - Switch the API to operate on `AsRef<[u8]>`.
+  - Switch set-based methods to use iterators.
+  - Update TinyStr to 0.3.2.
+
 ## unic-langid 0.6.0 (October 3, 2019)
 
   - Add CLDR 35 backed `get_character_direction`.

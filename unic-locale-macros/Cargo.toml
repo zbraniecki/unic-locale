@@ -1,7 +1,7 @@
 [package]
 name = "unic-locale-macros"
 description = "API for managing Unicode Locale Identifiers"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>", "Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
 readme = "README.md"
@@ -12,5 +12,5 @@ categories = ["internationalization"]
 [dependencies]
 proc-macro-hack = "0.5"
 tinystr = "0.3.2"
-unic-locale-macros-impl = { path = "../unic-locale-macros-impl" }
-unic-locale-impl = { path = "../unic-locale-impl" }
+unic-locale-macros-impl = "0.7"
+unic-locale-impl = "0.7"
