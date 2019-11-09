@@ -84,20 +84,17 @@ impl ExtensionsMap {
 
         let mut st = iter.next();
         while let Some(subtag) = st {
-            if subtag.is_empty() {
-                break;
-            }
-
-            match ExtensionType::from_byte(subtag[0]) {
-                Ok(ExtensionType::Unicode) => {
+            match subtag.get(0).map(|b| ExtensionType::from_byte(*b)) {
+                Some(Ok(ExtensionType::Unicode)) => {
                     result.unicode = UnicodeExtensionList::try_from_iter(iter)?;
                 }
-                Ok(ExtensionType::Transform) => {
+                Some(Ok(ExtensionType::Transform)) => {
                     result.transform = TransformExtensionList::try_from_iter(iter)?;
                 }
-                Ok(ExtensionType::Private) => {
+                Some(Ok(ExtensionType::Private)) => {
                     result.private = PrivateExtensionList::try_from_iter(iter)?;
                 }
+                None => {}
                 _ => unimplemented!(),
             }
 
