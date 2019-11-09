@@ -27,12 +27,7 @@ pub enum CharacterDirection {
     LTR,
 }
 
-type RawPartsTuple = (
-    Option<u64>,
-    Option<u32>,
-    Option<u32>,
-    Option<Box<[u64]>>,
-);
+type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>);
 
 /// `LanguageIdentifier` is a core struct representing a Unicode Language Identifier.
 ///
@@ -77,7 +72,7 @@ type RawPartsTuple = (
 /// assert_eq!(li.get_region(), Some("US"));
 /// assert_eq!(li.get_variants().collect::<Vec<_>>(), &["valencia"]);
 /// ```
-#[derive(Default, Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Default, Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct LanguageIdentifier {
     language: Option<TinyStr8>,
     script: Option<TinyStr4>,

@@ -64,7 +64,7 @@ pub use unic_langid_impl::LanguageIdentifier;
 /// assert_eq!(loc.get_region(), Some("US"));
 /// assert_eq!(loc.get_variants().collect::<Vec<_>>(), &["valencia"]);
 /// ```
-#[derive(Debug, Default, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Locale {
     pub langid: LanguageIdentifier,
     pub extensions: extensions::ExtensionsMap,

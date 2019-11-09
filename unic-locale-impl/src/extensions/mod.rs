@@ -25,16 +25,16 @@ use tinystr::TinyStr8;
 use crate::parser::ParserError;
 
 /// Defines the type of extension.
-#[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy, Hash, PartialOrd, Ord)]
 pub enum ExtensionType {
-    /// Unicode Extension Type marked as `u`.
-    Unicode,
     /// Transform Extension Type marked as `t`.
     Transform,
-    /// Other Extension Type marked as `a-z` except of `t`, `u` and `x`.
-    Other(char),
+    /// Unicode Extension Type marked as `u`.
+    Unicode,
     /// Private Extension Type marked as `x`.
     Private,
+    /// Other Extension Type marked as `a-z` except of `t`, `u` and `x`.
+    Other(char),
 }
 
 impl ExtensionType {
@@ -63,7 +63,7 @@ impl std::fmt::Display for ExtensionType {
 }
 
 /// A map of extensions associated with a given `Locale.
-#[derive(Debug, Default, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct ExtensionsMap {
     pub unicode: UnicodeExtensionList,
     pub transform: TransformExtensionList,
