@@ -29,7 +29,7 @@ use tinystr::{TinyStr4, TinyStr8};
 /// [`Unicode BCP47 U Extensions`]: https://unicode.org/reports/tr35/#u_Extension
 /// [`RFC 6067`]: https://www.ietf.org/rfc/rfc6067.txt
 /// [`Unicode Locale Identifier`]: https://unicode.org/reports/tr35/#Unicode_locale_identifier
-#[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct UnicodeExtensionList {
     // Canonical: sort by key (BTreeMap is already) / remove value 'true'
     keywords: BTreeMap<TinyStr4, Vec<TinyStr8>>,

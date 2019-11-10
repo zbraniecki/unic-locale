@@ -37,7 +37,7 @@ use tinystr::{TinyStr4, TinyStr8};
 /// [`Unicode BCP47 T Extensions`]: https://unicode.org/reports/tr35/#t_Extension
 /// [`RFC 6497`]: https://www.ietf.org/rfc/rfc6497.txt
 /// [`Unicode Locale Identifier`]: https://unicode.org/reports/tr35/#Unicode_locale_identifier
-#[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct TransformExtensionList {
     tlang: Option<LanguageIdentifier>,
 

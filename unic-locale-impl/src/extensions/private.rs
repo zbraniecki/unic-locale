@@ -24,7 +24,7 @@ use tinystr::TinyStr8;
 ///
 /// [`Unicode Private Extensions`]: https://unicode.org/reports/tr35/#pu_extensions
 /// [`Unicode Locale Identifier`]: https://unicode.org/reports/tr35/#Unicode_locale_identifier
-#[derive(Clone, PartialEq, Eq, Debug, Default, Hash)]
+#[derive(Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct PrivateExtensionList(Vec<TinyStr8>);
 
 fn parse_value(t: &[u8]) -> Result<TinyStr8, ParserError> {

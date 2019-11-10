@@ -153,3 +153,42 @@ fn test_character_direction() {
     assert_eq!(langid.get_character_direction(), CharacterDirection::LTR);
     assert_eq!(langid2.get_character_direction(), CharacterDirection::RTL);
 }
+
+#[test]
+fn test_langid_ord() {
+    let input = &[
+        "en-US-macos-zarab",
+        "en-US-macos-nedis",
+        "en-US-macos",
+        "en-GB",
+        "en",
+        "en-US",
+        "ar",
+        "fr",
+        "de",
+    ];
+
+    let mut langids = input
+        .iter()
+        .map(|l| -> LanguageIdentifier { l.parse().unwrap() })
+        .collect::<Vec<_>>();
+
+    langids.sort();
+
+    let result = langids.iter().map(|l| l.to_string()).collect::<Vec<_>>();
+
+    assert_eq!(
+        &result,
+        &[
+            "ar",
+            "de",
+            "en",
+            "en-GB",
+            "en-US",
+            "en-US-macos",
+            "en-US-macos-nedis",
+            "en-US-macos-zarab",
+            "fr"
+        ]
+    );
+}
