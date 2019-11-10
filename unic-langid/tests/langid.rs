@@ -22,3 +22,31 @@ fn langids_macro_test() {
     assert_eq!(langids.len(), 4);
     assert_eq!(langids.get(3).unwrap().get_language(), "pl");
 }
+
+#[test]
+fn langid_ord() {
+    let mut input = vec!["en-Latn", "en-US"];
+
+    let mut langids: Vec<LanguageIdentifier> = input.iter().map(|l| l.parse().unwrap()).collect();
+
+    assert_eq!(
+        langids
+            .iter()
+            .map(|l: &LanguageIdentifier| l.to_string())
+            .collect::<Vec<_>>(),
+        &["en-Latn", "en-US"]
+    );
+
+    input.sort();
+    assert_eq!(input, &["en-Latn", "en-US"]);
+
+    langids.sort();
+
+    assert_eq!(
+        langids
+            .iter()
+            .map(|l: &LanguageIdentifier| l.to_string())
+            .collect::<Vec<_>>(),
+        &["en-US", "en-Latn"]
+    );
+}
