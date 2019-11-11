@@ -28,9 +28,7 @@ pub fn add_likely_subtags(
     if let Some(l) = lang {
         if let Some(r) = region {
             let result = tables::LANG_REGION
-                .binary_search_by(|(key_l, key_r, _)| {
-                    key_l.cmp(&l.into()).then(key_r.cmp(&r.into()))
-                })
+                .binary_search_by_key(&(&l.into(), &r.into()), |(key_l, key_r, _)| (key_l, key_r))
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
@@ -40,9 +38,7 @@ pub fn add_likely_subtags(
 
         if let Some(s) = script {
             let result = tables::LANG_SCRIPT
-                .binary_search_by(|(key_l, key_s, _)| {
-                    key_l.cmp(&l.into()).then(key_s.cmp(&s.into()))
-                })
+                .binary_search_by_key(&(&l.into(), &s.into()), |(key_l, key_s, _)| (key_l, key_s))
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
@@ -51,7 +47,7 @@ pub fn add_likely_subtags(
         }
 
         let result = tables::LANG_ONLY
-            .binary_search_by(|(key_l, _)| key_l.cmp(&l.into()))
+            .binary_search_by_key(&(&l.into()), |(key_l, _)| key_l)
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
@@ -60,9 +56,7 @@ pub fn add_likely_subtags(
     } else if let Some(s) = script {
         if let Some(r) = region {
             let result = tables::SCRIPT_REGION
-                .binary_search_by(|(key_s, key_r, _)| {
-                    key_s.cmp(&s.into()).then(key_r.cmp(&r.into()))
-                })
+                .binary_search_by_key(&(&s.into(), &r.into()), |(key_s, key_r, _)| (key_s, key_r))
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
@@ -73,7 +67,7 @@ pub fn add_likely_subtags(
         }
 
         let result = tables::SCRIPT_ONLY
-            .binary_search_by(|(key_s, _)| key_s.cmp(&s.into()))
+            .binary_search_by_key(&(&s.into()), |(key_s, _)| key_s)
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
@@ -81,7 +75,7 @@ pub fn add_likely_subtags(
         }
     } else if let Some(r) = region {
         let result = tables::REGION_ONLY
-            .binary_search_by(|(key_r, _)| key_r.cmp(&r.into()))
+            .binary_search_by_key(&(&r.into()), |(key_r, _)| key_r)
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
