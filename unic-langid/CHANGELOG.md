@@ -4,6 +4,10 @@
 
   - …
 
+## unic-langid 0.7.1 (November 10, 2019)
+
+  - Add `PartialOrd` and Ord` for `LanguageIdentifier`.
+
 ## unic-langid 0.7.0 (October 29, 2019)
 
   - Separate out `clear_*` methods.
