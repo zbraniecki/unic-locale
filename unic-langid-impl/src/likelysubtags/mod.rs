@@ -2,17 +2,33 @@ mod tables;
 
 pub use tables::CLDR_VERSION;
 
+#[derive(Debug)]
+pub enum SubtagOverride<T> {
+    None,
+    Some(T),
+    Same,
+}
+
 use tinystr::{TinyStr4, TinyStr8};
 
 unsafe fn get_lang_from_parts(
-    input: (Option<u64>, Option<u32>, Option<u32>),
-    lang: Option<TinyStr8>,
-    script: Option<TinyStr4>,
-    region: Option<TinyStr4>,
-) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
-    let lang = lang.or_else(|| input.0.map(|l| TinyStr8::new_unchecked(l)));
-    let script = script.or_else(|| input.1.map(|s| TinyStr4::new_unchecked(s)));
-    let region = region.or_else(|| input.2.map(|r| TinyStr4::new_unchecked(r)));
+    input: &(SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>),
+) -> Option<(Option<Option<TinyStr8>>, Option<Option<TinyStr4>>, Option<Option<TinyStr4>>)> {
+    let lang = match input.0 {
+        SubtagOverride::None => Some(None),
+        SubtagOverride::Some(t) => Some(Some(TinyStr8::new_unchecked(t))),
+        SubtagOverride::Same => None,
+    };
+    let script = match input.1 {
+        SubtagOverride::None => Some(None),
+        SubtagOverride::Some(t) => Some(Some(TinyStr4::new_unchecked(t))),
+        SubtagOverride::Same => None,
+    };
+    let region = match input.2 {
+        SubtagOverride::None => Some(None),
+        SubtagOverride::Some(t) => Some(Some(TinyStr4::new_unchecked(t))),
+        SubtagOverride::Same => None,
+    };
     Some((lang, script, region))
 }
 
@@ -20,7 +36,7 @@ pub fn add_likely_subtags(
     lang: Option<TinyStr8>,
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
-) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
+) -> Option<(Option<Option<TinyStr8>>, Option<Option<TinyStr4>>, Option<Option<TinyStr4>>)> {
     if lang.is_some() && script.is_some() && region.is_some() {
         return None;
     }
@@ -32,7 +48,7 @@ pub fn add_likely_subtags(
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(tables::LANG_REGION[r].2, None, None, None) };
+                return unsafe { get_lang_from_parts(&tables::LANG_REGION[r].2) };
             }
         }
 
@@ -42,7 +58,7 @@ pub fn add_likely_subtags(
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(tables::LANG_SCRIPT[r].2, None, None, None) };
+                return unsafe { get_lang_from_parts(&tables::LANG_SCRIPT[r].2) };
             }
         }
 
@@ -51,7 +67,7 @@ pub fn add_likely_subtags(
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
-            return unsafe { get_lang_from_parts(tables::LANG_ONLY[r].1, None, script, region) };
+            return unsafe { get_lang_from_parts(&tables::LANG_ONLY[r].1) };
         }
     } else if let Some(s) = script {
         if let Some(r) = region {
@@ -61,7 +77,7 @@ pub fn add_likely_subtags(
             if let Some(r) = result {
                 // safe because all table entries are well formed.
                 return unsafe {
-                    get_lang_from_parts(tables::SCRIPT_REGION[r].2, None, None, None)
+                    get_lang_from_parts(&tables::SCRIPT_REGION[r].2)
                 };
             }
         }
@@ -71,7 +87,7 @@ pub fn add_likely_subtags(
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
-            return unsafe { get_lang_from_parts(tables::SCRIPT_ONLY[r].1, None, None, region) };
+            return unsafe { get_lang_from_parts(&tables::SCRIPT_ONLY[r].1) };
         }
     } else if let Some(r) = region {
         let result = tables::REGION_ONLY
@@ -79,7 +95,7 @@ pub fn add_likely_subtags(
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
-            return unsafe { get_lang_from_parts(tables::REGION_ONLY[r].1, None, None, None) };
+            return unsafe { get_lang_from_parts(&tables::REGION_ONLY[r].1) };
         }
     }
 
@@ -87,38 +103,38 @@ pub fn add_likely_subtags(
 }
 
 pub fn remove_likely_subtags(
-    lang: Option<TinyStr8>,
-    script: Option<TinyStr4>,
-    region: Option<TinyStr4>,
+    _lang: Option<TinyStr8>,
+    _script: Option<TinyStr4>,
+    _region: Option<TinyStr4>,
 ) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
     // add_likely_subtags returns None when all 3 components are
     // already filled so don't call it in that case.
-    let max_langid = if lang.is_some() && script.is_some() && region.is_some() {
-        (lang, script, region)
-    } else {
-        add_likely_subtags(lang, script, region)?
-    };
+    //let max_langid = if lang.is_some() && script.is_some() && region.is_some() {
+        //(lang, script, region)
+    //} else {
+        //add_likely_subtags(lang, script, region)?
+    //};
 
-    if let Some(trial) = add_likely_subtags(max_langid.0, None, None) {
-        if trial == max_langid {
-            return Some((max_langid.0, None, None));
-        }
-    }
+    //if let Some(trial) = add_likely_subtags(max_langid.0, None, None) {
+        //if trial == max_langid {
+            //return Some((max_langid.0, None, None));
+        //}
+    //}
 
-    if max_langid.2.is_some() {
-        if let Some(trial) = add_likely_subtags(max_langid.0, None, max_langid.2) {
-            if trial == max_langid {
-                return Some((max_langid.0, None, max_langid.2));
-            }
-        }
-    }
+    //if max_langid.2.is_some() {
+        //if let Some(trial) = add_likely_subtags(max_langid.0, None, max_langid.2) {
+            //if trial == max_langid {
+                //return Some((max_langid.0, None, max_langid.2));
+            //}
+        //}
+    //}
 
-    if max_langid.1.is_some() {
-        if let Some(trial) = add_likely_subtags(max_langid.0, max_langid.1, None) {
-            if trial == max_langid {
-                return Some((max_langid.0, max_langid.1, None));
-            }
-        }
-    }
+    //if max_langid.1.is_some() {
+        //if let Some(trial) = add_likely_subtags(max_langid.0, max_langid.1, None) {
+            //if trial == max_langid {
+                //return Some((max_langid.0, max_langid.1, None));
+            //}
+        //}
+    //}
     None
 }

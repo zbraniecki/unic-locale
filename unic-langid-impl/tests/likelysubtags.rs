@@ -65,13 +65,33 @@ fn extract_input(s: &str) -> (Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr
 
 fn extract_output(
     s: Option<&str>,
-) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
+    subtags: (Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)
+) -> Option<(Option<Option<TinyStr8>>, Option<Option<TinyStr4>>, Option<Option<TinyStr4>>)> {
     s.map(|s| {
         let chunks: Vec<&str> = s.split("-").collect();
+        let lang = chunks.get(0).map(|s| s.parse().unwrap());
+        let script = chunks.get(1).map(|s| s.parse().unwrap());
+        let region = chunks.get(2).map(|s| s.parse().unwrap());
+
+        let lang = if lang == subtags.0  {
+            None
+        } else {
+            Some(lang)
+        };
+        let script = if script == subtags.1  {
+            None
+        } else {
+            Some(script)
+        };
+        let region = if region == subtags.2  {
+            None
+        } else {
+            Some(region)
+        };
         (
-            chunks.get(0).map(|s| s.parse().unwrap()),
-            chunks.get(1).map(|s| s.parse().unwrap()),
-            chunks.get(2).map(|s| s.parse().unwrap()),
+            lang,
+            script,
+            region
         )
     })
 }
@@ -81,7 +101,7 @@ fn add_likely_subtags_test() {
     for i in STRINGS {
         let chunks = extract_input(i.0);
         let result = add_likely_subtags(chunks.0, chunks.1, chunks.2);
-        assert_eq!(extract_output(i.1), result);
+        assert_eq!(extract_output(i.1, chunks), result);
     }
 }
 

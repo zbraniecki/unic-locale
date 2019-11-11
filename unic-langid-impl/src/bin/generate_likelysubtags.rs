@@ -4,7 +4,7 @@ use std::str::FromStr;
 use tinystr::{TinyStr4, TinyStr8};
 use unic_langid_impl::LanguageIdentifier;
 
-type LangIdSubTags = (Option<u64>, Option<u32>, Option<u32>);
+type LangIdSubTags = (Option<Option<u64>>, Option<Option<u32>>, Option<Option<u32>>);
 
 fn serialize_val(input: LangIdSubTags) -> String {
     format!(
@@ -15,27 +15,27 @@ fn serialize_val(input: LangIdSubTags) -> String {
     )
 }
 
-fn serialize_lang_option(l: Option<u64>) -> String {
-    if let Some(l) = l {
-        format!("Some({})", l)
-    } else {
-        String::from("None")
+fn serialize_lang_option(l: Option<Option<u64>>) -> String {
+    match l {
+        Some(Some(l)) => format!("SubtagOverride::Some({})", l),
+        Some(None) => format!("SubtagOverride::None"),
+        None => format!("SubtagOverride::Same"),
     }
 }
 
-fn serialize_script_option(r: Option<u32>) -> String {
-    if let Some(r) = r {
-        format!("Some({})", r)
-    } else {
-        String::from("None")
+fn serialize_script_option(s: Option<Option<u32>>) -> String {
+    match s {
+        Some(Some(s)) => format!("SubtagOverride::Some({})", s),
+        Some(None) => format!("SubtagOverride::None"),
+        None => format!("SubtagOverride::Same"),
     }
 }
 
-fn serialize_region_option(r: Option<u32>) -> String {
-    if let Some(r) = r {
-        format!("Some({})", r)
-    } else {
-        String::from("None")
+fn serialize_region_option(r: Option<Option<u32>>) -> String {
+    match r {
+        Some(Some(r)) => format!("SubtagOverride::Some({})", r),
+        Some(None) => format!("SubtagOverride::None"),
+        None => format!("SubtagOverride::Same"),
     }
 }
 
@@ -66,33 +66,97 @@ fn main() {
         let region = key_langid.get_region();
 
         match (lang, script, region) {
-            (l, None, None) => lang_only.push((
-                TinyStr8::from_str(l).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            (l, None, Some(r)) if l != "und" => lang_region.push((
+            (l, None, None) => {
+                let input_lang = TinyStr8::from_str(l).unwrap().into();
+                let new_lang = if Some(input_lang) != val_lang {
+                    Some(val_lang)
+                } else {
+                    None
+                };
+                lang_only.push((
+                        input_lang,
+                        (new_lang, Some(val_script), Some(val_region)),
+                        ))
+            },
+            (l, None, Some(r)) if l != "und" => {
+                let input_lang = TinyStr8::from_str(l).unwrap().into();
+                let input_region = TinyStr4::from_str(r).unwrap().into();
+                let new_lang = if Some(input_lang) != val_lang {
+                    Some(val_lang)
+                } else {
+                    None
+                };
+                let new_region = if Some(input_region) != val_region {
+                    Some(val_region)
+                } else {
+                    None
+                };
+                lang_region.push((
                 TinyStr8::from_str(l).unwrap().into(),
                 TinyStr4::from_str(r).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            (l, Some(s), None) if l != "und" => lang_script.push((
+                (new_lang, Some(val_script), new_region),
+            ))},
+            (l, Some(s), None) if l != "und" => {
+                let input_lang = TinyStr8::from_str(l).unwrap().into();
+                let input_script = TinyStr4::from_str(s).unwrap().into();
+                let new_lang = if Some(input_lang) != val_lang {
+                    Some(val_lang)
+                } else {
+                    None
+                };
+                let new_script = if Some(input_script) != val_script {
+                    Some(val_script)
+                } else {
+                    None
+                };
+                lang_script.push((
                 TinyStr8::from_str(l).unwrap().into(),
                 TinyStr4::from_str(s).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            ("und", Some(s), Some(r)) => script_region.push((
+                (new_lang, new_script, Some(val_region)),
+            ))},
+            ("und", Some(s), Some(r)) => {
+                let input_script = TinyStr4::from_str(s).unwrap().into();
+                let input_region = TinyStr4::from_str(r).unwrap().into();
+                let new_script = if Some(input_script) != val_script {
+                    Some(val_script)
+                } else {
+                    None
+                };
+                let new_region = if Some(input_region) != val_region {
+                    Some(val_region)
+                } else {
+                    None
+                };
+                script_region.push((
                 TinyStr4::from_str(s).unwrap().into(),
                 TinyStr4::from_str(r).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            ("und", Some(s), None) => script_only.push((
+                (Some(val_lang), new_script, new_region),
+            ))
+            },
+            ("und", Some(s), None) => {
+                let input_script = TinyStr4::from_str(s).unwrap().into();
+                let new_script = if Some(input_script) != val_script {
+                    Some(val_script)
+                } else {
+                    None
+                };
+                script_only.push((
                 TinyStr4::from_str(s).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            ("und", None, Some(r)) => region_only.push((
+                (Some(val_lang), new_script, Some(val_region)),
+            ))
+            },
+            ("und", None, Some(r)) => {
+                let input_region = TinyStr4::from_str(r).unwrap().into();
+                let new_region = if Some(input_region) != val_region {
+                    Some(val_region)
+                } else {
+                    None
+                };
+                region_only.push((
                 TinyStr4::from_str(r).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
+                (Some(val_lang), Some(val_script), new_region),
+            ))
+            },
             _ => {
                 panic!("{:#?}", key_langid);
             }
@@ -106,9 +170,10 @@ fn main() {
         .as_str()
         .unwrap();
     println!("pub const CLDR_VERSION: &str = \"{}\";", version);
+    println!("pub use super::SubtagOverride;");
 
     println!(
-        "pub const LANG_ONLY: &[(u64, (Option<u64>, Option<u32>, Option<u32>)); {}] = &[",
+        "pub const LANG_ONLY: &[(u64, (SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>)); {}] = &[",
         lang_only.len()
     );
     lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
@@ -118,7 +183,7 @@ fn main() {
     println!("];");
 
     println!(
-        "pub const LANG_REGION: [(u64, u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
+        "pub const LANG_REGION: [(u64, u32, (SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>)); {}] = [",
         lang_region.len()
     );
     lang_region.sort_by(|a, b| {
@@ -136,7 +201,7 @@ fn main() {
     }
     println!("];");
     println!(
-        "pub const LANG_SCRIPT: [(u64, u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
+        "pub const LANG_SCRIPT: [(u64, u32, (SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>)); {}] = [",
         lang_script.len()
     );
     lang_script.sort_by(|a, b| {
@@ -154,7 +219,7 @@ fn main() {
     }
     println!("];");
     println!(
-        "pub const SCRIPT_REGION: [(u32, u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
+        "pub const SCRIPT_REGION: [(u32, u32, (SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>)); {}] = [",
         script_region.len()
     );
     script_region.sort_by(|a, b| {
@@ -172,7 +237,7 @@ fn main() {
     }
     println!("];");
     println!(
-        "pub const SCRIPT_ONLY: [(u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
+        "pub const SCRIPT_ONLY: [(u32, (SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>)); {}] = [",
         script_only.len()
     );
     script_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
@@ -181,7 +246,7 @@ fn main() {
     }
     println!("];");
     println!(
-        "pub const REGION_ONLY: [(u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
+        "pub const REGION_ONLY: [(u32, (SubtagOverride<u64>, SubtagOverride<u32>, SubtagOverride<u32>)); {}] = [",
         region_only.len()
     );
     region_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());

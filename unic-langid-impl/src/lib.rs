@@ -595,9 +595,15 @@ impl LanguageIdentifier {
         if let Some(new_li) =
             likelysubtags::add_likely_subtags(self.language, self.script, self.region)
         {
-            self.language = new_li.0;
-            self.script = new_li.1;
-            self.region = new_li.2;
+            if let Some(lang) = new_li.0 {
+                self.language = lang;
+            }
+            if let Some(script) = new_li.1 {
+                self.script = script;
+            }
+            if let Some(region) = new_li.2 {
+                self.region = region;
+            }
             true
         } else {
             false
