@@ -3,8 +3,14 @@ use crate::parser::ParserError;
 
 use std::collections::BTreeMap;
 use std::iter::Peekable;
+use std::ops::RangeInclusive;
 
 use tinystr::{TinyStr4, TinyStr8};
+
+/// Constants for locale extension key/value handling.
+const KEY_LENGTH: usize = 2;
+const TYPE_LENGTH: RangeInclusive<usize> = 3..=8;
+const ATTR_LENGTH: RangeInclusive<usize> = 3..=8;
 
 /// A list of [`Unicode BCP47 U Extensions`] as defined in [`Unicode Locale
 /// Identifier`] specification.
@@ -39,7 +45,7 @@ pub struct UnicodeExtensionList {
 }
 
 fn parse_key(key: &[u8]) -> Result<TinyStr4, ParserError> {
-    if key.len() != 2 || !key[0].is_ascii_alphanumeric() || !key[1].is_ascii_alphabetic() {
+    if key.len() != KEY_LENGTH || !key[0].is_ascii_alphanumeric() || !key[1].is_ascii_alphabetic() {
         return Err(ParserError::InvalidSubtag);
     }
     let key = TinyStr4::from_bytes(key).map_err(|_| ParserError::InvalidSubtag)?;
@@ -50,7 +56,7 @@ const TRUE_TYPE: TinyStr8 = unsafe { TinyStr8::new_unchecked(1_702_195_828u64) }
 
 fn parse_type(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
     let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
-    if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
+    if !TYPE_LENGTH.contains(&t.len()) || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
 
@@ -65,21 +71,21 @@ fn parse_type(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
 
 fn parse_attribute(t: &[u8]) -> Result<TinyStr8, ParserError> {
     let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
-    if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
+    if !ATTR_LENGTH.contains(&t.len()) || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
 
     Ok(s.to_ascii_lowercase())
 }
 
-fn is_attribute(t: &[u8]) -> bool {
-    let slen = t.len();
-    (slen >= 3 && slen <= 8) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
-}
-
 fn is_type(t: &[u8]) -> bool {
     let slen = t.len();
-    (slen >= 3 && slen <= 8) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
+    TYPE_LENGTH.contains(&slen) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
+}
+
+fn is_attribute(t: &[u8]) -> bool {
+    let slen = t.len();
+    ATTR_LENGTH.contains(&slen) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
 }
 
 impl UnicodeExtensionList {
