@@ -3,15 +3,14 @@ use crate::parser::ParserError;
 
 use std::collections::BTreeMap;
 use std::iter::Peekable;
+use std::ops::RangeInclusive;
 
 use tinystr::{TinyStr4, TinyStr8};
 
 /// Constants for locale extension key/value handling.
 const KEY_LENGTH: usize = 2;
-const TYPE_MIN: usize = 3;
-const TYPE_MAX: usize = 8;
-const ATTR_MIN: usize = 3;
-const ATTR_MAX: usize = 8;
+const TYPE_LENGTH: RangeInclusive<usize> = 3..=8;
+const ATTR_LENGTH: RangeInclusive<usize> = 3..=8;
 
 /// A list of [`Unicode BCP47 U Extensions`] as defined in [`Unicode Locale
 /// Identifier`] specification.
@@ -57,7 +56,7 @@ const TRUE_TYPE: TinyStr8 = unsafe { TinyStr8::new_unchecked(1_702_195_828u64) }
 
 fn parse_type(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
     let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
-    if t.len() < TYPE_MIN || t.len() > TYPE_MAX || !s.is_ascii_alphanumeric() {
+    if !TYPE_LENGTH.contains(&t.len()) || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
 
@@ -72,7 +71,7 @@ fn parse_type(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
 
 fn parse_attribute(t: &[u8]) -> Result<TinyStr8, ParserError> {
     let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
-    if t.len() < ATTR_MIN || t.len() > ATTR_MAX || !s.is_ascii_alphanumeric() {
+    if !ATTR_LENGTH.contains(&t.len()) || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
 
@@ -81,12 +80,12 @@ fn parse_attribute(t: &[u8]) -> Result<TinyStr8, ParserError> {
 
 fn is_type(t: &[u8]) -> bool {
     let slen = t.len();
-    (slen >= TYPE_MIN && slen <= TYPE_MAX) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
+    TYPE_LENGTH.contains(&slen) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
 }
 
 fn is_attribute(t: &[u8]) -> bool {
     let slen = t.len();
-    (slen >= ATTR_MIN && slen <= ATTR_MAX) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
+    ATTR_LENGTH.contains(&slen) && !t.iter().any(|c: &u8| !c.is_ascii_alphanumeric())
 }
 
 impl UnicodeExtensionList {
