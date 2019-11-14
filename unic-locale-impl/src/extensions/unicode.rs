@@ -31,10 +31,10 @@ use tinystr::{TinyStr4, TinyStr8};
 /// [`Unicode Locale Identifier`]: https://unicode.org/reports/tr35/#Unicode_locale_identifier
 #[derive(Clone, PartialEq, Eq, Debug, Default, Hash, PartialOrd, Ord)]
 pub struct UnicodeExtensionList {
-    // Canonical: sort by key (BTreeMap is already) / remove value 'true'
+    // Canonical: sort by key (BTreeMap is already sorted) / remove value 'true'
     keywords: BTreeMap<TinyStr4, Vec<TinyStr8>>,
 
-    // Canonical: sort / dudup
+    // Canonical: sort / de-dup
     attributes: Vec<TinyStr8>,
 }
 
