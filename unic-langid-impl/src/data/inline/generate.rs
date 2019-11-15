@@ -62,7 +62,7 @@ pub fn generate_layout(path: &str) -> (String, String) {
     let path = Path::new(path).join("main");
     let map = get_langid_to_direction_map(path);
 
-    let mut result = vec![];
+    let mut langs = vec![];
 
     let mut version = None;
 
@@ -85,22 +85,23 @@ pub fn generate_layout(path: &str) -> (String, String) {
             check_all_variants_rtl(&map, &lang),
             "We didn't expect a language with two directionalities!"
         );
-        if !result.contains(&lang) {
-            result.push(lang.to_string());
+        if !langs.contains(&lang) {
+            langs.push(lang.to_string());
         }
     }
 
-    let list: Vec<String> = result
+    let mut u64_list: Vec<u64> = langs
         .iter()
-        .map(|s| {
-            let num: u64 = TinyStr8::from_str(s).unwrap().into();
-            num.to_string()
-        })
+        .map(|s| TinyStr8::from_str(s).unwrap().into())
         .collect();
+
+    u64_list.sort();
+
+    let list: Vec<String> = u64_list.iter().map(|s| s.to_string()).collect();
 
     let result = format!(
         "pub const CHARACTER_DIRECTION_RTL: [u64; {}] = [{}];",
-        result.len(),
+        list.len(),
         list.join(", ")
     );
 
@@ -210,7 +211,7 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
     let mut result = String::new();
 
     writeln!(result, "#![allow(clippy::type_complexity)]")?;
-    writeln!(result, "#![allow(clippy::unreadable_literal)]")?;
+    writeln!(result, "#![allow(clippy::unreadable_literal)]\n")?;
 
     let version = v["supplemental"]["version"]["_cldrVersion"]
         .as_str()

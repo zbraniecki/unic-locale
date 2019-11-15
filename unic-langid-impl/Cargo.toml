@@ -37,11 +37,7 @@ cldr = ["likelysubtags-cldr", "layout-cldr"]
 binary = ["json"]
 
 [[bin]]
-name = "generate_likelysubtags"
-required-features = ["binary"]
-
-[[bin]]
-name = "generate_layout"
+name = "generate_inline_data"
 required-features = ["binary"]
 
 [[test]]

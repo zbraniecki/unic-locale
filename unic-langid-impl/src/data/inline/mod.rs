@@ -3,6 +3,8 @@ pub(super) mod layout_table;
 #[cfg(feature = "likelysubtags-inline")]
 pub(super) mod likelysubtags;
 
+#[cfg(feature = "binary")]
 pub mod generate;
+mod version;
 
-pub const CLDR_VERSION: &str = "36";
+pub use version::CLDR_VERSION;
