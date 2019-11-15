@@ -1,7 +1,19 @@
 pub mod layout_table {
-    pub const CHARACTER_DIRECTION_RTL: [u64; 6] = [24934, 25715, 25960, 29281, 29301, 29552];
+    use crate::data::generate::get_layout_entry;
+    use crate::CharacterDirection;
+    use std::path::Path;
+    use tinystr::TinyStr8;
 
     pub fn is_rtl(subtag: u64) -> bool {
-        CHARACTER_DIRECTION_RTL.binary_search(&subtag).is_ok()
+        let path = "./data/cldr-misc-modern";
+
+        let langid = unsafe { TinyStr8::new_unchecked(subtag) };
+        let path = Path::new(path)
+            .join("main")
+            .join(&langid.to_string())
+            .join("layout.json");
+
+        let entry = get_layout_entry(path).expect("Entry retrival failed.");
+        entry.2 == CharacterDirection::RTL
     }
 }
