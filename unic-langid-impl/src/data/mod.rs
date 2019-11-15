@@ -1,4 +1,8 @@
-#[cfg(any(feature = "layout-inline", feature = "likelysubtags-inline"))]
+#[cfg(any(
+    feature = "layout-inline",
+    feature = "likelysubtags-inline",
+    feature = "binary"
+))]
 mod inline;
 // mod cldr;
 
@@ -10,3 +14,6 @@ pub(crate) use inline::likelysubtags::{add_likely_subtags, remove_likely_subtags
 
 #[cfg(any(feature = "layout-inline", feature = "likelysubtags-inline"))]
 pub use inline::CLDR_VERSION;
+
+#[cfg(feature = "binary")]
+pub use inline::generate;
