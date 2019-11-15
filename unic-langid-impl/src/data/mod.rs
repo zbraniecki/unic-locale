@@ -1,13 +1,16 @@
-#[cfg(any(
-    feature = "layout-inline",
-    feature = "likelysubtags-inline",
-    feature = "binary"
-))]
+#[cfg(any(feature = "layout-inline", feature = "likelysubtags-inline",))]
 mod inline;
-// mod cldr;
 
-#[cfg(any(feature = "layout-inline", feature = "layout-cldr"))]
-pub(crate) use inline::layout_table::CHARACTER_DIRECTION_RTL;
+#[cfg(any(feature = "layout-cldr", feature = "likelysubtags-cldr"))]
+mod cldr;
+
+#[cfg(any(feature = "binary", feature = "layout-cldr",))]
+mod generate;
+
+#[cfg(feature = "layout-cldr")]
+pub(crate) use cldr::layout_table::is_rtl;
+#[cfg(feature = "layout-inline")]
+pub(crate) use inline::layout_table::is_rtl;
 
 #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
 pub(crate) use inline::likelysubtags::{add_likely_subtags, remove_likely_subtags};

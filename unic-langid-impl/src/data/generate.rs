@@ -10,6 +10,32 @@ use tinystr::{TinyStr4, TinyStr8};
 
 // Layout
 
+pub fn get_layout_entry(path: PathBuf) -> Option<(String, String, CharacterDirection)> {
+    let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
+    let v: Value = serde_json::from_str(&contents).unwrap();
+
+    let langid_key = v["main"].as_object().unwrap().keys().nth(0).unwrap();
+
+    if langid_key == "root" {
+        return None;
+    }
+
+    let character_order = match v["main"][langid_key]["layout"]["orientation"]["characterOrder"]
+        .as_str()
+        .unwrap()
+    {
+        "right-to-left" => CharacterDirection::RTL,
+        "left-to-right" => CharacterDirection::LTR,
+        _ => unimplemented!("Encountered unknown directionality!"),
+    };
+
+    let version = v["main"][langid_key]["identity"]["version"]["_cldrVersion"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    Some((langid_key.to_string(), version, character_order))
+}
+
 fn get_langid_to_direction_map(
     path: PathBuf,
 ) -> HashMap<LanguageIdentifier, (String, CharacterDirection)> {
@@ -18,30 +44,11 @@ fn get_langid_to_direction_map(
         let entry = entry.unwrap();
         let mut path = entry.path();
         path.push("layout.json");
-        let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
-        let v: Value = serde_json::from_str(&contents).unwrap();
 
-        let langid_key = v["main"].as_object().unwrap().keys().nth(0).unwrap();
-
-        if langid_key == "root" {
-            continue;
+        if let Some((langid_key, version, character_order)) = get_layout_entry(path) {
+            let langid: LanguageIdentifier = langid_key.parse().unwrap();
+            result.insert(langid, (version, character_order));
         }
-        let langid: LanguageIdentifier = langid_key.parse().unwrap();
-
-        let character_order = match v["main"][langid_key]["layout"]["orientation"]["characterOrder"]
-            .as_str()
-            .unwrap()
-        {
-            "right-to-left" => CharacterDirection::RTL,
-            "left-to-right" => CharacterDirection::LTR,
-            _ => unimplemented!("Encountered unknown directionality!"),
-        };
-
-        let version = v["main"][langid_key]["identity"]["version"]["_cldrVersion"]
-            .as_str()
-            .unwrap()
-            .to_string();
-        result.insert(langid, (version, character_order));
     }
     result
 }

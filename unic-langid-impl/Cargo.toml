@@ -48,7 +48,6 @@ required-features = ["likelysubtags-inline"]
 [[test]]
 name = "layout_data"
 path = "tests/layout_data.rs"
-required-features = ["layout-inline"]
 
 [[bench]]
 name = "parser"

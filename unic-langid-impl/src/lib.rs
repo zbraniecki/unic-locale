@@ -647,9 +647,7 @@ impl LanguageIdentifier {
     #[cfg(any(feature = "layout-inline", feature = "layout-cldr"))]
     pub fn get_character_direction(&self) -> CharacterDirection {
         match self.language {
-            Some(lang) if data::CHARACTER_DIRECTION_RTL.contains(&(lang.into())) => {
-                CharacterDirection::RTL
-            }
+            Some(lang) if data::is_rtl(lang.into()) => CharacterDirection::RTL,
             _ => CharacterDirection::LTR,
         }
     }
