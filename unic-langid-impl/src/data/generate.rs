@@ -65,7 +65,7 @@ fn check_all_variants_rtl(
     true
 }
 
-pub fn generate_layout(path: &str) -> (String, String) {
+pub fn generate_layout(path: &str) -> Result<(String, String), std::fmt::Error> {
     let path = Path::new(path).join("main");
     let map = get_langid_to_direction_map(path);
 
@@ -106,14 +106,23 @@ pub fn generate_layout(path: &str) -> (String, String) {
 
     let list: Vec<String> = u64_list.iter().map(|s| s.to_string()).collect();
 
-    let result = format!(
+    let mut result = String::new();
+
+    writeln!(
+        result,
         "pub const CHARACTER_DIRECTION_RTL: [u64; {}] = [{}];",
         list.len(),
         list.join(", ")
-    );
+    )?;
+    writeln!(result, "pub fn is_rtl(subtag: u64) -> bool {{")?;
+    writeln!(
+        result,
+        "    CHARACTER_DIRECTION_RTL.binary_search(&subtag).is_ok()"
+    )?;
+    writeln!(result, "}}")?;
 
     let version = version.expect("CLDR Version should be specified.");
-    return (version, result);
+    Ok((version, result))
 }
 
 // Likely Subtags

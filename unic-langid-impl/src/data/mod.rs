@@ -5,7 +5,7 @@ mod inline;
 mod cldr;
 
 #[cfg(any(feature = "binary", feature = "layout-cldr",))]
-mod generate;
+pub mod generate;
 
 #[cfg(feature = "layout-cldr")]
 pub(crate) use cldr::layout_table::is_rtl;
@@ -17,6 +17,3 @@ pub(crate) use inline::likelysubtags::{add_likely_subtags, remove_likely_subtags
 
 #[cfg(any(feature = "layout-inline", feature = "likelysubtags-inline"))]
 pub use inline::CLDR_VERSION;
-
-#[cfg(feature = "binary")]
-pub use inline::generate;

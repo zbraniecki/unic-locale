@@ -9,9 +9,9 @@ fn main() {
 
     let dest_path = "./src/data/inline";
 
-    let (layout_version, layout_rs) = generate_layout(misc_path);
+    let (layout_version, layout_rs) = generate_layout(misc_path).expect("Generating data failed.");
     let (main_version, likely_subtags_rs) =
-        generate_likely_subtags(core_path).expect("Generating data failed");
+        generate_likely_subtags(core_path).expect("Generating data failed.");
 
     if layout_version != main_version {
         panic!("CLDR version mismatch!");
