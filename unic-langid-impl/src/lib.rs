@@ -1,13 +1,14 @@
+pub mod data;
 mod errors;
-mod layout_table;
-#[cfg(feature = "likelysubtags")]
-pub mod likelysubtags;
 #[doc(hidden)]
 pub mod parser;
 mod subtags;
 
+#[cfg(any(feature = "likelysubtags-inline", feature = "layout-inline"))]
+pub use data::CLDR_VERSION;
+
 pub use crate::errors::LanguageIdentifierError;
-use layout_table::CHARACTER_DIRECTION_RTL;
+
 use std::fmt::Write;
 use std::iter::Peekable;
 use std::str::FromStr;
@@ -590,11 +591,9 @@ impl LanguageIdentifier {
     /// assert_eq!(li.add_likely_subtags(), true);
     /// assert_eq!(li.to_string(), "en-Latn-US");
     /// ```
-    #[cfg(feature = "likelysubtags")]
+    #[cfg(feature = "likelysubtags-inline")]
     pub fn add_likely_subtags(&mut self) -> bool {
-        if let Some(new_li) =
-            likelysubtags::add_likely_subtags(self.language, self.script, self.region)
-        {
+        if let Some(new_li) = data::add_likely_subtags(self.language, self.script, self.region) {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;
@@ -618,11 +617,9 @@ impl LanguageIdentifier {
     /// assert_eq!(li.remove_likely_subtags(), true);
     /// assert_eq!(li.to_string(), "en");
     /// ```
-    #[cfg(feature = "likelysubtags")]
+    #[cfg(feature = "likelysubtags-inline")]
     pub fn remove_likely_subtags(&mut self) -> bool {
-        if let Some(new_li) =
-            likelysubtags::remove_likely_subtags(self.language, self.script, self.region)
-        {
+        if let Some(new_li) = data::remove_likely_subtags(self.language, self.script, self.region) {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;
@@ -647,9 +644,10 @@ impl LanguageIdentifier {
     /// assert_eq!(li1.get_character_direction(), CharacterDirection::LTR);
     /// assert_eq!(li2.get_character_direction(), CharacterDirection::RTL);
     /// ```
+    #[cfg(any(feature = "layout-inline", feature = "layout-cldr"))]
     pub fn get_character_direction(&self) -> CharacterDirection {
         match self.language {
-            Some(lang) if CHARACTER_DIRECTION_RTL.contains(&(lang.into())) => {
+            Some(lang) if data::CHARACTER_DIRECTION_RTL.contains(&(lang.into())) => {
                 CharacterDirection::RTL
             }
             _ => CharacterDirection::LTR,

@@ -1,7 +1,5 @@
 mod tables;
 
-pub use tables::CLDR_VERSION;
-
 use tinystr::{TinyStr4, TinyStr8};
 
 unsafe fn get_lang_from_parts(
