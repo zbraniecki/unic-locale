@@ -234,24 +234,12 @@ pub fn get_likely_subtags_data(
         }
     }
 
-    lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
-    lang_region.sort_by(|a, b| {
-        a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
-    });
-    lang_script.sort_by(|a, b| {
-        a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
-    });
-    script_region.sort_by(|a, b| {
-        a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
-    });
-    script_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
-    region_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    lang_only.sort_by_key(|a| a.0);
+    lang_region.sort_by_key(|a| (a.0, a.1));
+    lang_script.sort_by_key(|a| (a.0, a.1));
+    script_region.sort_by_key(|a| (a.0, a.1));
+    script_only.sort_by_key(|a| a.0);
+    region_only.sort_by_key(|a| a.0);
 
     let version = v["supplemental"]["version"]["_cldrVersion"]
         .as_str()
