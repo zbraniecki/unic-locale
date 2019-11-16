@@ -502,7 +502,7 @@ impl Locale {
     /// assert_eq!(loc.add_likely_subtags(), true);
     /// assert_eq!(loc.to_string(), "en-Latn-US");
     /// ```
-    #[cfg(feature = "likelysubtags")]
+    #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
     pub fn add_likely_subtags(&mut self) -> bool {
         self.langid.add_likely_subtags()
     }
@@ -521,7 +521,7 @@ impl Locale {
     /// assert_eq!(loc.remove_likely_subtags(), true);
     /// assert_eq!(loc.to_string(), "en");
     /// ```
-    #[cfg(feature = "likelysubtags")]
+    #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
     pub fn remove_likely_subtags(&mut self) -> bool {
         self.langid.remove_likely_subtags()
     }
@@ -541,6 +541,7 @@ impl Locale {
     /// assert_eq!(loc1.get_character_direction(), CharacterDirection::LTR);
     /// assert_eq!(loc2.get_character_direction(), CharacterDirection::RTL);
     /// ```
+    #[cfg(any(feature = "layout-inline", feature = "layout-cldr"))]
     pub fn get_character_direction(&self) -> CharacterDirection {
         self.langid.get_character_direction()
     }
