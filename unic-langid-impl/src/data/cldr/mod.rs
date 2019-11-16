@@ -24,6 +24,15 @@ pub mod likelysubtags {
     use crate::data::generate::get_likely_subtags_data;
     use tinystr::{TinyStr4, TinyStr8};
 
+    pub static mut DATA: Option<(
+        Vec<(u64, (Option<u64>, Option<u32>, Option<u32>))>, // LANG_ONLY
+        Vec<(u64, u32, (Option<u64>, Option<u32>, Option<u32>))>, // LANG_REGION
+        Vec<(u64, u32, (Option<u64>, Option<u32>, Option<u32>))>, // LANG_SCRIPT
+        Vec<(u32, u32, (Option<u64>, Option<u32>, Option<u32>))>, // SCRIPT_REGION
+        Vec<(u32, (Option<u64>, Option<u32>, Option<u32>))>, // REGION_ONLY
+        Vec<(u32, (Option<u64>, Option<u32>, Option<u32>))>, // SCRIPT_ONLY
+    )> = None;
+
     unsafe fn get_lang_from_parts(
         input: (Option<u64>, Option<u32>, Option<u32>),
         lang: Option<TinyStr8>,
@@ -45,69 +54,89 @@ pub mod likelysubtags {
             return None;
         }
 
-        let path = "./data/cldr-core";
-        let (_, lang_only, lang_region, lang_script, script_region, region_only, script_only) =
-            get_likely_subtags_data(path);
+        if unsafe { DATA.is_none() } {
+            let path = "./data/cldr-core";
+            let (_, lang_only, lang_region, lang_script, script_region, region_only, script_only) =
+                get_likely_subtags_data(path);
+
+            unsafe {
+                DATA = Some((
+                    lang_only,
+                    lang_region,
+                    lang_script,
+                    script_region,
+                    region_only,
+                    script_only,
+                ));
+            };
+        }
+        let data = unsafe { DATA.as_ref().unwrap() };
 
         if let Some(l) = lang {
             if let Some(r) = region {
-                let result = lang_region
+                let result = data
+                    .1
                     .binary_search_by_key(&(&l.into(), &r.into()), |(key_l, key_r, _)| {
                         (key_l, key_r)
                     })
                     .ok();
                 if let Some(r) = result {
                     // safe because all table entries are well formed.
-                    return unsafe { get_lang_from_parts(lang_region[r].2, None, None, None) };
+                    return unsafe { get_lang_from_parts(data.1[r].2, None, None, None) };
                 }
             }
 
             if let Some(s) = script {
-                let result = lang_script
+                let result = data
+                    .2
                     .binary_search_by_key(&(&l.into(), &s.into()), |(key_l, key_s, _)| {
                         (key_l, key_s)
                     })
                     .ok();
                 if let Some(r) = result {
                     // safe because all table entries are well formed.
-                    return unsafe { get_lang_from_parts(lang_script[r].2, None, None, None) };
+                    return unsafe { get_lang_from_parts(data.2[r].2, None, None, None) };
                 }
             }
 
-            let result = lang_only
+            let result = data
+                .0
                 .binary_search_by_key(&(&l.into()), |(key_l, _)| key_l)
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(lang_only[r].1, None, script, region) };
+                return unsafe { get_lang_from_parts(data.0[r].1, None, script, region) };
             }
         } else if let Some(s) = script {
             if let Some(r) = region {
-                let result = script_region
+                let result = data
+                    .3
                     .binary_search_by_key(&(&s.into(), &r.into()), |(key_s, key_r, _)| {
                         (key_s, key_r)
                     })
                     .ok();
                 if let Some(r) = result {
                     // safe because all table entries are well formed.
-                    return unsafe { get_lang_from_parts(script_region[r].2, None, None, None) };
+                    return unsafe { get_lang_from_parts(data.3[r].2, None, None, None) };
                 }
             }
 
-            let result = script_only
+            let result = data
+                .5
                 .binary_search_by_key(&(&s.into()), |(key_s, _)| key_s)
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(script_only[r].1, None, None, region) };
+                return unsafe { get_lang_from_parts(data.5[r].1, None, None, region) };
             }
         } else if let Some(r) = region {
-            let result = region_only
+            let result = data
+                .4
                 .binary_search_by_key(&(&r.into()), |(key_r, _)| key_r)
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(region_only[r].1, None, None, None) };
+                return unsafe { get_lang_from_parts(data.4[r].1, None, None, None) };
             }
         }
 
