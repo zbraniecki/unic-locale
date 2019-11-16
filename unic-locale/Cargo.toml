@@ -10,8 +10,8 @@ license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-unic-langid-impl = "0.7.1"
-unic-locale-impl = "0.7.1"
+unic-langid-impl = { path = "../unic-langid-impl" }
+unic-locale-impl = { path = "../unic-locale-impl" }
 unic-locale-macros = { version = "0.7" , optional = true }
 
 [dev-dependencies]
