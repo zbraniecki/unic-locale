@@ -162,7 +162,17 @@ fn serialize_region_option(r: Option<u32>) -> String {
     }
 }
 
-pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt::Error> {
+pub fn get_likely_subtags_data(
+    path: &str,
+) -> (
+    String,
+    Vec<(u64, LangIdSubTags)>,
+    Vec<(u64, u32, LangIdSubTags)>,
+    Vec<(u64, u32, LangIdSubTags)>,
+    Vec<(u32, u32, LangIdSubTags)>,
+    Vec<(u32, LangIdSubTags)>,
+    Vec<(u32, LangIdSubTags)>,
+) {
     let path = Path::new(path)
         .join("supplemental")
         .join("likelySubtags.json");
@@ -224,22 +234,55 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
         }
     }
 
-    let mut result = String::new();
-
-    writeln!(result, "#![allow(clippy::type_complexity)]")?;
-    writeln!(result, "#![allow(clippy::unreadable_literal)]\n")?;
+    lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    lang_region.sort_by(|a, b| {
+        a.0.partial_cmp(&b.0)
+            .unwrap()
+            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
+    });
+    lang_script.sort_by(|a, b| {
+        a.0.partial_cmp(&b.0)
+            .unwrap()
+            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
+    });
+    script_region.sort_by(|a, b| {
+        a.0.partial_cmp(&b.0)
+            .unwrap()
+            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
+    });
+    script_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    region_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
     let version = v["supplemental"]["version"]["_cldrVersion"]
         .as_str()
         .unwrap()
         .to_string();
 
+    (
+        version,
+        lang_only,
+        lang_region,
+        lang_script,
+        script_region,
+        region_only,
+        script_only,
+    )
+}
+
+pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt::Error> {
+    let (version, lang_only, lang_region, lang_script, script_region, region_only, script_only) =
+        get_likely_subtags_data(path);
+
+    let mut result = String::new();
+
+    writeln!(result, "#![allow(clippy::type_complexity)]")?;
+    writeln!(result, "#![allow(clippy::unreadable_literal)]\n")?;
+
     writeln!(
         result,
         "pub const LANG_ONLY: &[(u64, (Option<u64>, Option<u32>, Option<u32>)); {}] = &[",
         lang_only.len()
     )?;
-    lang_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     for (key_lang, val) in lang_only {
         writeln!(result, "    ({}, {}),", key_lang, serialize_val(val),)?;
     }
@@ -250,11 +293,6 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
         "pub const LANG_REGION: [(u64, u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
         lang_region.len()
     )?;
-    lang_region.sort_by(|a, b| {
-        a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
-    });
     for (key_lang, key_region, val) in lang_region {
         writeln!(
             result,
@@ -270,11 +308,6 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
         "pub const LANG_SCRIPT: [(u64, u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
         lang_script.len()
     )?;
-    lang_script.sort_by(|a, b| {
-        a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
-    });
     for (key_lang, key_script, val) in lang_script {
         writeln!(
             result,
@@ -290,11 +323,6 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
         "pub const SCRIPT_REGION: [(u32, u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
         script_region.len()
     )?;
-    script_region.sort_by(|a, b| {
-        a.0.partial_cmp(&b.0)
-            .unwrap()
-            .then_with(|| a.1.partial_cmp(&b.1).unwrap())
-    });
     for (key_script, key_region, val) in script_region {
         writeln!(
             result,
@@ -310,7 +338,6 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
         "pub const SCRIPT_ONLY: [(u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
         script_only.len()
     )?;
-    script_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     for (key_script, val) in script_only {
         writeln!(result, "    ({}, {}),", key_script, serialize_val(val),)?;
     }
@@ -320,7 +347,6 @@ pub fn generate_likely_subtags(path: &str) -> Result<(String, String), std::fmt:
         "pub const REGION_ONLY: [(u32, (Option<u64>, Option<u32>, Option<u32>)); {}] = [",
         region_only.len()
     )?;
-    region_only.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     for (key_region, val) in region_only {
         writeln!(result, "    ({}, {}),", key_region, serialize_val(val),)?;
     }

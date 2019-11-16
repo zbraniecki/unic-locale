@@ -43,6 +43,7 @@ static STRINGS: &[(&str, Option<&str>)] = &[
     ("zh-TW", Some("zh-Hant-TW")),
 ];
 
+#[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
 #[test]
 fn add_likely_subtags_test() {
     for i in STRINGS {
@@ -53,11 +54,13 @@ fn add_likely_subtags_test() {
     }
 }
 
+#[cfg(any(feature = "likelysubtags-inline"))]
 #[test]
 fn version_works() {
     assert_eq!(unic_langid_impl::data::CLDR_VERSION, "36");
 }
 
+#[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
 #[test]
 fn remove_likely_subtags_test() {
     let mut langid: LanguageIdentifier = "zh-Hant".parse().expect("Parsing failed");

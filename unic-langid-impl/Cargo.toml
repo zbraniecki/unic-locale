@@ -43,7 +43,6 @@ required-features = ["binary"]
 [[test]]
 name = "likelysubtags"
 path = "tests/likelysubtags.rs"
-required-features = ["likelysubtags-inline"]
 
 [[test]]
 name = "layout_data"
@@ -64,4 +63,3 @@ harness = false
 [[bench]]
 name = "add_likely_subtags"
 harness = false
-required-features = ["likelysubtags-inline"]

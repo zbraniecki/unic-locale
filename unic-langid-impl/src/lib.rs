@@ -591,7 +591,7 @@ impl LanguageIdentifier {
     /// assert_eq!(li.add_likely_subtags(), true);
     /// assert_eq!(li.to_string(), "en-Latn-US");
     /// ```
-    #[cfg(feature = "likelysubtags-inline")]
+    #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
     pub fn add_likely_subtags(&mut self) -> bool {
         if let Some(new_li) = data::add_likely_subtags(self.language, self.script, self.region) {
             self.language = new_li.0;
@@ -617,7 +617,7 @@ impl LanguageIdentifier {
     /// assert_eq!(li.remove_likely_subtags(), true);
     /// assert_eq!(li.to_string(), "en");
     /// ```
-    #[cfg(feature = "likelysubtags-inline")]
+    #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
     pub fn remove_likely_subtags(&mut self) -> bool {
         if let Some(new_li) = data::remove_likely_subtags(self.language, self.script, self.region) {
             self.language = new_li.0;

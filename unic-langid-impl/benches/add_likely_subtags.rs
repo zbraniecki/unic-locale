@@ -48,6 +48,7 @@ static STRINGS: &[&str] = &[
 ];
 
 fn add_likely_subtags_bench(c: &mut Criterion) {
+    #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
     c.bench_function("add_likely_subtags", move |b| {
         let langids: Vec<LanguageIdentifier> = STRINGS
             .iter()
@@ -63,6 +64,7 @@ fn add_likely_subtags_bench(c: &mut Criterion) {
 }
 
 fn remove_likely_subtags_bench(c: &mut Criterion) {
+    #[cfg(any(feature = "likelysubtags-inline", feature = "likelysubtags-cldr"))]
     c.bench_function("remove_likely_subtags", move |b| {
         let langids: Vec<LanguageIdentifier> = STRINGS
             .iter()
