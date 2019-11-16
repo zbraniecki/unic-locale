@@ -14,6 +14,7 @@ exclude = ["data/*"]
 tinystr = "0.3.2"
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
+serde-tuple-vec-map = {version = "0.2.1", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
@@ -21,9 +22,9 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
 [features]
-json = ["serde", "serde_json"]
+json = ["serde", "serde_json", "serde-tuple-vec-map"]
 
-likelysubtags-cldr = ["json"]
+likelysubtags-cldr = ["json", "serde/derive"]
 likelysubtags-inline = []
 
 layout-cldr = ["json"]

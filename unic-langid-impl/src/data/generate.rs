@@ -162,6 +162,34 @@ fn serialize_region_option(r: Option<u32>) -> String {
     }
 }
 
+mod ast {
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    pub struct Resource<'s> {
+        #[serde(borrow)]
+        pub supplemental: Supplemental<'s>,
+    }
+
+    #[derive(Deserialize)]
+    pub struct Supplemental<'s> {
+        #[serde(borrow)]
+        pub version: Version<'s>,
+
+        #[serde(rename = "likelySubtags")]
+        #[serde(borrow)]
+        #[serde(with = "tuple_vec_map")]
+        pub likely_subtags: Vec<(&'s [u8], &'s [u8])>,
+    }
+
+    #[derive(Deserialize)]
+    pub struct Version<'s> {
+        #[serde(rename = "_cldrVersion")]
+        #[serde(borrow)]
+        pub cldr_version: &'s str
+    }
+}
+
 pub fn get_likely_subtags_data(
     path: &str,
 ) -> (
@@ -177,8 +205,8 @@ pub fn get_likely_subtags_data(
         .join("supplemental")
         .join("likelySubtags.json");
     let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
-    let v: Value = serde_json::from_str(&contents).unwrap();
-    let values = v["supplemental"]["likelySubtags"].as_object().unwrap();
+    let v: ast::Resource = serde_json::from_str(&contents).unwrap();
+    let values = v.supplemental.likely_subtags;
 
     let mut lang_only: Vec<(u64, LangIdSubTags)> = vec![];
     let mut lang_region: Vec<(u64, u32, LangIdSubTags)> = vec![];
@@ -188,9 +216,8 @@ pub fn get_likely_subtags_data(
     let mut script_only: Vec<(u32, LangIdSubTags)> = vec![];
 
     for (k, v) in values {
-        let key_langid: LanguageIdentifier = k.parse().expect("Failed to parse a key.");
-        let v: &str = v.as_str().unwrap();
-        let mut value_langid: LanguageIdentifier = v.parse().expect("Failed to parse a value.");
+        let key_langid = LanguageIdentifier::from_bytes(k).expect("Failed to parse a key.");
+        let mut value_langid = LanguageIdentifier::from_bytes(v).expect("Failed to parse a value.");
         if let Some("ZZ") = value_langid.get_region() {
             value_langid.clear_region();
         }
@@ -241,10 +268,7 @@ pub fn get_likely_subtags_data(
     script_only.sort_by_key(|a| a.0);
     region_only.sort_by_key(|a| a.0);
 
-    let version = v["supplemental"]["version"]["_cldrVersion"]
-        .as_str()
-        .unwrap()
-        .to_string();
+    let version = v.supplemental.version.cldr_version.to_string();
 
     (
         version,
