@@ -6,7 +6,7 @@ use std::fmt::Write;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use tinystr::{TinyStr4, TinyStr8};
+use tinystr::TinyStr8;
 
 // Layout
 
@@ -204,16 +204,17 @@ pub fn get_likely_subtags_data(
     let path = Path::new(path)
         .join("supplemental")
         .join("likelySubtags.json");
-    let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
-    let v: ast::Resource = serde_json::from_str(&contents).unwrap();
+    let contents = fs::read(path).expect("Something went wrong reading the file");
+    let v: ast::Resource = serde_json::from_slice(&contents).unwrap();
     let values = v.supplemental.likely_subtags;
 
-    let mut lang_only: Vec<(u64, LangIdSubTags)> = vec![];
-    let mut lang_region: Vec<(u64, u32, LangIdSubTags)> = vec![];
-    let mut lang_script: Vec<(u64, u32, LangIdSubTags)> = vec![];
-    let mut script_region: Vec<(u32, u32, LangIdSubTags)> = vec![];
-    let mut region_only: Vec<(u32, LangIdSubTags)> = vec![];
-    let mut script_only: Vec<(u32, LangIdSubTags)> = vec![];
+    // capacity based on CLDR 36 data
+    let mut lang_only: Vec<(u64, LangIdSubTags)> = Vec::with_capacity(1333);
+    let mut lang_region: Vec<(u64, u32, LangIdSubTags)> = Vec::with_capacity(45);
+    let mut lang_script: Vec<(u64, u32, LangIdSubTags)> = Vec::with_capacity(28);
+    let mut script_region: Vec<(u32, u32, LangIdSubTags)> = Vec::with_capacity(59);
+    let mut region_only: Vec<(u32, LangIdSubTags)> = Vec::with_capacity(227);
+    let mut script_only: Vec<(u32, LangIdSubTags)> = Vec::with_capacity(154);
 
     for (k, v) in values {
         let key_langid = LanguageIdentifier::from_bytes(k).expect("Failed to parse a key.");
