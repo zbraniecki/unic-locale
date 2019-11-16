@@ -28,4 +28,5 @@ harness = false
 
 [features]
 default = []
-likelysubtags = ["unic-langid-impl/likelysubtags"]
+likelysubtags-inline = ["unic-langid-impl/likelysubtags-inline"]
+likelysubtags-cldr = ["unic-langid-impl/likelysubtags-cldr"]

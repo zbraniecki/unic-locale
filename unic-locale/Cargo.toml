@@ -22,4 +22,5 @@ default = []
 
 # Provide macros.
 macros = ["unic-locale-macros"]
-likelysubtags = ["unic-locale-impl/likelysubtags"]
+likelysubtags-inline = ["unic-locale-impl/likelysubtags-inline"]
+likelysubtags-cldr = ["unic-locale-impl/likelysubtags-cldr"]
