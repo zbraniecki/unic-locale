@@ -186,7 +186,7 @@ mod ast {
     pub struct Version<'s> {
         #[serde(rename = "_cldrVersion")]
         #[serde(borrow)]
-        pub cldr_version: &'s str
+        pub cldr_version: &'s str,
     }
 }
 
@@ -223,40 +223,26 @@ pub fn get_likely_subtags_data(
         }
         let (val_lang, val_script, val_region, _) = value_langid.into_raw_parts();
 
-        let lang = key_langid.get_language();
-        let script = key_langid.get_script();
-        let region = key_langid.get_region();
+        let (key_lang, key_script, key_region, _) = key_langid.into_raw_parts();
 
-        match (lang, script, region) {
-            (l, None, None) => lang_only.push((
-                TinyStr8::from_str(l).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            (l, None, Some(r)) if l != "und" => lang_region.push((
-                TinyStr8::from_str(l).unwrap().into(),
-                TinyStr4::from_str(r).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            (l, Some(s), None) if l != "und" => lang_script.push((
-                TinyStr8::from_str(l).unwrap().into(),
-                TinyStr4::from_str(s).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            ("und", Some(s), Some(r)) => script_region.push((
-                TinyStr4::from_str(s).unwrap().into(),
-                TinyStr4::from_str(r).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            ("und", Some(s), None) => script_only.push((
-                TinyStr4::from_str(s).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
-            ("und", None, Some(r)) => region_only.push((
-                TinyStr4::from_str(r).unwrap().into(),
-                (val_lang, val_script, val_region),
-            )),
+        match (key_lang, key_script, key_region) {
+            (Some(l), None, None) => lang_only.push((l, (val_lang, val_script, val_region))),
+            (Some(l), None, Some(r)) => {
+                lang_region.push((l, r, (val_lang, val_script, val_region)))
+            }
+            (Some(l), Some(s), None) => {
+                lang_script.push((l, s, (val_lang, val_script, val_region)))
+            }
+            (None, Some(s), Some(r)) => {
+                script_region.push((s, r, (val_lang, val_script, val_region)))
+            }
+            (None, Some(s), None) => script_only.push((s, (val_lang, val_script, val_region))),
+            (None, None, Some(r)) => region_only.push((r, (val_lang, val_script, val_region))),
+            (None, None, None) => {
+                // XXX: We want to handle "und"!
+            }
             _ => {
-                panic!("{:#?}", key_langid);
+                panic!("Unknown scenario: {:#?}", std::str::from_utf8(k));
             }
         }
     }
