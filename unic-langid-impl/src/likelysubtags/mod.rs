@@ -16,7 +16,7 @@ unsafe fn get_lang_from_parts(
     Some((lang, script, region))
 }
 
-pub fn add_likely_subtags(
+pub fn maximize(
     lang: Option<TinyStr8>,
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
@@ -86,27 +86,27 @@ pub fn add_likely_subtags(
     None
 }
 
-pub fn remove_likely_subtags(
+pub fn minimize(
     lang: Option<TinyStr8>,
     script: Option<TinyStr4>,
     region: Option<TinyStr4>,
 ) -> Option<(Option<TinyStr8>, Option<TinyStr4>, Option<TinyStr4>)> {
-    // add_likely_subtags returns None when all 3 components are
+    // maximize returns None when all 3 components are
     // already filled so don't call it in that case.
     let max_langid = if lang.is_some() && script.is_some() && region.is_some() {
         (lang, script, region)
     } else {
-        add_likely_subtags(lang, script, region)?
+        maximize(lang, script, region)?
     };
 
-    if let Some(trial) = add_likely_subtags(max_langid.0, None, None) {
+    if let Some(trial) = maximize(max_langid.0, None, None) {
         if trial == max_langid {
             return Some((max_langid.0, None, None));
         }
     }
 
     if max_langid.2.is_some() {
-        if let Some(trial) = add_likely_subtags(max_langid.0, None, max_langid.2) {
+        if let Some(trial) = maximize(max_langid.0, None, max_langid.2) {
             if trial == max_langid {
                 return Some((max_langid.0, None, max_langid.2));
             }
@@ -114,7 +114,7 @@ pub fn remove_likely_subtags(
     }
 
     if max_langid.1.is_some() {
-        if let Some(trial) = add_likely_subtags(max_langid.0, max_langid.1, None) {
+        if let Some(trial) = maximize(max_langid.0, max_langid.1, None) {
             if trial == max_langid {
                 return Some((max_langid.0, max_langid.1, None));
             }

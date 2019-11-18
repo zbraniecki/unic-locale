@@ -499,12 +499,12 @@ impl Locale {
     /// let mut loc: Locale = "en-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.add_likely_subtags(), true);
+    /// assert_eq!(loc.maximize(), true);
     /// assert_eq!(loc.to_string(), "en-Latn-US");
     /// ```
     #[cfg(feature = "likelysubtags")]
-    pub fn add_likely_subtags(&mut self) -> bool {
-        self.langid.add_likely_subtags()
+    pub fn maximize(&mut self) -> bool {
+        self.langid.maximize()
     }
 
     /// Extends the `Locale` removing likely subtags based
@@ -518,12 +518,12 @@ impl Locale {
     /// let mut loc: Locale = "en-Latn-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.remove_likely_subtags(), true);
+    /// assert_eq!(loc.minimize(), true);
     /// assert_eq!(loc.to_string(), "en");
     /// ```
     #[cfg(feature = "likelysubtags")]
-    pub fn remove_likely_subtags(&mut self) -> bool {
-        self.langid.remove_likely_subtags()
+    pub fn minimize(&mut self) -> bool {
+        self.langid.minimize()
     }
 
     /// Returns character direction of the `Locale`.

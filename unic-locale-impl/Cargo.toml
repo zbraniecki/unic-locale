@@ -10,7 +10,7 @@ license = "MIT/Apache-2.0"
 categories = ["internationalization"]
 
 [dependencies]
-unic-langid-impl = "0.7.1"
+unic-langid-impl = { path = "../unic-langid-impl" }
 tinystr = "0.3.2"
 
 [dev-dependencies]

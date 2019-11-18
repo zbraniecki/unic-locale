@@ -50,6 +50,6 @@ name = "canonicalize"
 harness = false
 
 [[bench]]
-name = "add_likely_subtags"
+name = "likely_subtags"
 harness = false
 required-features = ["likelysubtags"]

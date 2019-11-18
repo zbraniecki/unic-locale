@@ -184,19 +184,19 @@ fn test_set_fields() {
 #[test]
 fn test_likelysubtags() {
     let mut loc_en: Locale = "en-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_en.add_likely_subtags(), true);
+    assert_eq!(loc_en.maximize(), true);
     assert_eq!(loc_en.to_string(), "en-Latn-US-u-hc-h12");
 
     let mut loc_sr: Locale = "sr-Cyrl-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_sr.add_likely_subtags(), true);
+    assert_eq!(loc_sr.maximize(), true);
     assert_eq!(loc_sr.to_string(), "sr-Cyrl-RS-u-hc-h12");
 
     let mut loc_zh_hans: Locale = "zh-Hans-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_zh_hans.remove_likely_subtags(), true);
+    assert_eq!(loc_zh_hans.minimize(), true);
     assert_eq!(loc_zh_hans.to_string(), "zh-u-hc-h12");
 
     let mut loc_zh_hant: Locale = "zh-Hant-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_zh_hant.remove_likely_subtags(), true);
+    assert_eq!(loc_zh_hant.minimize(), true);
     assert_eq!(loc_zh_hant.to_string(), "zh-TW-u-hc-h12");
 }
 

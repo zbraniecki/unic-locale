@@ -587,14 +587,12 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "en-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li.add_likely_subtags(), true);
+    /// assert_eq!(li.maximize(), true);
     /// assert_eq!(li.to_string(), "en-Latn-US");
     /// ```
     #[cfg(feature = "likelysubtags")]
-    pub fn add_likely_subtags(&mut self) -> bool {
-        if let Some(new_li) =
-            likelysubtags::add_likely_subtags(self.language, self.script, self.region)
-        {
+    pub fn maximize(&mut self) -> bool {
+        if let Some(new_li) = likelysubtags::maximize(self.language, self.script, self.region) {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;
@@ -615,14 +613,12 @@ impl LanguageIdentifier {
     /// let mut li: LanguageIdentifier = "en-Latn-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li.remove_likely_subtags(), true);
+    /// assert_eq!(li.minimize(), true);
     /// assert_eq!(li.to_string(), "en");
     /// ```
     #[cfg(feature = "likelysubtags")]
-    pub fn remove_likely_subtags(&mut self) -> bool {
-        if let Some(new_li) =
-            likelysubtags::remove_likely_subtags(self.language, self.script, self.region)
-        {
+    pub fn minimize(&mut self) -> bool {
+        if let Some(new_li) = likelysubtags::minimize(self.language, self.script, self.region) {
             self.language = new_li.0;
             self.script = new_li.1;
             self.region = new_li.2;
