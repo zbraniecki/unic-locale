@@ -27,7 +27,7 @@ const ATTR_LENGTH: RangeInclusive<usize> = 3..=8;
 /// let mut loc: Locale = "de-u-hc-h12-ca-buddhist".parse()
 ///     .expect("Parsing failed.");
 ///
-/// assert_eq!(loc.extensions.unicode.get_keyword("ca")
+/// assert_eq!(loc.extensions.unicode.keyword("ca")
 ///               .expect("Getting keyword failed.")
 ///               .collect::<Vec<_>>(),
 ///            &["buddhist"]);
@@ -116,18 +116,18 @@ impl UnicodeExtensionList {
     /// let mut loc: Locale = "en-US-u-ca-buddhist".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.extensions.unicode.get_keyword("ca")
+    /// assert_eq!(loc.extensions.unicode.keyword("ca")
     ///                .expect("Getting keyword failed.")
     ///                .collect::<Vec<_>>(),
     ///            &["buddhist"]);
     ///
     /// // Here keyword with key "aa" is not available
-    /// assert_eq!(loc.extensions.unicode.get_keyword("aa")
+    /// assert_eq!(loc.extensions.unicode.keyword("aa")
     ///               .expect("Getting keyword failed.")
     ///               .len(),
     ///            0);
     /// ```
-    pub fn get_keyword<S: AsRef<[u8]>>(
+    pub fn keyword<S: AsRef<[u8]>>(
         &self,
         key: S,
     ) -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
@@ -149,10 +149,10 @@ impl UnicodeExtensionList {
     /// let mut loc: Locale = "en-US-u-ca-buddhist-nu-thai".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.extensions.unicode.get_keyword_keys().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.unicode.keyword_keys().collect::<Vec<_>>(),
     ///            &["ca", "nu"]);
     /// ```
-    pub fn get_keyword_keys(&self) -> impl ExactSizeIterator<Item = &str> {
+    pub fn keyword_keys(&self) -> impl ExactSizeIterator<Item = &str> {
         self.keywords.keys().map(|s| s.as_ref())
     }
 
@@ -259,10 +259,10 @@ impl UnicodeExtensionList {
     /// let mut loc: Locale = "en-US-u-foo-bar".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.extensions.unicode.get_attributes().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.unicode.attributes().collect::<Vec<_>>(),
     ///            &["bar", "foo"]);
     /// ```
-    pub fn get_attributes(&self) -> impl ExactSizeIterator<Item = &str> {
+    pub fn attributes(&self) -> impl ExactSizeIterator<Item = &str> {
         self.attributes.iter().map(|s| s.as_ref())
     }
 

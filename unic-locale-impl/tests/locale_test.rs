@@ -45,14 +45,14 @@ fn test_locale_identifier() {
 
     let val = extensions
         .unicode
-        .get_keyword("hc")
+        .keyword("hc")
         .unwrap()
         .collect::<Vec<_>>();
     assert_eq!(val, &["h12"]);
 
     let val = extensions
         .unicode
-        .get_keyword("aa")
+        .keyword("aa")
         .unwrap()
         .collect::<Vec<_>>();
     assert_eq!(val.is_empty(), true);
@@ -76,14 +76,14 @@ fn test_locale_identifier() {
 
     let val = extensions
         .transform
-        .get_tfield("m0")
+        .tfield("m0")
         .unwrap()
         .collect::<Vec<_>>();
     assert_eq!(val, &["foo"]);
 
     let val = extensions
         .transform
-        .get_tfield("x0")
+        .tfield("x0")
         .unwrap()
         .collect::<Vec<_>>();
     assert_eq!(val.is_empty(), true);
@@ -201,12 +201,12 @@ fn test_likelysubtags() {
 }
 
 #[test]
-fn test_get_character_direction() {
+fn test_character_direction() {
     let loc_en: Locale = "en-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_en.get_character_direction(), CharacterDirection::LTR);
+    assert_eq!(loc_en.character_direction(), CharacterDirection::LTR);
 
     let loc_ar: Locale = "ar-AF-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_ar.get_character_direction(), CharacterDirection::RTL);
+    assert_eq!(loc_ar.character_direction(), CharacterDirection::RTL);
 }
 
 #[test]

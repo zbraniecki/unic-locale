@@ -11,11 +11,11 @@ fn assert_language_identifier(
     region: Option<&str>,
     variants: Option<&[&str]>,
 ) {
-    assert_eq!(loc.get_language(), language.unwrap_or("und"));
-    assert_eq!(loc.get_script(), script);
-    assert_eq!(loc.get_region(), region);
+    assert_eq!(loc.language(), language.unwrap_or("und"));
+    assert_eq!(loc.script(), script);
+    assert_eq!(loc.region(), region);
     assert_eq!(
-        loc.get_variants().collect::<Vec<_>>(),
+        loc.variants().collect::<Vec<_>>(),
         variants.unwrap_or(&[])
     );
 }
@@ -150,8 +150,8 @@ fn test_matches_as_range() {
 fn test_character_direction() {
     let langid: LanguageIdentifier = "en-US".parse().unwrap();
     let langid2: LanguageIdentifier = "ar-AF".parse().unwrap();
-    assert_eq!(langid.get_character_direction(), CharacterDirection::LTR);
-    assert_eq!(langid2.get_character_direction(), CharacterDirection::RTL);
+    assert_eq!(langid.character_direction(), CharacterDirection::LTR);
+    assert_eq!(langid2.character_direction(), CharacterDirection::RTL);
 }
 
 #[test]

@@ -4,7 +4,7 @@ pub use tables::CLDR_VERSION;
 
 use tinystr::{TinyStr4, TinyStr8};
 
-unsafe fn get_lang_from_parts(
+unsafe fn lang_from_parts(
     input: (Option<u64>, Option<u32>, Option<u32>),
     lang: Option<TinyStr8>,
     script: Option<TinyStr4>,
@@ -32,7 +32,7 @@ pub fn maximize(
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(tables::LANG_REGION[r].2, None, None, None) };
+                return unsafe { lang_from_parts(tables::LANG_REGION[r].2, None, None, None) };
             }
         }
 
@@ -42,7 +42,7 @@ pub fn maximize(
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe { get_lang_from_parts(tables::LANG_SCRIPT[r].2, None, None, None) };
+                return unsafe { lang_from_parts(tables::LANG_SCRIPT[r].2, None, None, None) };
             }
         }
 
@@ -51,7 +51,7 @@ pub fn maximize(
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
-            return unsafe { get_lang_from_parts(tables::LANG_ONLY[r].1, None, script, region) };
+            return unsafe { lang_from_parts(tables::LANG_ONLY[r].1, None, script, region) };
         }
     } else if let Some(s) = script {
         if let Some(r) = region {
@@ -61,7 +61,7 @@ pub fn maximize(
             if let Some(r) = result {
                 // safe because all table entries are well formed.
                 return unsafe {
-                    get_lang_from_parts(tables::SCRIPT_REGION[r].2, None, None, None)
+                    lang_from_parts(tables::SCRIPT_REGION[r].2, None, None, None)
                 };
             }
         }
@@ -71,7 +71,7 @@ pub fn maximize(
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
-            return unsafe { get_lang_from_parts(tables::SCRIPT_ONLY[r].1, None, None, region) };
+            return unsafe { lang_from_parts(tables::SCRIPT_ONLY[r].1, None, None, region) };
         }
     } else if let Some(r) = region {
         let result = tables::REGION_ONLY
@@ -79,7 +79,7 @@ pub fn maximize(
             .ok();
         if let Some(r) = result {
             // safe because all table entries are well formed.
-            return unsafe { get_lang_from_parts(tables::REGION_ONLY[r].1, None, None, None) };
+            return unsafe { lang_from_parts(tables::REGION_ONLY[r].1, None, None, None) };
         }
     }
 

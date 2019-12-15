@@ -20,14 +20,14 @@
 //! let mut loc: Locale = "en-Latn-US-u-hc-h12-t-h0-hybrid".parse()
 //!     .expect("Failed to parse.");
 //!
-//! assert_eq!(loc.get_language(), "en");
-//! assert_eq!(loc.get_script(), Some("Latn"));
-//! assert_eq!(loc.get_region(), Some("US"));
-//! assert_eq!(loc.get_variants().len(), 0);
-//! assert_eq!(loc.extensions.unicode.get_keyword("hc")
+//! assert_eq!(loc.language(), "en");
+//! assert_eq!(loc.script(), Some("Latn"));
+//! assert_eq!(loc.region(), Some("US"));
+//! assert_eq!(loc.variants().len(), 0);
+//! assert_eq!(loc.extensions.unicode.keyword("hc")
 //!     .expect("Getting keyword failed.")
 //!     .collect::<Vec<_>>(), &["h12"]);
-//! assert_eq!(loc.extensions.transform.get_tfield("h0")
+//! assert_eq!(loc.extensions.transform.tfield("h0")
 //!     .expect("Getting tfield failed.")
 //!     .collect::<Vec<_>>(), &["hybrid"]);
 //!

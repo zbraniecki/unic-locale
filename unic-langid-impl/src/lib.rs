@@ -39,10 +39,10 @@ type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>)
 /// let li: LanguageIdentifier = "en-US".parse()
 ///     .expect("Failed to parse.");
 ///
-/// assert_eq!(li.get_language(), "en");
-/// assert_eq!(li.get_script(), None);
-/// assert_eq!(li.get_region(), Some("US"));
-/// assert_eq!(li.get_variants().len(), 0);
+/// assert_eq!(li.language(), "en");
+/// assert_eq!(li.script(), None);
+/// assert_eq!(li.region(), Some("US"));
+/// assert_eq!(li.variants().len(), 0);
 /// ```
 ///
 /// # Parsing
@@ -67,10 +67,10 @@ type RawPartsTuple = (Option<u64>, Option<u32>, Option<u32>, Option<Box<[u64]>>)
 /// let li: LanguageIdentifier = "eN_latn_Us-Valencia".parse()
 ///     .expect("Failed to parse.");
 ///
-/// assert_eq!(li.get_language(), "en");
-/// assert_eq!(li.get_script(), Some("Latn"));
-/// assert_eq!(li.get_region(), Some("US"));
-/// assert_eq!(li.get_variants().collect::<Vec<_>>(), &["valencia"]);
+/// assert_eq!(li.language(), "en");
+/// assert_eq!(li.script(), Some("Latn"));
+/// assert_eq!(li.region(), Some("US"));
+/// assert_eq!(li.variants().collect::<Vec<_>>(), &["valencia"]);
 /// ```
 #[derive(Default, Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct LanguageIdentifier {
@@ -304,14 +304,14 @@ impl LanguageIdentifier {
     /// let li1: LanguageIdentifier = "de-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li1.get_language(), "de");
+    /// assert_eq!(li1.language(), "de");
     ///
     /// let li2: LanguageIdentifier = "und-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li2.get_language(), "und");
+    /// assert_eq!(li2.language(), "und");
     /// ```
-    pub fn get_language(&self) -> &str {
+    pub fn language(&self) -> &str {
         self.language.as_ref().map(|s| s.as_ref()).unwrap_or("und")
     }
 
@@ -368,14 +368,14 @@ impl LanguageIdentifier {
     /// let li1: LanguageIdentifier = "de-Latn-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li1.get_script(), Some("Latn"));
+    /// assert_eq!(li1.script(), Some("Latn"));
     ///
     /// let li2: LanguageIdentifier = "de-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li2.get_script(), None);
+    /// assert_eq!(li2.script(), None);
     /// ```
-    pub fn get_script(&self) -> Option<&str> {
+    pub fn script(&self) -> Option<&str> {
         self.script.as_ref().map(|s| s.as_ref())
     }
 
@@ -427,14 +427,14 @@ impl LanguageIdentifier {
     /// let li1: LanguageIdentifier = "de-Latn-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li1.get_region(), Some("AT"));
+    /// assert_eq!(li1.region(), Some("AT"));
     ///
     /// let li2: LanguageIdentifier = "de".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li2.get_region(), None);
+    /// assert_eq!(li2.region(), None);
     /// ```
-    pub fn get_region(&self) -> Option<&str> {
+    pub fn region(&self) -> Option<&str> {
         self.region.as_ref().map(|s| s.as_ref())
     }
 
@@ -486,14 +486,14 @@ impl LanguageIdentifier {
     /// let li1: LanguageIdentifier = "ca-ES-valencia".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li1.get_variants().collect::<Vec<_>>(), &["valencia"]);
+    /// assert_eq!(li1.variants().collect::<Vec<_>>(), &["valencia"]);
     ///
     /// let li2: LanguageIdentifier = "de".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li2.get_variants().len(), 0);
+    /// assert_eq!(li2.variants().len(), 0);
     /// ```
-    pub fn get_variants(&self) -> impl ExactSizeIterator<Item = &str> {
+    pub fn variants(&self) -> impl ExactSizeIterator<Item = &str> {
         let variants: &[_] = match self.variants {
             Some(ref v) => &**v,
             None => &[],
@@ -640,10 +640,10 @@ impl LanguageIdentifier {
     /// let li2: LanguageIdentifier = "fa".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(li1.get_character_direction(), CharacterDirection::LTR);
-    /// assert_eq!(li2.get_character_direction(), CharacterDirection::RTL);
+    /// assert_eq!(li1.character_direction(), CharacterDirection::LTR);
+    /// assert_eq!(li2.character_direction(), CharacterDirection::RTL);
     /// ```
-    pub fn get_character_direction(&self) -> CharacterDirection {
+    pub fn character_direction(&self) -> CharacterDirection {
         match self.language {
             Some(lang) if CHARACTER_DIRECTION_RTL.contains(&(lang.into())) => {
                 CharacterDirection::RTL

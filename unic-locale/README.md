@@ -13,14 +13,14 @@ use unic_locale::{Locale, ExtensionType};
 let loc: Locale = "en-US-u-hc-h12".parse()
     .expect("Parsing.failed");
 
-assert_eq!(loc.get_language(), "en");
-assert_eq!(loc.get_script(), None);
-assert_eq!(loc.get_region(), Some("US"));
+assert_eq!(loc.language(), "en");
+assert_eq!(loc.script(), None);
+assert_eq!(loc.region(), Some("US"));
 
 loc.extensions.unicode.set_keyword("ca", "buddhist")
     .expect("Setting extension failed.");
 
-let val = loc.extensions.unicode.get_keyword("ca")
+let val = loc.extensions.unicode.keyword("ca")
     .expect("Getting extension value failed.")
     .collect::<Vec<_>>();
 

@@ -50,7 +50,7 @@ fn language_identifier_construct_bench(c: &mut Criterion) {
             let entries: Vec<(Option<&str>, Option<&str>, Option<&str>, Vec<&str>)> = langids
                 .iter()
                 .map(|langid| {
-                    let lang = Some(langid.get_language()).and_then(|s| {
+                    let lang = Some(langid.language()).and_then(|s| {
                         if s == "und" {
                             None
                         } else {
@@ -59,9 +59,9 @@ fn language_identifier_construct_bench(c: &mut Criterion) {
                     });
                     (
                         lang,
-                        langid.get_script(),
-                        langid.get_region(),
-                        langid.get_variants().collect::<Vec<_>>(),
+                        langid.script(),
+                        langid.region(),
+                        langid.variants().collect::<Vec<_>>(),
                     )
                 })
                 .collect();
