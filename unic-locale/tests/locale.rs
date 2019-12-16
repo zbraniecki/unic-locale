@@ -20,14 +20,14 @@ fn locale_macro_test() {
 fn locales_macro_test() {
     let locales = locales!["en-US-u-ca-buddhist", "pl", "de-AT-u-hc-h12", "Pl-Latn-PL"];
     assert_eq!(locales.len(), 4);
-    assert_eq!(locales.get(3).unwrap().get_language(), "pl");
+    assert_eq!(locales.get(3).unwrap().language(), "pl");
     assert_eq!(
         locales
             .get(0)
             .unwrap()
             .extensions
             .unicode
-            .get_keyword("ca")
+            .keyword("ca")
             .unwrap()
             .collect::<Vec<_>>(),
         &["buddhist"]

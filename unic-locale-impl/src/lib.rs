@@ -27,11 +27,11 @@ pub use unic_langid_impl::LanguageIdentifier;
 /// let loc: Locale = "en-US-u-ca-buddhist".parse()
 ///     .expect("Failed to parse.");
 ///
-/// assert_eq!(loc.get_language(), "en");
-/// assert_eq!(loc.get_script(), None);
-/// assert_eq!(loc.get_region(), Some("US"));
-/// assert_eq!(loc.get_variants().len(), 0);
-/// assert_eq!(loc.extensions.unicode.get_keyword("ca")
+/// assert_eq!(loc.language(), "en");
+/// assert_eq!(loc.script(), None);
+/// assert_eq!(loc.region(), Some("US"));
+/// assert_eq!(loc.variants().len(), 0);
+/// assert_eq!(loc.extensions.unicode.keyword("ca")
 ///     .expect("Getting keyword failed.")
 ///     .collect::<Vec<_>>(),
 ///     &["buddhist"]);
@@ -59,10 +59,10 @@ pub use unic_langid_impl::LanguageIdentifier;
 /// let loc: Locale = "eN_latn_Us-Valencia_u-hC-H12".parse()
 ///     .expect("Failed to parse.");
 ///
-/// assert_eq!(loc.get_language(), "en");
-/// assert_eq!(loc.get_script(), Some("Latn"));
-/// assert_eq!(loc.get_region(), Some("US"));
-/// assert_eq!(loc.get_variants().collect::<Vec<_>>(), &["valencia"]);
+/// assert_eq!(loc.language(), "en");
+/// assert_eq!(loc.script(), Some("Latn"));
+/// assert_eq!(loc.region(), Some("US"));
+/// assert_eq!(loc.variants().collect::<Vec<_>>(), &["valencia"]);
 /// ```
 #[derive(Debug, Default, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Locale {
@@ -244,15 +244,15 @@ impl Locale {
     /// let loc1: Locale = "de-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc1.get_language(), "de");
+    /// assert_eq!(loc1.language(), "de");
     ///
     /// let loc2: Locale = "und-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc2.get_language(), "und");
+    /// assert_eq!(loc2.language(), "und");
     /// ```
-    pub fn get_language(&self) -> &str {
-        self.langid.get_language()
+    pub fn language(&self) -> &str {
+        self.langid.language()
     }
 
     /// Sets the language subtag of the `Locale`.
@@ -304,15 +304,15 @@ impl Locale {
     /// let loc1: Locale = "de-Latn-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc1.get_script(), Some("Latn"));
+    /// assert_eq!(loc1.script(), Some("Latn"));
     ///
     /// let loc2: Locale = "de-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc2.get_script(), None);
+    /// assert_eq!(loc2.script(), None);
     /// ```
-    pub fn get_script(&self) -> Option<&str> {
-        self.langid.get_script()
+    pub fn script(&self) -> Option<&str> {
+        self.langid.script()
     }
 
     /// Sets the script subtag of the `Locale`.
@@ -362,15 +362,15 @@ impl Locale {
     /// let loc1: Locale = "de-Latn-AT".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc1.get_region(), Some("AT"));
+    /// assert_eq!(loc1.region(), Some("AT"));
     ///
     /// let loc2: Locale = "de".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc2.get_region(), None);
+    /// assert_eq!(loc2.region(), None);
     /// ```
-    pub fn get_region(&self) -> Option<&str> {
-        self.langid.get_region()
+    pub fn region(&self) -> Option<&str> {
+        self.langid.region()
     }
 
     /// Sets the region subtag of the `Locale`.
@@ -420,15 +420,15 @@ impl Locale {
     /// let loc1: Locale = "ca-ES-valencia".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc1.get_variants().collect::<Vec<_>>(), &["valencia"]);
+    /// assert_eq!(loc1.variants().collect::<Vec<_>>(), &["valencia"]);
     ///
     /// let loc2: Locale = "de".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc2.get_variants().len(), 0);
+    /// assert_eq!(loc2.variants().len(), 0);
     /// ```
-    pub fn get_variants(&self) -> impl ExactSizeIterator<Item = &str> {
-        self.langid.get_variants()
+    pub fn variants(&self) -> impl ExactSizeIterator<Item = &str> {
+        self.langid.variants()
     }
 
     /// Sets variant subtags of the `Locale`.
@@ -538,11 +538,11 @@ impl Locale {
     /// let loc2: Locale = "fa".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc1.get_character_direction(), CharacterDirection::LTR);
-    /// assert_eq!(loc2.get_character_direction(), CharacterDirection::RTL);
+    /// assert_eq!(loc1.character_direction(), CharacterDirection::LTR);
+    /// assert_eq!(loc2.character_direction(), CharacterDirection::RTL);
     /// ```
-    pub fn get_character_direction(&self) -> CharacterDirection {
-        self.langid.get_character_direction()
+    pub fn character_direction(&self) -> CharacterDirection {
+        self.langid.character_direction()
     }
 }
 

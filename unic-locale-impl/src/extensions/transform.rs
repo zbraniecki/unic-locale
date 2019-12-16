@@ -26,9 +26,9 @@ use tinystr::{TinyStr4, TinyStr8};
 /// let en_us: LanguageIdentifier = "en-US".parse()
 ///     .expect("Parsing failed.");
 ///
-/// assert_eq!(loc.extensions.transform.get_tlang(), Some(&en_us));
+/// assert_eq!(loc.extensions.transform.tlang(), Some(&en_us));
 /// assert_eq!(
-///     loc.extensions.transform.get_tfield("h0")
+///     loc.extensions.transform.tfield("h0")
 ///                             .expect("Getting tfield failed.")
 ///                             .collect::<Vec<_>>(),
 ///     &["hybrid"]
@@ -107,9 +107,9 @@ impl TransformExtensionList {
     /// let tlang: LanguageIdentifier = "es-AR".parse()
     ///     .expect("Parsing failed on tlang.");
     ///
-    /// assert_eq!(loc.extensions.transform.get_tlang(), Some(&tlang));
+    /// assert_eq!(loc.extensions.transform.tlang(), Some(&tlang));
     /// ```
-    pub fn get_tlang(&self) -> Option<&LanguageIdentifier> {
+    pub fn tlang(&self) -> Option<&LanguageIdentifier> {
         self.tlang.as_ref()
     }
 
@@ -166,19 +166,19 @@ impl TransformExtensionList {
     /// let mut loc: Locale = "en-US-t-k0-dvorak".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.extensions.transform.get_tfield("k0")
+    /// assert_eq!(loc.extensions.transform.tfield("k0")
     ///                .expect("Getting tfield failed.")
     ///                .collect::<Vec<_>>(),
     ///            &["dvorak"]);
     ///
     /// // Here tfield with tkey "m0" is not available
-    /// assert_eq!(loc.extensions.transform.get_tfield("m0")
+    /// assert_eq!(loc.extensions.transform.tfield("m0")
     ///                .expect("Getting tfield failed.")
     ///                .collect::<Vec<_>>()
     ///                .is_empty(),
     ///            true);
     /// ```
-    pub fn get_tfield<S: AsRef<[u8]>>(
+    pub fn tfield<S: AsRef<[u8]>>(
         &self,
         tkey: S,
     ) -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
@@ -200,10 +200,10 @@ impl TransformExtensionList {
     /// let mut loc: Locale = "en-US-t-k0-dvorak-h0-hybrid".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.extensions.transform.get_tfield_keys().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.transform.tfield_keys().collect::<Vec<_>>(),
     ///            &["h0", "k0"]);
     /// ```
-    pub fn get_tfield_keys(&self) -> impl ExactSizeIterator<Item = &str> {
+    pub fn tfield_keys(&self) -> impl ExactSizeIterator<Item = &str> {
         self.tfields.keys().map(|s| s.as_ref())
     }
 

@@ -17,7 +17,7 @@ use tinystr::TinyStr8;
 ///     .expect("Parsing failed.");
 ///
 /// assert_eq!(loc.extensions.private.has_tag("faa"), Ok(true));
-/// assert_eq!(loc.extensions.private.get_tags().next(), Some("faa")); // tags got sorted
+/// assert_eq!(loc.extensions.private.tags().next(), Some("faa")); // tags got sorted
 /// loc.extensions.private.clear_tags();
 /// assert_eq!(loc.to_string(), "en-US");
 /// ```
@@ -81,10 +81,10 @@ impl PrivateExtensionList {
     /// let mut loc: Locale = "en-US-x-foo-bar".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// assert_eq!(loc.extensions.private.get_tags().collect::<Vec<_>>(),
+    /// assert_eq!(loc.extensions.private.tags().collect::<Vec<_>>(),
     ///            &["bar", "foo"]);
     /// ```
-    pub fn get_tags(&self) -> impl ExactSizeIterator<Item = &str> {
+    pub fn tags(&self) -> impl ExactSizeIterator<Item = &str> {
         self.0.iter().map(|s| s.as_ref())
     }
 

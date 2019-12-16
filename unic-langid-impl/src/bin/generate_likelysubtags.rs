@@ -56,14 +56,14 @@ fn main() {
         let key_langid: LanguageIdentifier = k.parse().expect("Failed to parse a key.");
         let v: &str = v.as_str().unwrap();
         let mut value_langid: LanguageIdentifier = v.parse().expect("Failed to parse a value.");
-        if let Some("ZZ") = value_langid.get_region() {
+        if let Some("ZZ") = value_langid.region() {
             value_langid.clear_region();
         }
         let (val_lang, val_script, val_region, _) = value_langid.into_raw_parts();
 
-        let lang = key_langid.get_language();
-        let script = key_langid.get_script();
-        let region = key_langid.get_region();
+        let lang = key_langid.language();
+        let script = key_langid.script();
+        let region = key_langid.region();
 
         match (lang, script, region) {
             (l, None, None) => lang_only.push((
