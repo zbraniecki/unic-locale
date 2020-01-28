@@ -4,6 +4,12 @@
 
   - …
 
+## unic-langid 0.8.0 (January 28, 2020)
+
+ - Switch likelysubtags method names to maximize/minimize.
+ - Implement RFC 344 by removing get prefixes.
+ - Use `sort_unstable`.
+
 ## unic-langid 0.7.1 (November 10, 2019)
 
   - Add `PartialOrd` and Ord` for `LanguageIdentifier`.
