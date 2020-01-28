@@ -373,7 +373,7 @@ impl UnicodeExtensionList {
             uext.keywords.insert(current_keyword, current_types);
         }
 
-        uext.attributes.sort();
+        uext.attributes.sort_unstable();
         uext.attributes.dedup();
 
         Ok(uext)

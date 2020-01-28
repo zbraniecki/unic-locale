@@ -60,9 +60,7 @@ pub fn maximize(
                 .ok();
             if let Some(r) = result {
                 // safe because all table entries are well formed.
-                return unsafe {
-                    lang_from_parts(tables::SCRIPT_REGION[r].2, None, None, None)
-                };
+                return unsafe { lang_from_parts(tables::SCRIPT_REGION[r].2, None, None, None) };
             }
         }
 

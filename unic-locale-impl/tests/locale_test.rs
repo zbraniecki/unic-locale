@@ -121,15 +121,17 @@ fn test_to_langid() {
 fn test_from_parts_unchecked() {
     let loc: Locale = "en-US".parse().unwrap();
     let (lang, script, region, variants, extensions) = loc.into_raw_parts();
-    let loc = unsafe {
-        Locale::from_raw_parts_unchecked(
-            lang.map(|l| TinyStr8::new_unchecked(l)),
-            script.map(|s| TinyStr4::new_unchecked(s)),
-            region.map(|r| TinyStr4::new_unchecked(r)),
-            variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
-            extensions.parse().unwrap(),
-        )
-    };
+    let loc = Locale::from_raw_parts_unchecked(
+        lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+        script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+        region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+        variants.map(|v| {
+            v.into_iter()
+                .map(|v| unsafe { TinyStr8::new_unchecked(*v) })
+                .collect()
+        }),
+        extensions.parse().unwrap(),
+    );
     assert_eq!(&loc.to_string(), "en-US");
 }
 

@@ -15,24 +15,24 @@ pub fn locale(input: TokenStream) -> TokenStream {
 
     let (lang, script, region, variants, extensions) = parsed.into_raw_parts();
     let lang = if let Some(lang) = lang {
-        quote!(Some($crate::TinyStr8::new_unchecked(#lang)))
+        quote!(Some(unsafe { $crate::TinyStr8::new_unchecked(#lang) }))
     } else {
         quote!(None)
     };
     let script = if let Some(script) = script {
-        quote!(Some($crate::TinyStr4::new_unchecked(#script)))
+        quote!(Some(unsafe { $crate::TinyStr4::new_unchecked(#script) }))
     } else {
         quote!(None)
     };
     let region = if let Some(region) = region {
-        quote!(Some($crate::TinyStr4::new_unchecked(#region)))
+        quote!(Some(unsafe { $crate::TinyStr4::new_unchecked(#region) }))
     } else {
         quote!(None)
     };
     let variants = if let Some(variants) = variants {
         let v: Vec<_> = variants
             .iter()
-            .map(|v| quote!($crate::TinyStr8::new_unchecked(#v)))
+            .map(|v| quote!(unsafe { $crate::TinyStr8::new_unchecked(#v) }))
             .collect();
         quote!(Some(Box::new([#(#v,)*])))
     } else {
@@ -40,12 +40,12 @@ pub fn locale(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(quote! {
-        unsafe { $crate::Locale::from_raw_parts_unchecked(
+        $crate::Locale::from_raw_parts_unchecked(
             #lang,
             #script,
             #region,
             #variants,
             #extensions.parse().expect("must parse")
-        ) }
+        )
     })
 }

@@ -105,7 +105,7 @@ impl PrivateExtensionList {
     /// ```
     pub fn add_tag<S: AsRef<[u8]>>(&mut self, tag: S) -> Result<(), LocaleError> {
         self.0.push(parse_value(tag.as_ref())?);
-        self.0.sort();
+        self.0.sort_unstable();
         Ok(())
     }
 
@@ -164,7 +164,7 @@ impl PrivateExtensionList {
         for subtag in iter {
             pext.0.push(parse_value(subtag)?);
         }
-        pext.0.sort();
+        pext.0.sort_unstable();
 
         Ok(pext)
     }

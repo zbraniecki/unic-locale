@@ -127,7 +127,7 @@ impl Locale {
     /// of all subtags in form of `u64`/`u32`.
     ///
     /// Primarily used for storing internal representation and restoring via
-    /// an unsafe `from_raw_parts_unchecked`.
+    /// `from_raw_parts_unchecked`.
     ///
     /// # Examples
     ///
@@ -140,13 +140,13 @@ impl Locale {
     ///
     /// let (lang, script, region, variants, extensions) = loc.into_raw_parts();
     ///
-    /// let loc2 = unsafe { Locale::from_raw_parts_unchecked(
-    ///     lang.map(|l| TinyStr8::new_unchecked(l)),
-    ///     script.map(|s| TinyStr4::new_unchecked(s)),
-    ///     region.map(|r| TinyStr4::new_unchecked(r)),
-    ///     variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
+    /// let loc2 = Locale::from_raw_parts_unchecked(
+    ///     lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+    ///     script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+    ///     region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+    ///     variants.map(|v| v.into_iter().map(|v| unsafe { TinyStr8::new_unchecked(*v) }).collect()),
     ///     extensions.parse().unwrap()
-    /// ) };
+    /// );
     ///
     /// assert_eq!(loc2.to_string(), "en-US");
     /// ```
@@ -172,17 +172,17 @@ impl Locale {
     /// let (lang, script, region, variants, extensions) = loc.into_raw_parts();
     ///
     /// let loc2 = unsafe { Locale::from_raw_parts_unchecked(
-    ///     lang.map(|l| TinyStr8::new_unchecked(l)),
-    ///     script.map(|s| TinyStr4::new_unchecked(s)),
-    ///     region.map(|r| TinyStr4::new_unchecked(r)),
-    ///     variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
+    ///     lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+    ///     script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+    ///     region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+    ///     variants.map(|v| v.into_iter().map(|v| unsafe { TinyStr8::new_unchecked(*v) }).collect()),
     ///     extensions.parse().unwrap()
     /// ) };
     ///
     /// assert_eq!(loc2.to_string(), "en-US");
     /// ```
     #[inline(always)]
-    pub unsafe fn from_raw_parts_unchecked(
+    pub fn from_raw_parts_unchecked(
         language: Option<TinyStr8>,
         script: Option<TinyStr4>,
         region: Option<TinyStr4>,

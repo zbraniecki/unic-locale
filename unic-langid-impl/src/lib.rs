@@ -140,7 +140,7 @@ impl LanguageIdentifier {
                 .iter()
                 .map(|v| subtags::parse_variant_subtag(v.as_ref()))
                 .collect::<Result<Vec<TinyStr8>, parser::errors::ParserError>>()?;
-            vars.sort();
+            vars.sort_unstable();
             vars.dedup();
             Some(vars.into_boxed_slice())
         } else {
@@ -174,7 +174,7 @@ impl LanguageIdentifier {
     /// of all subtags in form of `u64`/`u32`.
     ///
     /// Primarily used for storing internal representation and restoring via
-    /// an unsafe `from_raw_parts_unchecked`.
+    /// `from_raw_parts_unchecked`.
     ///
     /// # Examples
     ///
@@ -187,12 +187,12 @@ impl LanguageIdentifier {
     ///
     /// let (lang, script, region, variants) = li.into_raw_parts();
     ///
-    /// let li2 = unsafe { LanguageIdentifier::from_raw_parts_unchecked(
-    ///     lang.map(|l| TinyStr8::new_unchecked(l)),
-    ///     script.map(|s| TinyStr4::new_unchecked(s)),
-    ///     region.map(|r| TinyStr4::new_unchecked(r)),
-    ///     variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
-    /// ) };
+    /// let li2 = LanguageIdentifier::from_raw_parts_unchecked(
+    ///     lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+    ///     script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+    ///     region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+    ///     variants.map(|v| v.into_iter().map(|v| unsafe { TinyStr8::new_unchecked(*v) }).collect()),
+    /// );
     ///
     /// assert_eq!(li2.to_string(), "en-US");
     /// ```
@@ -222,12 +222,12 @@ impl LanguageIdentifier {
     ///
     /// let (lang, script, region, variants) = li.into_raw_parts();
     ///
-    /// let li2 = unsafe { LanguageIdentifier::from_raw_parts_unchecked(
-    ///     lang.map(|l| TinyStr8::new_unchecked(l)),
-    ///     script.map(|s| TinyStr4::new_unchecked(s)),
-    ///     region.map(|r| TinyStr4::new_unchecked(r)),
-    ///     variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
-    /// ) };
+    /// let li2 =  LanguageIdentifier::from_raw_parts_unchecked(
+    ///     lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+    ///     script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+    ///     region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+    ///     variants.map(|v| v.into_iter().map(|v| unsafe { TinyStr8::new_unchecked(*v) }).collect()),
+    /// );
     ///
     /// assert_eq!(li2.to_string(), "en-US");
     /// ```
@@ -529,7 +529,7 @@ impl LanguageIdentifier {
         if v.is_empty() {
             self.variants = None;
         } else {
-            v.sort();
+            v.sort_unstable();
             v.dedup();
             self.variants = Some(v.into_boxed_slice());
         }

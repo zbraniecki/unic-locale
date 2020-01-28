@@ -14,10 +14,7 @@ fn assert_language_identifier(
     assert_eq!(loc.language(), language.unwrap_or("und"));
     assert_eq!(loc.script(), script);
     assert_eq!(loc.region(), region);
-    assert_eq!(
-        loc.variants().collect::<Vec<_>>(),
-        variants.unwrap_or(&[])
-    );
+    assert_eq!(loc.variants().collect::<Vec<_>>(), variants.unwrap_or(&[]));
 }
 
 fn assert_parsed_language_identifier(
@@ -79,14 +76,16 @@ fn test_from_parts() {
 fn test_from_parts_unchecked() {
     let langid: LanguageIdentifier = "en-nedis-macos".parse().unwrap();
     let (lang, script, region, variants) = langid.into_raw_parts();
-    let langid = unsafe {
-        LanguageIdentifier::from_raw_parts_unchecked(
-            lang.map(|l| TinyStr8::new_unchecked(l)),
-            script.map(|s| TinyStr4::new_unchecked(s)),
-            region.map(|r| TinyStr4::new_unchecked(r)),
-            variants.map(|v| v.into_iter().map(|v| TinyStr8::new_unchecked(*v)).collect()),
-        )
-    };
+    let langid = LanguageIdentifier::from_raw_parts_unchecked(
+        lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+        script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+        region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+        variants.map(|v| {
+            v.into_iter()
+                .map(|v| unsafe { TinyStr8::new_unchecked(*v) })
+                .collect()
+        }),
+    );
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 }
 
