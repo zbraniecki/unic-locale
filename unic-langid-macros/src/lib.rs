@@ -1,9 +1,17 @@
 use proc_macro_hack::proc_macro_hack;
-pub use tinystr::{TinyStr4, TinyStr8};
-pub use unic_langid_impl::LanguageIdentifier;
+pub use unic_langid_impl::{subtags, LanguageIdentifier};
 
-/// Add one to an expression.
-///
-/// (Documentation goes here on the re-export, not in the other crate.)
 #[proc_macro_hack]
 pub use unic_langid_macros_impl::langid;
+
+#[proc_macro_hack]
+pub use unic_langid_macros_impl::lang;
+
+#[proc_macro_hack]
+pub use unic_langid_macros_impl::script;
+
+#[proc_macro_hack]
+pub use unic_langid_macros_impl::region;
+
+#[proc_macro_hack]
+pub use unic_langid_macros_impl::variant_fn as variant;

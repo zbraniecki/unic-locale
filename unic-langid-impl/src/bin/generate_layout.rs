@@ -40,7 +40,7 @@ fn check_all_variants_rtl(
     lang: &str,
 ) -> bool {
     for (langid, dir) in map.iter() {
-        if langid.language() == lang && dir != &CharacterDirection::RTL {
+        if langid.language.as_str() == lang && dir != &CharacterDirection::RTL {
             return false;
         }
     }
@@ -58,7 +58,7 @@ fn main() {
             continue;
         }
 
-        let lang = langid.language().to_string();
+        let lang = langid.language.to_string();
 
         assert!(
             check_all_variants_rtl(&map, &lang),
@@ -69,13 +69,16 @@ fn main() {
         }
     }
 
-    let list: Vec<String> = result
+    let mut list: Vec<String> = result
         .iter()
         .map(|s| {
             let num: u64 = TinyStr8::from_str(s).unwrap().into();
             num.to_string()
         })
         .collect();
+
+    list.sort();
+
     println!(
         "pub const CHARACTER_DIRECTION_RTL: [u64; {}] = [{}];",
         result.len(),

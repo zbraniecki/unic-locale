@@ -2,8 +2,6 @@ use unic_langid_impl::LanguageIdentifier;
 use unic_locale_impl::parser::parse_locale;
 use unic_locale_impl::{CharacterDirection, ExtensionsMap, Locale};
 
-use tinystr::{TinyStr4, TinyStr8};
-
 fn assert_locale_extensions(loc: &Locale, extensions: &ExtensionsMap) {
     assert_eq!(&loc.extensions, extensions);
 }
@@ -17,7 +15,12 @@ fn assert_parsed_locale_identifier(input: &str, extensions: &ExtensionsMap) {
 fn test_basic() {
     let loc: Locale = "en-US".parse().unwrap();
     let loc2 = Locale {
-        langid: LanguageIdentifier::from_parts(Some("en"), None, Some("US"), &[]).unwrap(),
+        id: LanguageIdentifier::from_parts(
+            "en".parse().unwrap(),
+            None,
+            Some("US".parse().unwrap()),
+            &[],
+        ),
         extensions: ExtensionsMap::default(),
     };
     assert_eq!(loc, loc2);
@@ -26,9 +29,9 @@ fn test_basic() {
 #[test]
 fn test_from_parts() {
     let extensions = ExtensionsMap::default();
-    let loc = Locale::from_parts(Some("en"), None, None, &[], Some(extensions)).unwrap();
+    let loc = Locale::from_parts("en".parse().unwrap(), None, None, &[], Some(extensions));
     let loc2 = Locale {
-        langid: LanguageIdentifier::from_parts(Some("en"), None, None, &[]).unwrap(),
+        id: LanguageIdentifier::from_parts("en".parse().unwrap(), None, None, &[]),
         extensions: ExtensionsMap::default(),
     };
     assert_eq!(loc, loc2);
@@ -117,23 +120,23 @@ fn test_to_langid() {
     assert_eq!(langid.to_string(), "en-US");
 }
 
-#[test]
-fn test_from_parts_unchecked() {
-    let loc: Locale = "en-US".parse().unwrap();
-    let (lang, script, region, variants, extensions) = loc.into_raw_parts();
-    let loc = Locale::from_raw_parts_unchecked(
-        lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
-        script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
-        region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
-        variants.map(|v| {
-            v.into_iter()
-                .map(|v| unsafe { TinyStr8::new_unchecked(*v) })
-                .collect()
-        }),
-        extensions.parse().unwrap(),
-    );
-    assert_eq!(&loc.to_string(), "en-US");
-}
+// #[test]
+// fn test_from_parts_unchecked() {
+//     let loc: Locale = "en-US".parse().unwrap();
+//     let (lang, script, region, variants, extensions) = loc.into_parts();
+//     let loc = Locale::from_raw_parts_unchecked(
+//         lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
+//         script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
+//         region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
+//         variants.map(|v| {
+//             v.into_iter()
+//                 .map(|v| unsafe { TinyStr8::new_unchecked(*v) })
+//                 .collect()
+//         }),
+//         extensions.parse().unwrap(),
+//     );
+//     assert_eq!(&loc.to_string(), "en-US");
+// }
 
 #[test]
 fn test_matches() {
@@ -159,26 +162,26 @@ fn test_set_fields() {
     let mut loc = Locale::default();
     assert_eq!(&loc.to_string(), "und");
 
-    loc.set_language("pl").expect("Setting language failed");
+    loc.id.language = "pl".parse().expect("Setting language failed");
     assert_eq!(&loc.to_string(), "pl");
 
-    loc.set_language("de").expect("Setting language failed");
+    loc.id.language = "de".parse().expect("Setting language failed");
     assert_eq!(&loc.to_string(), "de");
-    loc.set_region("AT").expect("Setting region failed");
+    loc.id.region = Some("AT".parse().expect("Setting region failed"));
     assert_eq!(&loc.to_string(), "de-AT");
-    loc.set_script("Latn").expect("Setting script failed");
+    loc.id.script = Some("Latn".parse().expect("Setting script failed"));
     assert_eq!(&loc.to_string(), "de-Latn-AT");
-    loc.set_variants(&["macos"])
-        .expect("Setting variants failed");
+    loc.id
+        .set_variants(&["macos".parse().expect("Setting variants failed")]);
     assert_eq!(&loc.to_string(), "de-Latn-AT-macos");
 
-    loc.clear_language();
+    loc.id.language.clear();
     assert_eq!(&loc.to_string(), "und-Latn-AT-macos");
-    loc.clear_region();
+    loc.id.region = None;
     assert_eq!(&loc.to_string(), "und-Latn-macos");
-    loc.clear_script();
+    loc.id.script = None;
     assert_eq!(&loc.to_string(), "und-macos");
-    loc.clear_variants();
+    loc.id.clear_variants();
     assert_eq!(&loc.to_string(), "und");
 }
 
@@ -186,29 +189,29 @@ fn test_set_fields() {
 #[test]
 fn test_likelysubtags() {
     let mut loc_en: Locale = "en-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_en.maximize(), true);
+    assert_eq!(loc_en.id.maximize(), true);
     assert_eq!(loc_en.to_string(), "en-Latn-US-u-hc-h12");
 
     let mut loc_sr: Locale = "sr-Cyrl-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_sr.maximize(), true);
+    assert_eq!(loc_sr.id.maximize(), true);
     assert_eq!(loc_sr.to_string(), "sr-Cyrl-RS-u-hc-h12");
 
     let mut loc_zh_hans: Locale = "zh-Hans-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_zh_hans.minimize(), true);
+    assert_eq!(loc_zh_hans.id.minimize(), true);
     assert_eq!(loc_zh_hans.to_string(), "zh-u-hc-h12");
 
     let mut loc_zh_hant: Locale = "zh-Hant-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_zh_hant.minimize(), true);
+    assert_eq!(loc_zh_hant.id.minimize(), true);
     assert_eq!(loc_zh_hant.to_string(), "zh-TW-u-hc-h12");
 }
 
 #[test]
 fn test_character_direction() {
     let loc_en: Locale = "en-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_en.character_direction(), CharacterDirection::LTR);
+    assert_eq!(loc_en.id.character_direction(), CharacterDirection::LTR);
 
     let loc_ar: Locale = "ar-AF-u-hc-h12".parse().unwrap();
-    assert_eq!(loc_ar.character_direction(), CharacterDirection::RTL);
+    assert_eq!(loc_ar.id.character_direction(), CharacterDirection::RTL);
 }
 
 #[test]
