@@ -26,18 +26,14 @@ impl From<LanguageIdentifierError> for LocaleError {
     }
 }
 
-impl Error for LocaleError {
-    fn description(&self) -> &str {
-        match self {
-            LocaleError::Unknown => "Unknown error",
-            LocaleError::ParserError(p) => p.description(),
-            LocaleError::LanguageIdentifierError(_) => "LangId Error",
-        }
-    }
-}
+impl Error for LocaleError {}
 
 impl Display for LocaleError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(self.description())
+        match self {
+            Self::Unknown => write!(f, "Unknown error"),
+            Self::ParserError(p) => write!(f, "Parser error: {}", p),
+            Self::LanguageIdentifierError(l) => write!(f, "Language Identifier Error: {}", l),
+        }
     }
 }

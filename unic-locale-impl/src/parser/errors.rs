@@ -16,19 +16,16 @@ impl From<LangIdParserError> for ParserError {
     }
 }
 
-impl Error for ParserError {
-    fn description(&self) -> &str {
-        match &self {
+impl Error for ParserError {}
+
+impl Display for ParserError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let value = match &self {
             ParserError::InvalidLanguage => "The given language subtag is invalid",
             ParserError::InvalidSubtag => "Invalid subtag",
             ParserError::InvalidExtension => "Invalid extension",
             ParserError::LangIdError(_) => "Language Identifier Parser Error",
-        }
-    }
-}
-
-impl Display for ParserError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(self.description())
+        };
+        f.write_str(value)
     }
 }
