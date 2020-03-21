@@ -20,6 +20,6 @@ proc_macro = true
 
 [dependencies]
 unic-locale-impl = { version = "0.8", path = "../unic-locale-impl" }
-syn = "1.0"
+syn = { version = "1.0", default-features = false }
 quote = "1.0"
 proc-macro-hack = "0.5"
