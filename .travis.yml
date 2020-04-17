@@ -27,5 +27,5 @@ script:
 
 after_success: |
   if [[ "$TRAVIS_RUST_VERSION" == stable ]] && [[ "$CARGO_EXTRA_ARGS" == "--all-features" ]]; then
-    cargo tarpaulin --ciserver travis-ci --coveralls $TRAVIS_JOB_ID
+    cargo tarpaulin --ciserver travis-ci --coveralls $TRAVIS_JOB_ID --all-features
   fi

@@ -13,26 +13,33 @@ pub fn locale(input: TokenStream) -> TokenStream {
     let id = parse_macro_input!(input as LitStr);
     let parsed: Locale = id.value().parse().expect("Malformed Locale Identifier");
 
-    let (lang, script, region, variants, extensions) = parsed.into_raw_parts();
+    let (lang, script, region, variants, extensions) = parsed.into_parts();
+
+    let lang: Option<u64> = lang.into();
     let lang = if let Some(lang) = lang {
-        quote!(Some(unsafe { $crate::TinyStr8::new_unchecked(#lang) }))
+        quote!(unsafe { $crate::subtags::Language::from_raw_unchecked(#lang) })
     } else {
-        quote!(None)
+        quote!($crate::subtags::Language::default())
     };
     let script = if let Some(script) = script {
-        quote!(Some(unsafe { $crate::TinyStr4::new_unchecked(#script) }))
+        let script: u32 = script.into();
+        quote!(Some(unsafe { $crate::subtags::Script::from_raw_unchecked(#script) }))
     } else {
         quote!(None)
     };
     let region = if let Some(region) = region {
-        quote!(Some(unsafe { $crate::TinyStr4::new_unchecked(#region) }))
+        let region: u32 = region.into();
+        quote!(Some(unsafe { $crate::subtags::Region::from_raw_unchecked(#region) }))
     } else {
         quote!(None)
     };
-    let variants = if let Some(variants) = variants {
+    let variants = if !variants.is_empty() {
         let v: Vec<_> = variants
             .iter()
-            .map(|v| quote!(unsafe { $crate::TinyStr8::new_unchecked(#v) }))
+            .map(|v| {
+                let variant: u64 = v.into();
+                quote!(unsafe { $crate::subtags::Variant::from_raw_unchecked(#variant) })
+            })
             .collect();
         quote!(Some(Box::new([#(#v,)*])))
     } else {
@@ -40,12 +47,12 @@ pub fn locale(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(quote! {
-        $crate::Locale::from_raw_parts_unchecked(
+        unsafe { $crate::Locale::from_raw_parts_unchecked(
             #lang,
             #script,
             #region,
             #variants,
             #extensions.parse().expect("must parse")
-        )
+        ) }
     })
 }

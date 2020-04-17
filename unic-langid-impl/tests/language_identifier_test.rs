@@ -1,8 +1,7 @@
-use tinystr::{TinyStr4, TinyStr8};
-use unic_langid_impl::parser::errors::ParserError;
 use unic_langid_impl::parser::parse_language_identifier;
+use unic_langid_impl::subtags;
 use unic_langid_impl::CharacterDirection;
-use unic_langid_impl::{LanguageIdentifier, LanguageIdentifierError};
+use unic_langid_impl::LanguageIdentifier;
 
 fn assert_language_identifier(
     loc: &LanguageIdentifier,
@@ -11,10 +10,23 @@ fn assert_language_identifier(
     region: Option<&str>,
     variants: Option<&[&str]>,
 ) {
-    assert_eq!(loc.language(), language.unwrap_or("und"));
-    assert_eq!(loc.script(), script);
-    assert_eq!(loc.region(), region);
-    assert_eq!(loc.variants().collect::<Vec<_>>(), variants.unwrap_or(&[]));
+    assert_eq!(
+        loc.language,
+        language.map_or(subtags::Language::default(), |l| {
+            subtags::Language::from_bytes(l.as_bytes()).unwrap()
+        })
+    );
+    assert_eq!(loc.script, script.map(|s| s.parse().unwrap()));
+    assert_eq!(loc.region, region.map(|r| r.parse().unwrap()));
+    let v = variants
+        .unwrap_or(&[])
+        .iter()
+        .map(|v| -> subtags::Variant { v.parse().unwrap() })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        loc.variants().collect::<Vec<_>>(),
+        v.iter().collect::<Vec<_>>(),
+    );
 }
 
 fn assert_parsed_language_identifier(
@@ -56,36 +68,27 @@ fn test_sorted_variants() {
     let langid: LanguageIdentifier = "en-nedis-macos".parse().unwrap();
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 
-    let langid =
-        LanguageIdentifier::from_parts(Some("en"), None, None, &["nedis", "macos"]).unwrap();
-    assert_eq!(&langid.to_string(), "en-macos-nedis");
-}
-
-#[test]
-fn test_from_parts() {
-    let langid = LanguageIdentifier::from_parts(Some("en"), None, None, &["1", "macos"]);
-    assert_eq!(
-        langid,
-        Err(LanguageIdentifierError::ParserError(
-            ParserError::InvalidSubtag
-        ))
+    let langid = LanguageIdentifier::from_parts(
+        "en".parse().unwrap(),
+        None,
+        None,
+        &["nedis".parse().unwrap(), "macos".parse().unwrap()],
     );
+    assert_eq!(&langid.to_string(), "en-macos-nedis");
 }
 
 #[test]
 fn test_from_parts_unchecked() {
     let langid: LanguageIdentifier = "en-nedis-macos".parse().unwrap();
-    let (lang, script, region, variants) = langid.into_raw_parts();
-    let langid = LanguageIdentifier::from_raw_parts_unchecked(
-        lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
-        script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
-        region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
-        variants.map(|v| {
-            v.into_iter()
-                .map(|v| unsafe { TinyStr8::new_unchecked(*v) })
-                .collect()
-        }),
-    );
+    let (lang, script, region, variants) = langid.into_parts();
+    let langid = unsafe {
+        LanguageIdentifier::from_raw_parts_unchecked(
+            lang,
+            script,
+            region,
+            Some(variants.into_boxed_slice()),
+        )
+    };
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 }
 
@@ -106,33 +109,31 @@ fn test_set_fields() {
     let mut langid = LanguageIdentifier::default();
     assert_eq!(&langid.to_string(), "und");
 
-    langid.set_language("pl").expect("Setting language failed");
+    langid.language = "pl".parse().expect("Setting language failed");
     assert_eq!(&langid.to_string(), "pl");
 
-    langid.set_language("de").expect("Setting language failed");
+    langid.language = "de".parse().expect("Setting language failed");
     assert_eq!(&langid.to_string(), "de");
-    langid.set_region("AT").expect("Setting region failed");
+    langid.region = Some("AT".parse().expect("Setting region failed"));
     assert_eq!(&langid.to_string(), "de-AT");
-    langid.set_script("Latn").expect("Setting script failed");
+    langid.script = Some("Latn".parse().expect("Setting script failed"));
     assert_eq!(&langid.to_string(), "de-Latn-AT");
-    langid
-        .set_variants(&["macos"])
-        .expect("Setting variants failed");
+    langid.set_variants(&["macos".parse().expect("Setting variants failed")]);
     assert_eq!(&langid.to_string(), "de-Latn-AT-macos");
 
-    assert_eq!(langid.has_variant("macos"), Ok(true));
-    assert_eq!(langid.has_variant("windows"), Ok(false));
+    assert_eq!(langid.has_variant("macos".parse().unwrap()), true);
+    assert_eq!(langid.has_variant("windows".parse().unwrap()), false);
 
-    langid.clear_language();
+    langid.language.clear();
     assert_eq!(&langid.to_string(), "und-Latn-AT-macos");
-    langid.clear_region();
+    langid.region = None;
     assert_eq!(&langid.to_string(), "und-Latn-macos");
-    langid.clear_script();
+    langid.script = None;
     assert_eq!(&langid.to_string(), "und-macos");
     langid.clear_variants();
     assert_eq!(&langid.to_string(), "und");
 
-    assert_eq!(langid.has_variant("macos"), Ok(false));
+    assert_eq!(langid.has_variant("macos".parse().unwrap()), false);
 }
 
 #[test]

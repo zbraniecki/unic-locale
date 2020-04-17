@@ -11,13 +11,13 @@ fn main() {
         .expect("Setting extension failed.");
 
     println!("{:#?}", locale);
-    assert_eq!(locale.language(), "fr");
+    assert_eq!(locale.id.language, "fr");
     assert_eq!(&locale.to_string(), "fr-CA-u-ca-buddhist");
 
     #[cfg(feature = "macros")]
     {
         let langid = locale!("de-AT");
         println!("{:#?}", langid);
-        assert_eq!(langid.language(), "de");
+        assert_eq!(langid.id.language.as_str(), "de");
     }
 }

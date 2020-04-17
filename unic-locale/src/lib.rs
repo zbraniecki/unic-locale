@@ -20,10 +20,10 @@
 //! let mut loc: Locale = "en-Latn-US-u-hc-h12-t-h0-hybrid".parse()
 //!     .expect("Failed to parse.");
 //!
-//! assert_eq!(loc.language(), "en");
-//! assert_eq!(loc.script(), Some("Latn"));
-//! assert_eq!(loc.region(), Some("US"));
-//! assert_eq!(loc.variants().len(), 0);
+//! assert_eq!(loc.id.language.as_str(), "en");
+//! assert_eq!(loc.id.script, Some("Latn".parse().unwrap()));
+//! assert_eq!(loc.id.region, Some("US".parse().unwrap()));
+//! assert_eq!(loc.id.variants().len(), 0);
 //! assert_eq!(loc.extensions.unicode.keyword("hc")
 //!     .expect("Getting keyword failed.")
 //!     .collect::<Vec<_>>(), &["h12"]);
@@ -31,9 +31,8 @@
 //!     .expect("Getting tfield failed.")
 //!     .collect::<Vec<_>>(), &["hybrid"]);
 //!
-//! loc.clear_script();
-//! loc.set_region("GB")
-//!     .expect("Region parsing failed.");
+//! loc.id.script = None;
+//! loc.id.region = Some("GB".parse().expect("Region parsing failed."));
 //!
 //! assert_eq!(loc.to_string(), "en-GB-t-h0-hybrid-u-hc-h12");
 //! ```

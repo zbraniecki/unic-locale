@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::convert::TryInto;
 use std::error::Error;
 use std::fs::File;
 use std::path::Path;
@@ -104,17 +105,16 @@ fn test_locale_fixtures(path: &str) {
         match test.output {
             LocaleTestOutput::Object(o) => {
                 let expected = Locale::from_parts(
-                    o.language.as_ref().map(String::as_str),
-                    o.script.as_ref().map(String::as_str),
-                    o.region.as_ref().map(String::as_str),
+                    o.language.try_into().unwrap(),
+                    o.script.as_ref().map(|s| s.parse().unwrap()),
+                    o.region.as_ref().map(|r| r.parse().unwrap()),
                     o.variants
                         .iter()
-                        .map(|s| s.as_str())
+                        .map(|s| s.parse().unwrap())
                         .collect::<Vec<_>>()
                         .as_ref(),
                     o.extensions.map(create_extensions_map),
-                )
-                .expect("Parsing failed.");
+                );
                 assert_eq!(locale, expected);
             }
             LocaleTestOutput::String(s) => {

@@ -5,14 +5,13 @@ pub mod parser;
 use errors::LocaleError;
 pub use extensions::{ExtensionType, ExtensionsMap};
 use std::str::FromStr;
-use tinystr::{TinyStr4, TinyStr8};
 pub use unic_langid_impl::CharacterDirection;
-pub use unic_langid_impl::LanguageIdentifier;
+pub use unic_langid_impl::{subtags, LanguageIdentifier};
 
 /// `Locale` is a core struct representing a Unicode Locale Identifier.
 ///
 /// A locale is made of two parts:
-///  * `langid` - Unicode Language Identifier
+///  * `id` - Unicode Language Identifier
 ///  * `extensions` - A set of Unicode Extensions
 ///
 /// `Locale` exposes all of the same methods as `LanguageIdentifier`, and
@@ -27,10 +26,10 @@ pub use unic_langid_impl::LanguageIdentifier;
 /// let loc: Locale = "en-US-u-ca-buddhist".parse()
 ///     .expect("Failed to parse.");
 ///
-/// assert_eq!(loc.language(), "en");
-/// assert_eq!(loc.script(), None);
-/// assert_eq!(loc.region(), Some("US"));
-/// assert_eq!(loc.variants().len(), 0);
+/// assert_eq!(loc.id.language, "en");
+/// assert_eq!(loc.id.script, None);
+/// assert_eq!(loc.id.region, Some("US".parse().unwrap()));
+/// assert_eq!(loc.id.variants().len(), 0);
 /// assert_eq!(loc.extensions.unicode.keyword("ca")
 ///     .expect("Getting keyword failed.")
 ///     .collect::<Vec<_>>(),
@@ -59,22 +58,22 @@ pub use unic_langid_impl::LanguageIdentifier;
 /// let loc: Locale = "eN_latn_Us-Valencia_u-hC-H12".parse()
 ///     .expect("Failed to parse.");
 ///
-/// assert_eq!(loc.language(), "en");
-/// assert_eq!(loc.script(), Some("Latn"));
-/// assert_eq!(loc.region(), Some("US"));
-/// assert_eq!(loc.variants().collect::<Vec<_>>(), &["valencia"]);
+/// assert_eq!(loc.id.language, "en");
+/// assert_eq!(loc.id.script, Some("Latn".parse().unwrap()));
+/// assert_eq!(loc.id.region, Some("US".parse().unwrap()));
+/// assert_eq!(loc.id.variants().collect::<Vec<_>>(), &["valencia"]);
 /// ```
 #[derive(Debug, Default, PartialEq, Eq, Clone, Hash, PartialOrd, Ord)]
 pub struct Locale {
-    pub langid: LanguageIdentifier,
+    pub id: LanguageIdentifier,
     pub extensions: extensions::ExtensionsMap,
 }
 
-type RawPartsTuple = (
-    Option<u64>,
-    Option<u32>,
-    Option<u32>,
-    Option<Box<[u64]>>,
+type PartsTuple = (
+    subtags::Language,
+    Option<subtags::Script>,
+    Option<subtags::Region>,
+    Vec<subtags::Variant>,
     String,
 );
 
@@ -104,23 +103,37 @@ impl Locale {
     /// ```
     /// use unic_locale_impl::Locale;
     ///
-    /// let loc = Locale::from_parts(Some("fr"), None, Some("CA"), &[], None)
-    ///     .expect("Parsing failed.");
+    /// let loc = Locale::from_parts("fr".parse().unwrap(), None, Some("CA".parse().unwrap()), &[], None);
     ///
     /// assert_eq!(loc.to_string(), "fr-CA");
     /// ```
-    pub fn from_parts<S: AsRef<[u8]>>(
-        language: Option<S>,
-        script: Option<S>,
-        region: Option<S>,
-        variants: &[S],
+    pub fn from_parts(
+        language: subtags::Language,
+        script: Option<subtags::Script>,
+        region: Option<subtags::Region>,
+        variants: &[subtags::Variant],
         extensions: Option<extensions::ExtensionsMap>,
-    ) -> Result<Self, LocaleError> {
-        let langid = LanguageIdentifier::from_parts(language, script, region, variants)?;
-        Ok(Locale {
-            langid,
+    ) -> Self {
+        let id = LanguageIdentifier::from_parts(language, script, region, variants);
+        Locale {
+            id,
             extensions: extensions.unwrap_or_default(),
-        })
+        }
+    }
+
+    /// # Safety
+    ///
+    /// This function accepts subtags expecting variants
+    /// to be deduplicated and ordered.
+    pub const unsafe fn from_raw_parts_unchecked(
+        language: subtags::Language,
+        script: Option<subtags::Script>,
+        region: Option<subtags::Region>,
+        variants: Option<Box<[subtags::Variant]>>,
+        extensions: extensions::ExtensionsMap,
+    ) -> Self {
+        let id = LanguageIdentifier::from_raw_parts_unchecked(language, script, region, variants);
+        Self { id, extensions }
     }
 
     /// Consumes `Locale` and produces raw internal representations
@@ -138,60 +151,21 @@ impl Locale {
     /// let loc: Locale = "en-US".parse()
     ///     .expect("Parsing failed.");
     ///
-    /// let (lang, script, region, variants, extensions) = loc.into_raw_parts();
+    /// let (lang, script, region, variants, extensions) = loc.into_parts();
     ///
-    /// let loc2 = Locale::from_raw_parts_unchecked(
-    ///     lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
-    ///     script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
-    ///     region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
-    ///     variants.map(|v| v.into_iter().map(|v| unsafe { TinyStr8::new_unchecked(*v) }).collect()),
-    ///     extensions.parse().unwrap()
+    /// let loc2 = Locale::from_parts(
+    ///     lang,
+    ///     script,
+    ///     region,
+    ///     &variants,
+    ///     Some(extensions.parse().unwrap())
     /// );
     ///
     /// assert_eq!(loc2.to_string(), "en-US");
     /// ```
-    pub fn into_raw_parts(self) -> RawPartsTuple {
-        let (lang, region, script, variants) = self.langid.into_raw_parts();
+    pub fn into_parts(self) -> PartsTuple {
+        let (lang, region, script, variants) = self.id.into_parts();
         (lang, region, script, variants, self.extensions.to_string())
-    }
-
-    /// Consumes raw representation of subtags generating new `Locale`
-    /// without any checks.
-    ///
-    /// Primarily used for restoring internal representation.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    /// use tinystr::{TinyStr8, TinyStr4};
-    ///
-    /// let loc: Locale = "en-US".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// let (lang, script, region, variants, extensions) = loc.into_raw_parts();
-    ///
-    /// let loc2 = unsafe { Locale::from_raw_parts_unchecked(
-    ///     lang.map(|l| unsafe { TinyStr8::new_unchecked(l) }),
-    ///     script.map(|s| unsafe { TinyStr4::new_unchecked(s) }),
-    ///     region.map(|r| unsafe { TinyStr4::new_unchecked(r) }),
-    ///     variants.map(|v| v.into_iter().map(|v| unsafe { TinyStr8::new_unchecked(*v) }).collect()),
-    ///     extensions.parse().unwrap()
-    /// ) };
-    ///
-    /// assert_eq!(loc2.to_string(), "en-US");
-    /// ```
-    #[inline(always)]
-    pub fn from_raw_parts_unchecked(
-        language: Option<TinyStr8>,
-        script: Option<TinyStr4>,
-        region: Option<TinyStr4>,
-        variants: Option<Box<[TinyStr8]>>,
-        extensions: extensions::ExtensionsMap,
-    ) -> Self {
-        let langid =
-            LanguageIdentifier::from_raw_parts_unchecked(language, script, region, variants);
-        Self { langid, extensions }
     }
 
     /// Compares a `Locale` to another `AsRef<Locale`
@@ -228,321 +202,7 @@ impl Locale {
         if !self.extensions.private.is_empty() || !other.extensions.private.is_empty() {
             return false;
         }
-        self.langid
-            .matches(&other.langid, self_as_range, other_as_range)
-    }
-
-    /// Returns the language subtag of the `Locale`.
-    ///
-    /// If the language is empty, `"und"` is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let loc1: Locale = "de-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc1.language(), "de");
-    ///
-    /// let loc2: Locale = "und-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc2.language(), "und");
-    /// ```
-    pub fn language(&self) -> &str {
-        self.langid.language()
-    }
-
-    /// Sets the language subtag of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "de-Latn-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.set_language("fr")
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.to_string(), "fr-Latn-AT");
-    /// ```
-    pub fn set_language<S: AsRef<[u8]>>(&mut self, language: S) -> Result<(), LocaleError> {
-        Ok(self.langid.set_language(language)?)
-    }
-
-    /// Clears the language subtag of the `Locale`.
-    ///
-    /// An empty language subtag is serialized to `und`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "de-Latn-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.clear_language();
-    ///
-    /// assert_eq!(loc.to_string(), "und-Latn-AT");
-    /// ```
-    pub fn clear_language(&mut self) {
-        self.langid.clear_language()
-    }
-
-    /// Returns the script subtag of the `Locale`, if set.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let loc1: Locale = "de-Latn-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc1.script(), Some("Latn"));
-    ///
-    /// let loc2: Locale = "de-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc2.script(), None);
-    /// ```
-    pub fn script(&self) -> Option<&str> {
-        self.langid.script()
-    }
-
-    /// Sets the script subtag of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "sr-Latn".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.set_script("Cyrl")
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.to_string(), "sr-Cyrl");
-    /// ```
-    pub fn set_script<S: AsRef<[u8]>>(&mut self, script: S) -> Result<(), LocaleError> {
-        Ok(self.langid.set_script(script)?)
-    }
-
-    /// Clears the script subtag of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "sr-Latn".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.clear_script();
-    ///
-    /// assert_eq!(loc.to_string(), "sr");
-    /// ```
-    pub fn clear_script(&mut self) {
-        self.langid.clear_script()
-    }
-
-    /// Returns the region subtag of the `Locale`, if set.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let loc1: Locale = "de-Latn-AT".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc1.region(), Some("AT"));
-    ///
-    /// let loc2: Locale = "de".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc2.region(), None);
-    /// ```
-    pub fn region(&self) -> Option<&str> {
-        self.langid.region()
-    }
-
-    /// Sets the region subtag of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "fr-FR".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.set_region("CA")
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.to_string(), "fr-CA");
-    /// ```
-    pub fn set_region<S: AsRef<[u8]>>(&mut self, region: S) -> Result<(), LocaleError> {
-        Ok(self.langid.set_region(region)?)
-    }
-
-    /// Clears the region subtag of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "fr-FR".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.clear_region();
-    ///
-    /// assert_eq!(loc.to_string(), "fr");
-    /// ```
-    pub fn clear_region(&mut self) {
-        self.langid.clear_region()
-    }
-
-    /// Returns a vector of variants subtags of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let loc1: Locale = "ca-ES-valencia".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc1.variants().collect::<Vec<_>>(), &["valencia"]);
-    ///
-    /// let loc2: Locale = "de".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc2.variants().len(), 0);
-    /// ```
-    pub fn variants(&self) -> impl ExactSizeIterator<Item = &str> {
-        self.langid.variants()
-    }
-
-    /// Sets variant subtags of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "ca-ES".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.set_variants(&["valencia"])
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.to_string(), "ca-ES-valencia");
-    /// ```
-    pub fn set_variants<S: AsRef<[u8]>>(
-        &mut self,
-        variants: impl IntoIterator<Item = S>,
-    ) -> Result<(), LocaleError> {
-        Ok(self.langid.set_variants(variants)?)
-    }
-
-    /// Tests if a variant subtag is present in the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "ca-ES-macos".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.has_variant("valencia"), Ok(false));
-    /// assert_eq!(loc.has_variant("macos"), Ok(true));
-    /// ```
-    pub fn has_variant<S: AsRef<[u8]>>(&self, variant: S) -> Result<bool, LocaleError> {
-        Ok(self.langid.has_variant(variant)?)
-    }
-
-    /// Clears variant subtags of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "ca-ES-valencia".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// loc.clear_variants();
-    ///
-    /// assert_eq!(loc.to_string(), "ca-ES");
-    /// ```
-    pub fn clear_variants(&mut self) {
-        self.langid.clear_variants()
-    }
-
-    /// Extends the `Locale` adding likely subtags based
-    /// on tables provided by CLDR.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "en-US".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.maximize(), true);
-    /// assert_eq!(loc.to_string(), "en-Latn-US");
-    /// ```
-    #[cfg(feature = "likelysubtags")]
-    pub fn maximize(&mut self) -> bool {
-        self.langid.maximize()
-    }
-
-    /// Extends the `Locale` removing likely subtags based
-    /// on tables provided by CLDR.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::Locale;
-    ///
-    /// let mut loc: Locale = "en-Latn-US".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc.minimize(), true);
-    /// assert_eq!(loc.to_string(), "en");
-    /// ```
-    #[cfg(feature = "likelysubtags")]
-    pub fn minimize(&mut self) -> bool {
-        self.langid.minimize()
-    }
-
-    /// Returns character direction of the `Locale`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use unic_locale_impl::{Locale, CharacterDirection};
-    ///
-    /// let loc1: Locale = "es-AR".parse()
-    ///     .expect("Parsing failed.");
-    /// let loc2: Locale = "fa".parse()
-    ///     .expect("Parsing failed.");
-    ///
-    /// assert_eq!(loc1.character_direction(), CharacterDirection::LTR);
-    /// assert_eq!(loc2.character_direction(), CharacterDirection::RTL);
-    /// ```
-    pub fn character_direction(&self) -> CharacterDirection {
-        self.langid.character_direction()
+        self.id.matches(&other.id, self_as_range, other_as_range)
     }
 }
 
@@ -555,9 +215,9 @@ impl FromStr for Locale {
 }
 
 impl From<LanguageIdentifier> for Locale {
-    fn from(langid: LanguageIdentifier) -> Self {
+    fn from(id: LanguageIdentifier) -> Self {
         Locale {
-            langid,
+            id,
             extensions: ExtensionsMap::default(),
         }
     }
@@ -565,13 +225,13 @@ impl From<LanguageIdentifier> for Locale {
 
 impl Into<LanguageIdentifier> for Locale {
     fn into(self) -> LanguageIdentifier {
-        self.langid
+        self.id
     }
 }
 
 impl AsRef<LanguageIdentifier> for Locale {
     fn as_ref(&self) -> &LanguageIdentifier {
-        &self.langid
+        &self.id
     }
 }
 
@@ -584,7 +244,7 @@ impl AsRef<Locale> for Locale {
 
 impl std::fmt::Display for Locale {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}{}", self.langid, self.extensions)
+        write!(f, "{}{}", self.id, self.extensions)
     }
 }
 
