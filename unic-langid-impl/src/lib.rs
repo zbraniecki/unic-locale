@@ -1,3 +1,5 @@
+#[cfg(feature = "serde")]
+mod serde;
 mod errors;
 mod layout_table;
 #[cfg(feature = "likelysubtags")]
