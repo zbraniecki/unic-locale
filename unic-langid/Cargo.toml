@@ -24,6 +24,7 @@ unic-langid-macros = { version = "0.8", path = "../unic-langid-macros" }
 
 [features]
 default = []
+serde = ["unic-langid-impl/serde"]
 
 # Provide macros.
 macros = ["unic-langid-macros"]
