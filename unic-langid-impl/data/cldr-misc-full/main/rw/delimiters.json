@@ -1,0 +1,18 @@
+{
+  "main": {
+    "rw": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "rw"
+      },
+      "delimiters": {
+        "quotationStart": "«",
+        "quotationEnd": "»",
+        "alternateQuotationStart": "‘",
+        "alternateQuotationEnd": "’"
+      }
+    }
+  }
+}

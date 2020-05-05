@@ -28,7 +28,7 @@ static STRINGS: &[&str] = &[
     "th",
     "de",
     "zh-Cyrl-HN",
-    "en-Latn-US"
+    "en-Latn-US",
 ];
 
 fn language_identifier_construct_bench(c: &mut Criterion) {

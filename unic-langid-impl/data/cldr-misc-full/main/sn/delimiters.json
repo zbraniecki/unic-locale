@@ -1,0 +1,18 @@
+{
+  "main": {
+    "sn": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "sn"
+      },
+      "delimiters": {
+        "quotationStart": "”",
+        "quotationEnd": "”",
+        "alternateQuotationStart": "’",
+        "alternateQuotationEnd": "’"
+      }
+    }
+  }
+}

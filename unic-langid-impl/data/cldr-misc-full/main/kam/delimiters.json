@@ -1,0 +1,18 @@
+{
+  "main": {
+    "kam": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "kam"
+      },
+      "delimiters": {
+        "quotationStart": "“",
+        "quotationEnd": "”",
+        "alternateQuotationStart": "‘",
+        "alternateQuotationEnd": "’"
+      }
+    }
+  }
+}

@@ -7,7 +7,6 @@ pub mod parser;
 pub mod subtags;
 
 pub use crate::errors::LanguageIdentifierError;
-use layout_table::CHARACTER_DIRECTION_RTL;
 use std::fmt::Write;
 use std::iter::Peekable;
 use std::str::FromStr;
@@ -411,8 +410,15 @@ impl LanguageIdentifier {
     /// assert_eq!(li2.character_direction(), CharacterDirection::RTL);
     /// ```
     pub fn character_direction(&self) -> CharacterDirection {
-        match (&self.language).into() {
-            Some(lang) if CHARACTER_DIRECTION_RTL.contains(&lang) => CharacterDirection::RTL,
+        match (self.language.into(), self.script) {
+            (_, Some(script))
+                if layout_table::SCRIPTS_CHARACTER_DIRECTION_RTL.contains(&script.into()) =>
+            {
+                CharacterDirection::RTL
+            }
+            (Some(lang), _) if layout_table::LANGS_CHARACTER_DIRECTION_RTL.contains(&lang) => {
+                CharacterDirection::RTL
+            }
             _ => CharacterDirection::LTR,
         }
     }

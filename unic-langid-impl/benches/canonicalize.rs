@@ -27,8 +27,8 @@ fn langid_canonicalize_bench(c: &mut Criterion) {
         "tH",
         "DE",
         "ZH_cyrl_hN",
-        "eN-lAtN-uS"
-            ];
+        "eN-lAtN-uS",
+    ];
     c.bench_function("langid_canonicalize", |b| {
         b.iter(|| {
             for s in strings {

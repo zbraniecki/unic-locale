@@ -1,0 +1,18 @@
+{
+  "main": {
+    "eu": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "eu"
+      },
+      "delimiters": {
+        "quotationStart": "“",
+        "quotationEnd": "”",
+        "alternateQuotationStart": "“",
+        "alternateQuotationEnd": "”"
+      }
+    }
+  }
+}

@@ -81,14 +81,12 @@ fn test_sorted_variants() {
 fn test_from_parts_unchecked() {
     let langid: LanguageIdentifier = "en-nedis-macos".parse().unwrap();
     let (lang, script, region, variants) = langid.into_parts();
-    let langid = unsafe {
-        LanguageIdentifier::from_raw_parts_unchecked(
-            lang,
-            script,
-            region,
-            Some(variants.into_boxed_slice()),
-        )
-    };
+    let langid = LanguageIdentifier::from_raw_parts_unchecked(
+        lang,
+        script,
+        region,
+        Some(variants.into_boxed_slice()),
+    );
     assert_eq!(&langid.to_string(), "en-macos-nedis");
 }
 

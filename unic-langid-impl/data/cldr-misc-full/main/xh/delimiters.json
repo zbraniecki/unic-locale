@@ -1,0 +1,18 @@
+{
+  "main": {
+    "xh": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "xh"
+      },
+      "delimiters": {
+        "quotationStart": "‘",
+        "quotationEnd": "’",
+        "alternateQuotationStart": "“",
+        "alternateQuotationEnd": "”"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "main": {
+    "ebu": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "ebu"
+      },
+      "delimiters": {
+        "quotationStart": "“",
+        "quotationEnd": "”",
+        "alternateQuotationStart": "‘",
+        "alternateQuotationEnd": "’"
+      }
+    }
+  }
+}

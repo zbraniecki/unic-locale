@@ -1,0 +1,18 @@
+{
+  "main": {
+    "mg": {
+      "identity": {
+        "version": {
+          "_cldrVersion": "37"
+        },
+        "language": "mg"
+      },
+      "delimiters": {
+        "quotationStart": "«",
+        "quotationEnd": "»",
+        "alternateQuotationStart": "“",
+        "alternateQuotationEnd": "”"
+      }
+    }
+  }
+}
