@@ -1,7 +1,7 @@
 [package]
 name = "unic-langid-macros"
 description = "API for managing Unicode Language Identifiers"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>", "Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
 readme = "README.md"
@@ -17,6 +17,6 @@ include = [
 
 [dependencies]
 proc-macro-hack = "0.5"
-unic-langid-macros-impl = { version = "0.8", path = "../unic-langid-macros-impl" } 
-unic-langid-impl = { version = "0.8", path = "../unic-langid-impl" } 
+unic-langid-macros-impl = { version = "0.9", path = "../unic-langid-macros-impl" }
+unic-langid-impl = { version = "0.9", path = "../unic-langid-impl" }
 tinystr = "0.3.2"

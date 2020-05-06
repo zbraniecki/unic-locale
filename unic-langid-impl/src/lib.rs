@@ -1,11 +1,11 @@
-#[cfg(feature = "serde")]
-mod serde;
 mod errors;
 mod layout_table;
 #[cfg(feature = "likelysubtags")]
 pub mod likelysubtags;
 #[doc(hidden)]
 pub mod parser;
+#[cfg(feature = "serde")]
+mod serde;
 pub mod subtags;
 
 pub use crate::errors::LanguageIdentifierError;

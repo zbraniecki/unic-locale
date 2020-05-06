@@ -4,6 +4,13 @@
 
   - …
 
+## unic-locale 0.9.0 (May 6, 2020)
+
+ - Separate out subtags into their own structs.
+ - Update to CLDR 37 full.
+ - Add serde derives when `serde` feature is on.
+ - Remove deprecated Error descriptions.
+
 ## unic-locale 0.8.0 (January 28, 2020)
 
  - Switch likelysubtags method names to maximize/minimize.

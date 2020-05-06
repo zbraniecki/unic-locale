@@ -1,7 +1,7 @@
 [package]
 name = "unic-langid"
 description = "API for managing Unicode Language Identifiers"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2018"
 readme = "README.md"
@@ -16,11 +16,11 @@ include = [
 ]
 
 [dependencies]
-unic-langid-impl = { version = "0.8", path = "../unic-langid-impl" }
-unic-langid-macros = { version = "0.8", path = "../unic-langid-macros", optional = true }
+unic-langid-impl = { version = "0.9", path = "../unic-langid-impl" }
+unic-langid-macros = { version = "0.9", path = "../unic-langid-macros", optional = true }
 
 [dev-dependencies]
-unic-langid-macros = { version = "0.8", path = "../unic-langid-macros" }
+unic-langid-macros = { version = "0.9", path = "../unic-langid-macros" }
 
 [features]
 default = []
