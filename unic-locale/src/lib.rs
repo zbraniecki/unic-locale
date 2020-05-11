@@ -110,11 +110,9 @@ pub use unic_locale_macros::locale;
 macro_rules! locales {
     ( $($loc:expr),* ) => {
         {
-            let mut v = vec![];
-            $(
-                v.push(locale!($loc));
-            )*
-            v
+            vec![$(
+                $crate::locale!($loc),
+            )*]
         }
     };
 }

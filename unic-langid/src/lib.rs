@@ -113,11 +113,9 @@ pub use unic_langid_macros::{lang, langid, region, script, variant};
 macro_rules! langids {
     ( $($langid:expr),* ) => {
         {
-            let mut v = vec![];
-            $(
-                v.push(langid!($langid));
-            )*
-            v
+            vec![$(
+                $crate::langid!($langid),
+            )*]
         }
     };
 }
