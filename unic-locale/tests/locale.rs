@@ -32,4 +32,7 @@ fn locales_macro_test() {
             .collect::<Vec<_>>(),
         &["buddhist"]
     );
+
+    // check trailing comma
+    locales!["en-US-u-ca-buddhist", "pl",];
 }
