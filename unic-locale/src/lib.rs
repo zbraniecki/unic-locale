@@ -65,8 +65,7 @@
 //! The macros produce instances of `Locale` the same way as parsing from `&str` does,
 //! but since the parsing is performed at build time, it doesn't need a `Result`.
 //!
-//! At the moment `locale!` can also be used for const variables, but only if no variants or extensions
-//! are used.
+//! Unlike `langid!` `locale!` can't be used for const variables.
 //!
 //! The macros are optional to reduce the dependency chain and compilation time of `unic-locale`.
 //!
@@ -108,11 +107,12 @@ pub use unic_locale_macros::locale;
 #[cfg(feature = "unic-locale-macros")]
 #[macro_export]
 macro_rules! locales {
-    ( $($loc:expr),* ) => {
-        {
-            vec![$(
-                $crate::locale!($loc),
-            )*]
-        }
+    ( $($locale:expr),* ) => {
+        vec![$(
+            $crate::locale!($locale),
+        )*]
+    };
+    ( $($locale:expr,)* ) => {
+        $crate::locales![$($locale),*]
     };
 }

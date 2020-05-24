@@ -1,6 +1,6 @@
 use unic_langid::LanguageIdentifier;
 #[cfg(feature = "unic-langid-macros")]
-use unic_langid::{langid, langids};
+use unic_langid::{langid, langid_slice, langids};
 
 #[test]
 fn basic_test() {
@@ -13,6 +13,9 @@ fn basic_test() {
 fn langid_macro_test() {
     let loc = langid!("en-US");
     assert_eq!(&loc.to_string(), "en-US");
+
+    // ensure it can be used in a const context
+    const _: LanguageIdentifier = langid!("en-US");
 }
 
 #[test]
@@ -21,6 +24,23 @@ fn langids_macro_test() {
     let langids = langids!["en-US", "pl", "de-AT", "Pl-Latn-PL"];
     assert_eq!(langids.len(), 4);
     assert_eq!(langids.get(3).unwrap().language.as_str(), "pl");
+
+    // check trailing comma
+    langids!["en-US", "pl",];
+}
+
+#[test]
+#[cfg(feature = "unic-langid-macros")]
+fn langid_slice_macro_test() {
+    let langids = langids!["en-US", "pl", "de-AT", "Pl-Latn-PL"];
+
+    // ensure it can be used in a const context
+    const CONST_LANGIDS: &[LanguageIdentifier] =
+        langid_slice!["en-US", "pl", "de-AT", "Pl-Latn-PL"];
+    assert_eq!(CONST_LANGIDS, langids.as_slice());
+
+    // check trailing comma
+    langid_slice!["en-US", "pl",];
 }
 
 #[test]
