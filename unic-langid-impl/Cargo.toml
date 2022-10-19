@@ -17,7 +17,7 @@ include = [
 ]
 
 [dependencies]
-tinystr = "0.3.2"
+tinystr = "0.7.0"
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
 
