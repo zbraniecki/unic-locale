@@ -53,7 +53,7 @@ fn parse_tkey(key: &[u8]) -> Result<TinyStr4, ParserError> {
     Ok(tkey.to_ascii_lowercase())
 }
 
-const TRUE_TVALUE: TinyStr8 = unsafe { TinyStr8::new_unchecked(1_702_195_828u64) }; // "true"
+const TRUE_TVALUE: TinyStr8 = tinystr::tinystr!(8, "true"); // "true"
 
 fn parse_tvalue(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
     let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
