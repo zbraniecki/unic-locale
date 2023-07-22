@@ -20,6 +20,6 @@ proc_macro = true
 
 [dependencies]
 unic-langid-impl = { version = "0.9", path = "../unic-langid-impl" }
-syn = { version = "1.0", default-features = false, features = ["parsing", "proc-macro"] }
+syn = { version = "2.0", default-features = false, features = ["parsing", "proc-macro"] }
 quote = "1.0"
 proc-macro-hack = "0.5"
