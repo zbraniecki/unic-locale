@@ -24,6 +24,10 @@ pub enum CharacterDirection {
     ///
     /// Used in languages such as French, Spanish, English, German etc.
     LTR,
+    /// Top To Bottom
+    ///
+    /// Used in Traditional Mongolian
+    TTB,
 }
 
 type PartsTuple = (
@@ -414,9 +418,19 @@ impl LanguageIdentifier {
     pub fn character_direction(&self) -> CharacterDirection {
         match (self.language.into(), self.script) {
             (_, Some(script))
+                if layout_table::SCRIPTS_CHARACTER_DIRECTION_LTR.contains(&script.into()) =>
+            {
+                CharacterDirection::LTR
+            }
+            (_, Some(script))
                 if layout_table::SCRIPTS_CHARACTER_DIRECTION_RTL.contains(&script.into()) =>
             {
                 CharacterDirection::RTL
+            }
+            (_, Some(script))
+                if layout_table::SCRIPTS_CHARACTER_DIRECTION_TTB.contains(&script.into()) =>
+            {
+                CharacterDirection::TTB
             }
             (Some(lang), _) if layout_table::LANGS_CHARACTER_DIRECTION_RTL.contains(&lang) => {
                 CharacterDirection::RTL
