@@ -1,9 +1,9 @@
 {
   "main": {
-    "ca-ES-VALENCIA": {
+    "ca-ES-valencia": {
       "identity": {
         "version": {
-          "_cldrVersion": "37"
+          "_cldrVersion": "44"
         },
         "language": "ca",
         "territory": "ES",
