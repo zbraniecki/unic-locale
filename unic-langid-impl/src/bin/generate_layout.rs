@@ -65,28 +65,21 @@ fn main() {
     for (langid, dir) in map.iter() {
         let script = langid.script;
 
-        let scripts;
-        let exp_dir;
-        if dir == &CharacterDirection::LTR {
-            scripts = &mut scripts_ltr;
-            exp_dir = &CharacterDirection::LTR;
-        } else if dir == &CharacterDirection::RTL {
-            scripts = &mut scripts_rtl;
-            exp_dir = &CharacterDirection::RTL;
-
-            let lang = langid.language;
-            langs_rtl.insert(lang);
-        } else {
-            scripts = &mut scripts_ttb;
-            exp_dir = &CharacterDirection::TTB;
-        }
+        let scripts = match dir {
+            CharacterDirection::LTR => &mut scripts_ltr,
+            CharacterDirection::RTL => {
+                langs_rtl.insert(langid.language);
+                &mut scripts_rtl
+            }
+            CharacterDirection::TTB => &mut scripts_ttb,
+        };
 
         if let Some(script) = script {
             if scripts.contains(&script) {
                 continue;
             }
             assert!(
-                check_all_script_variants(&map, exp_dir, Some(script)),
+                check_all_script_variants(&map, dir, Some(script)),
                 "We didn't expect a script with two directionalities!"
             );
             scripts.insert(script);
