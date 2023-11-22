@@ -14,7 +14,7 @@ use std::iter::Peekable;
 use std::str::FromStr;
 
 /// Enum representing available character direction orientations.
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CharacterDirection {
     /// Right To Left
     ///

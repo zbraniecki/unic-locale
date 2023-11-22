@@ -38,13 +38,13 @@ fn langid_to_direction_map(path: &str) -> HashMap<LanguageIdentifier, CharacterD
 
 fn check_all_script_variants(
     map: &HashMap<LanguageIdentifier, CharacterDirection>,
-    exp_dir: &CharacterDirection,
+    exp_dir: CharacterDirection,
     script: Option<Script>,
 ) -> bool {
     for (langid, dir) in map.iter() {
         if let Some(reference_script) = script {
             if let Some(s) = langid.script {
-                if reference_script == s && dir != exp_dir {
+                if reference_script == s && *dir != exp_dir {
                     return false;
                 }
             }
@@ -79,7 +79,7 @@ fn main() {
                 continue;
             }
             assert!(
-                check_all_script_variants(&map, dir, Some(script)),
+                check_all_script_variants(&map, *dir, Some(script)),
                 "We didn't expect a script with two directionalities!"
             );
             scripts.insert(script);
