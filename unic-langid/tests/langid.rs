@@ -40,7 +40,7 @@ fn langid_slice_macro_test() {
     assert_eq!(CONST_LANGIDS, langids.as_slice());
 
     // check trailing comma
-    langid_slice!["en-US", "pl",];
+    let _ = langid_slice!["en-US", "pl",];
 }
 
 #[test]
