@@ -132,7 +132,7 @@ impl UnicodeExtensionList {
         key: S,
     ) -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
         let keywords: &[_] = match self.keywords.get(&parse_key(key.as_ref())?) {
-            Some(ref v) => &**v,
+            Some(v) => v,
             None => &[],
         };
 

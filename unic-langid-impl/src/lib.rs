@@ -246,7 +246,7 @@ impl LanguageIdentifier {
     ) -> bool {
         let other = other.as_ref();
         self.language
-            .matches(&other.language, self_as_range, other_as_range)
+            .matches(other.language, self_as_range, other_as_range)
             && subtag_matches(&self.script, &other.script, self_as_range, other_as_range)
             && subtag_matches(&self.region, &other.region, self_as_range, other_as_range)
             && subtags_match(
@@ -276,7 +276,7 @@ impl LanguageIdentifier {
     /// ```
     pub fn variants(&self) -> impl ExactSizeIterator<Item = &subtags::Variant> {
         let variants: &[_] = match self.variants {
-            Some(ref v) => &**v,
+            Some(ref v) => v,
             None => &[],
         };
 

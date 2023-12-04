@@ -62,7 +62,7 @@ pub fn locale_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream 
         quote!(None)
     };
 
-    TokenStream::from(quote! {
+    quote! {
         unsafe { ::#krate::Locale::from_raw_parts_unchecked(
             #lang,
             #script,
@@ -70,5 +70,5 @@ pub fn locale_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream 
             #variants,
             #extensions.parse().expect("must parse")
         ) }
-    })
+    }
 }

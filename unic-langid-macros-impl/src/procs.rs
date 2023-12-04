@@ -36,9 +36,9 @@ pub fn lang_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
         quote!(None)
     };
 
-    TokenStream::from(quote! {
+    quote! {
         #lang
-    })
+    }
 }
 
 pub fn script_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {

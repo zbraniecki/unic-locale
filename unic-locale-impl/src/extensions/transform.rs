@@ -72,7 +72,7 @@ fn parse_tvalue(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
 
 fn is_language_subtag(t: &[u8]) -> bool {
     let slen = t.len();
-    (slen >= 2 && slen <= 8 || slen == 4) && !t.iter().any(|c: &u8| !c.is_ascii_alphabetic())
+    ((2..=8).contains(&slen) || slen == 4) && !t.iter().any(|c: &u8| !c.is_ascii_alphabetic())
 }
 
 impl TransformExtensionList {
@@ -183,7 +183,7 @@ impl TransformExtensionList {
         tkey: S,
     ) -> Result<impl ExactSizeIterator<Item = &str>, LocaleError> {
         let tfields: &[_] = match self.tfields.get(&parse_tkey(tkey.as_ref())?) {
-            Some(ref v) => &**v,
+            Some(v) => v,
             None => &[],
         };
 
@@ -281,7 +281,7 @@ impl TransformExtensionList {
     }
 
     pub(crate) fn try_from_iter<'a>(
-        mut iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
+        iter: &mut Peekable<impl Iterator<Item = &'a [u8]>>,
     ) -> Result<Self, ParserError> {
         let mut text = Self::default();
 
@@ -306,7 +306,7 @@ impl TransformExtensionList {
                 iter.next();
             } else if is_language_subtag(subtag) {
                 text.tlang = Some(
-                    LanguageIdentifier::try_from_iter(&mut iter, true)
+                    LanguageIdentifier::try_from_iter(iter, true)
                         .map_err(|_| ParserError::InvalidLanguage)?,
                 );
             } else {

@@ -223,9 +223,9 @@ impl From<LanguageIdentifier> for Locale {
     }
 }
 
-impl Into<LanguageIdentifier> for Locale {
-    fn into(self) -> LanguageIdentifier {
-        self.id
+impl From<Locale> for LanguageIdentifier {
+    fn from(value: Locale) -> Self {
+        value.id
     }
 }
 
