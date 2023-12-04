@@ -212,6 +212,9 @@ fn test_character_direction() {
 
     let loc_ar: Locale = "ar-AF-u-hc-h12".parse().unwrap();
     assert_eq!(loc_ar.id.character_direction(), CharacterDirection::RTL);
+
+    let loc_mn: Locale = "mn-Mong".parse().unwrap();
+    assert_eq!(loc_mn.id.character_direction(), CharacterDirection::TTB);
 }
 
 #[test]

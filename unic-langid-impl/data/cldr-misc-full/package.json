@@ -1,12 +1,17 @@
 {
   "name": "cldr-misc-full",
-  "version": "37.0.0",
+  "version": "44.0.1",
   "peerDependencies": {
-    "cldr-core": "37.0.0"
+    "cldr-core": "44.0.1"
   },
-  "homepage": "http://cldr.unicode.org",
+  "description": "Other CLDR data not defined elsewhere (all locales)",
+  "homepage": "https://cldr.unicode.org",
   "author": "The Unicode Consortium",
   "maintainers": [
+    {
+      "name": "Steven R. Loomis",
+      "email": "srloomis@unicode.org"
+    },
     {
       "name": "John Emmons",
       "email": "emmo@us.ibm.com",
@@ -15,13 +20,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/unicode-cldr/cldr-misc-full.git"
+    "url": "git://github.com/unicode-cldr/cldr-json.git"
   },
-  "licenses": [
-    {
-      "type": "Unicode-TOU",
-      "url": "http://www.unicode.org/copyright.html"
-    }
-  ],
-  "bugs": "https://unicode-org.atlassian.net/projects/CLDR/issues"
+  "license": "Unicode-DFS-2016",
+  "bugs": "https://cldr.unicode.org/index/bug-reports#TOC-Filing-a-Ticket"
 }
