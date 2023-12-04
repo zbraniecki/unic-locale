@@ -2,13 +2,13 @@
 
 This meta-crate contains two basic crates for Unicode Language Identifier and Locale manipulation.
 
-# unic-langid [![crates.io](http://meritbadge.herokuapp.com/unic-langid)](https://crates.io/crates/unic-langid)
+# unic-langid [![crates.io](https://img.shields.io/crates/v/unic-langid.svg)](https://crates.io/crates/unic-langid)
 
 Unic crate for [Unicode Language Identifiers](http://unicode.org/reports/tr35/#Unicode_language_identifier) management.
 
 Language Identifier describes a combination of language, region, script and variants. Examples: `"en-US"`, `"sr-Cyrl-RU"`, `"de-AT"`, `"zh-Hans"`.
 
-# unic-locale [![crates.io](http://meritbadge.herokuapp.com/unic-locale)](https://crates.io/crates/unic-locale)
+# unic-locale [![crates.io](https://img.shields.io/crates/v/unic-locale.svg)](https://crates.io/crates/unic-locale)
 
 Unic crates for [Unicode Locale Identifiers](http://unicode.org/reports/tr35/#Unicode_locale_identifier) management.
 
