@@ -8,3 +8,4 @@
     - Raph Levien
     - Colin Rofls
     - Harry Mallon
+    - Eemeli Aro
