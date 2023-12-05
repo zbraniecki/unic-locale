@@ -2,16 +2,16 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use unic_langid_impl::{subtags, LanguageIdentifier};
 
-const CRATE_NAME: &str = "unic-langid-impl";
+const CRATE_NAME: &[&str] = &[
+    "unic-langid",
+    "unic-langid-impl",
+];
 
-pub(crate) fn get_crate_name() -> String {
-    let found_crate = proc_macro_crate::crate_name(CRATE_NAME)
-        .unwrap_or_else(|_| panic!("{}", "{CRATE_NAME} is present in `Cargo.toml`"));
-
-    match found_crate {
-        proc_macro_crate::FoundCrate::Itself => CRATE_NAME.to_string(),
-        proc_macro_crate::FoundCrate::Name(name) => name,
-    }
+pub(crate) fn get_crate_name() -> Ident {
+    let name = find_crate::find_crate(|s| CRATE_NAME.contains(&s))
+        .expect("Failed to find the crate in Cargo.toml")
+        .name;
+    Ident::new(&name, Span::call_site())
 }
 
 pub(crate) fn extract_string(s: TokenStream) -> String {
@@ -25,7 +25,7 @@ pub(crate) fn extract_string(s: TokenStream) -> String {
 }
 
 pub fn lang_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let krate = Ident::new(&get_crate_name(), Span::call_site());
+    let krate = get_crate_name();
     let input = extract_string(input);
     let parsed: subtags::Language = input.parse().expect("Malformed Language Subtag");
 
@@ -42,7 +42,7 @@ pub fn lang_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
 }
 
 pub fn script_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let krate = Ident::new(&get_crate_name(), Span::call_site());
+    let krate = get_crate_name();
     let input = extract_string(input);
     let parsed: subtags::Script = input.parse().expect("Malformed Script Subtag");
 
@@ -54,7 +54,7 @@ pub fn script_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream 
 }
 
 pub fn region_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let krate = Ident::new(&get_crate_name(), Span::call_site());
+    let krate = get_crate_name();
     let input = extract_string(input);
     let parsed: subtags::Region = input.parse().expect("Malformed Region Subtag");
 
@@ -66,7 +66,7 @@ pub fn region_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream 
 }
 
 pub fn variant_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let krate = Ident::new(&get_crate_name(), Span::call_site());
+    let krate = get_crate_name();
     let input = extract_string(input);
     let parsed: subtags::Variant = input.parse().expect("Malformed Variant Subtag");
 
@@ -78,7 +78,7 @@ pub fn variant_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream
 }
 
 pub fn langid_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let krate = Ident::new(&get_crate_name(), Span::call_site());
+    let krate = get_crate_name();
     let input = extract_string(input);
     let parsed: LanguageIdentifier = input.parse().expect("Malformed Language Identifier");
 

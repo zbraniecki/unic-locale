@@ -25,5 +25,5 @@ proc_macro = true
 unic-langid-impl = { version = "0.9", path = "../unic-langid-impl" }
 syn = { version = "2.0", default-features = false, features = ["parsing", "proc-macro"] }
 quote = "1.0"
-proc-macro-crate = "2.0.0"
+find-crate = "0.6"
 proc-macro2 = "1.0.70"

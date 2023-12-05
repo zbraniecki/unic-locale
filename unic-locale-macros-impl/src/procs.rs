@@ -2,16 +2,16 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use unic_locale_impl::Locale;
 
-const CRATE_NAME: &str = "unic-locale-impl";
+const CRATE_NAME: &[&str] = &[
+    "unic-locale",
+    "unic-locale-impl",
+];
 
-pub(crate) fn get_crate_name() -> String {
-    let found_crate = proc_macro_crate::crate_name(CRATE_NAME)
-        .unwrap_or_else(|_| panic!("{}", "{CRATE_NAME} is present in `Cargo.toml`"));
-
-    match found_crate {
-        proc_macro_crate::FoundCrate::Itself => CRATE_NAME.to_string(),
-        proc_macro_crate::FoundCrate::Name(name) => name,
-    }
+pub(crate) fn get_crate_name() -> Ident {
+    let name = find_crate::find_crate(|s| CRATE_NAME.contains(&s))
+        .expect("Failed to find the crate in Cargo.toml")
+        .name;
+    Ident::new(&name, Span::call_site())
 }
 
 pub(crate) fn extract_string(s: TokenStream) -> String {
@@ -25,7 +25,7 @@ pub(crate) fn extract_string(s: TokenStream) -> String {
 }
 
 pub fn locale_impl(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
-    let krate = Ident::new(&get_crate_name(), Span::call_site());
+    let krate = get_crate_name();
     let input = extract_string(input);
     let parsed: Locale = input.parse().expect("Malformed Locale Identifier");
 
