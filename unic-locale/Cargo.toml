@@ -1,30 +1,23 @@
 [package]
 name = "unic-locale"
 description = "API for managing Unicode Locale Identifiers"
-version = "0.9.3"
-authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
-edition = "2021"
-readme = "README.md"
-repository = "https://github.com/zbraniecki/unic-locale"
-license = "MIT OR Apache-2.0"
-categories = ["internationalization"]
-include = [
-  "src/**/*",
-  "benches/*.rs",
-  "tests/*.rs",
-  "Cargo.toml",
-  "LICENSE-APACHE",
-  "LICENSE-MIT",
-  "README.md"
-]
+
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+readme.workspace = true
+license.workspace = true
+categories.workspace = true
+include.workspace = true
 
 [dependencies]
-unic-langid-impl = { version = "0.9", path = "../unic-langid-impl" }
-unic-locale-impl = { version = "0.9", path = "../unic-locale-impl" }
-unic-locale-macros = { version = "0.9", path = "../unic-locale-macros", optional = true }
+unic-langid-impl = { workspace = true }
+unic-locale-impl = { workspace = true }
+unic-locale-macros = { workspace = true, optional = true }
 
 [dev-dependencies]
-unic-locale-macros = { version = "0.9", path = "../unic-locale-macros" }
+unic-locale-macros = { workspace = true }
 
 [features]
 default = []

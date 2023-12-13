@@ -1,22 +1,15 @@
 [package]
 name = "unic-langid-impl"
 description = "API for managing Unicode Language Identifiers"
-version = "0.9.3"
-authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
-edition = "2021"
-readme = "README.md"
-repository = "https://github.com/zbraniecki/unic-locale"
-license = "MIT OR Apache-2.0"
-categories = ["internationalization"]
-include = [
-  "src/**/*",
-  "benches/*.rs",
-  "tests/*.rs",
-  "Cargo.toml",
-  "LICENSE-APACHE",
-  "LICENSE-MIT",
-  "README.md"
-]
+
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+readme.workspace = true
+license.workspace = true
+categories.workspace = true
+include.workspace = true
 
 [dependencies]
 tinystr = "0.7.0"

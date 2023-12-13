@@ -1,25 +1,18 @@
 [package]
 name = "unic-locale-macros"
 description = "API for managing Unicode Locale Identifiers"
-version = "0.9.3"
-authors = ["Manish Goregaokar <manishsmail@gmail.com>", "Zibi Braniecki <gandalf@mozilla.com>"]
-edition = "2021"
-readme = "README.md"
-repository = "https://github.com/zbraniecki/unic-locale"
-license = "MIT OR Apache-2.0"
-categories = ["internationalization"]
-include = [
-  "src/**/*",
-  "benches/*.rs",
-  "tests/*.rs",
-  "Cargo.toml",
-  "LICENSE-APACHE",
-  "LICENSE-MIT",
-  "README.md"
-]
+
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+readme.workspace = true
+license.workspace = true
+categories.workspace = true
+include.workspace = true
 
 [dependencies]
 proc-macro-hack = "0.5"
 tinystr = "0.7.0"
-unic-locale-macros-impl = { version = "0.9", path = "../unic-locale-macros-impl" }
-unic-locale-impl = { version = "0.9", path = "../unic-locale-impl" }
+unic-locale-macros-impl = { workspace = true }
+unic-locale-impl = { workspace = true }
