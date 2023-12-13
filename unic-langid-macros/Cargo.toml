@@ -19,6 +19,7 @@ include = [
 ]
 
 [dependencies]
+proc-macro-hack = "0.5"
 unic-langid-macros-impl = { version = "0.9", path = "../unic-langid-macros-impl" }
 unic-langid-impl = { version = "0.9", path = "../unic-langid-impl" }
 tinystr = "0.7.0"

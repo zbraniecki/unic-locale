@@ -3,7 +3,7 @@ name = "unic-locale-macros-impl"
 description = "API for managing Unicode Locale Identifiers"
 version = "0.9.3"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>", "Zibi Braniecki <gandalf@mozilla.com>"]
-edition = "2018"
+edition = "2021"
 readme = "README.md"
 repository = "https://github.com/zbraniecki/unic-locale"
 license = "MIT OR Apache-2.0"
@@ -25,5 +25,4 @@ proc_macro = true
 unic-locale-impl = { version = "0.9", path = "../unic-locale-impl" }
 syn = { version = "2.0", default-features = false, features = ["parsing", "proc-macro"] }
 quote = "1.0"
-find-crate = "0.6"
-proc-macro2 = "1.0.70"
+proc-macro-hack = "0.5"

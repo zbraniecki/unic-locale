@@ -15,7 +15,7 @@ fn langid_to_direction_map(path: &str) -> HashMap<LanguageIdentifier, CharacterD
         let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
         let v: Value = serde_json::from_str(&contents).unwrap();
 
-        let langid_key = v["main"].as_object().unwrap().keys().nth(0).unwrap();
+        let langid_key = v["main"].as_object().unwrap().keys().next().unwrap();
 
         if langid_key == "root" {
             continue;
