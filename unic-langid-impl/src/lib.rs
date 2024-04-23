@@ -434,9 +434,11 @@ impl LanguageIdentifier {
             }
             (Some(lang), _) if layout_table::LANGS_CHARACTER_DIRECTION_RTL.contains(&lang) => {
                 #[cfg(feature = "likelysubtags")]
-                if let Some(max) = likelysubtags::maximize(self.language, None, self.region) {
-                    if layout_table::SCRIPTS_CHARACTER_DIRECTION_LTR.contains(max.script) {
-                        return CharacterDirection::LTR
+                if let Some((_, Some(script), _)) =
+                    likelysubtags::maximize(self.language, None, self.region)
+                {
+                    if layout_table::SCRIPTS_CHARACTER_DIRECTION_LTR.contains(&script.into()) {
+                        return CharacterDirection::LTR;
                     }
                 }
                 CharacterDirection::RTL

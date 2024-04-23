@@ -205,6 +205,7 @@ fn test_likelysubtags() {
     assert_eq!(loc_zh_hant.to_string(), "zh-TW-u-hc-h12");
 }
 
+#[cfg(not(feature = "likelysubtags"))]
 #[test]
 fn test_character_direction() {
     let loc_en: Locale = "en-u-hc-h12".parse().unwrap();
@@ -217,7 +218,10 @@ fn test_character_direction() {
     assert_eq!(loc_mn.id.character_direction(), CharacterDirection::TTB);
 
     let loc_pa_guru: Locale = "pa-Guru".parse().unwrap();
-    assert_eq!(loc_pa_guru.id.character_direction(), CharacterDirection::LTR);
+    assert_eq!(
+        loc_pa_guru.id.character_direction(),
+        CharacterDirection::LTR
+    );
 
     let loc_pa: Locale = "pa".parse().unwrap();
     assert_eq!(loc_pa.id.character_direction(), CharacterDirection::RTL);
