@@ -160,6 +160,29 @@ fn test_character_direction() {
 
     let mn_mong: LanguageIdentifier = "mn-Mong".parse().unwrap();
     assert_eq!(mn_mong.character_direction(), CharacterDirection::TTB);
+
+    let lid: LanguageIdentifier = "pa-Guru".parse().unwrap();
+    assert_eq!(lid.character_direction(), CharacterDirection::LTR);
+
+    let lid_pa_pk: LanguageIdentifier = "pa-PK".parse().unwrap();
+    assert_eq!(lid_pa_pk.character_direction(), CharacterDirection::RTL);
+
+    let lid_ar_us: LanguageIdentifier = "ar-US".parse().unwrap();
+    assert_eq!(lid_ar_us.character_direction(), CharacterDirection::RTL);
+}
+
+#[cfg(not(feature = "likelysubtags"))]
+#[test]
+fn test_character_direction_without_likelysubtags() {
+    let lid: LanguageIdentifier = "pa".parse().unwrap();
+    assert_eq!(lid.character_direction(), CharacterDirection::RTL);
+}
+
+#[cfg(feature = "likelysubtags")]
+#[test]
+fn test_character_direction_with_likelysubtags() {
+    let lid_pa: LanguageIdentifier = "pa".parse().unwrap();
+    assert_eq!(lid_pa.character_direction(), CharacterDirection::LTR);
 }
 
 #[test]
