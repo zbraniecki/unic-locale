@@ -1,5 +1,6 @@
 use crate::parser::errors::ParserError;
 use std::str::FromStr;
+use core::cmp::Ordering;
 use tinystr::TinyStr8;
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash, PartialOrd, Ord, Copy)]
@@ -36,6 +37,33 @@ impl Variant {
     /// `TinyStr8` and a valid `Variant` subtag.
     pub const unsafe fn from_raw_unchecked(v: u64) -> Self {
         Self(TinyStr8::from_bytes_unchecked(v.to_le_bytes()))
+    }
+
+    // Utility function to push a variant to a vector, keeping it sorted and deduplicated.
+    #[inline]
+    pub(crate) fn push_sorted_and_deduplicated(
+        item: Variant,
+        vec: &mut Vec<Variant>,
+    ) {
+        let mut i = 0;
+        while i < vec.len() {
+            match vec[i].cmp(&item) {
+                Ordering::Less => i += 1,
+                Ordering::Equal => return,
+                Ordering::Greater => break,
+            }
+        }
+        vec.insert(i, item);
+    }
+
+    // Utility function to sort and deduplicate a vector of variants.
+    #[inline]
+    pub(crate) fn sort_and_deduplicate(vec: &[Variant]) -> Vec<Variant> {
+        let mut new_vec = Vec::with_capacity(vec.len());
+        for item in vec {
+            Self::push_sorted_and_deduplicated(*item, &mut new_vec);
+        }
+        new_vec
     }
 }
 
