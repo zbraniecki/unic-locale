@@ -49,7 +49,7 @@ pub fn parse_language_identifier_from_iter<'a>(
         } else {
             // Variants
             if let Ok(v) = subtags::Variant::from_bytes(subtag) {
-                variants.push(v);
+                subtags::Variant::push_sorted_and_deduplicated(v, &mut variants);
             } else {
                 break;
             }
@@ -64,8 +64,6 @@ pub fn parse_language_identifier_from_iter<'a>(
     let variants = if variants.is_empty() {
         None
     } else {
-        variants.sort_unstable();
-        variants.dedup();
         Some(variants.into_boxed_slice())
     };
 

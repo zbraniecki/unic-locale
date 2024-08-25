@@ -130,9 +130,7 @@ impl LanguageIdentifier {
         variants: &[subtags::Variant],
     ) -> Self {
         let variants = if !variants.is_empty() {
-            let mut v = variants.to_vec();
-            v.sort_unstable();
-            v.dedup();
+            let v = subtags::Variant::sort_and_deduplicate(variants);
             Some(v.into_boxed_slice())
         } else {
             None
@@ -298,13 +296,10 @@ impl LanguageIdentifier {
     /// assert_eq!(li.to_string(), "ca-ES-valencia");
     /// ```
     pub fn set_variants(&mut self, variants: &[subtags::Variant]) {
-        let mut v = variants.to_vec();
-
-        if v.is_empty() {
+        if variants.is_empty() {
             self.variants = None;
         } else {
-            v.sort_unstable();
-            v.dedup();
+            let v = subtags::Variant::sort_and_deduplicate(variants);
             self.variants = Some(v.into_boxed_slice());
         }
     }
