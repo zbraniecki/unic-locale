@@ -28,7 +28,7 @@ use tinystr::TinyStr8;
 pub struct PrivateExtensionList(Vec<TinyStr8>);
 
 fn parse_value(t: &[u8]) -> Result<TinyStr8, ParserError> {
-    let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
+    let s = TinyStr8::try_from_utf8(t).map_err(|_| ParserError::InvalidSubtag)?;
     if t.is_empty() || t.len() > 8 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }

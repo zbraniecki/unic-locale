@@ -13,6 +13,6 @@ include.workspace = true
 
 [dependencies]
 proc-macro-hack = "0.5"
-tinystr = "0.7.0"
+tinystr = "0.8.0"
 unic-locale-macros-impl = { workspace = true }
 unic-locale-impl = { workspace = true }

@@ -12,7 +12,7 @@ categories.workspace = true
 include.workspace = true
 
 [dependencies]
-tinystr = "0.7.0"
+tinystr = "0.8.0"
 serde = { version = "1.0", optional = true }
 serde_json = { version = "1.0", optional = true }
 
