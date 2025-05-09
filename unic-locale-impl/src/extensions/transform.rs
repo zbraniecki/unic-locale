@@ -49,14 +49,14 @@ fn parse_tkey(key: &[u8]) -> Result<TinyStr4, ParserError> {
     if key.len() != 2 || !key[0].is_ascii_alphabetic() || !key[1].is_ascii_digit() {
         return Err(ParserError::InvalidSubtag);
     }
-    let tkey = TinyStr4::from_bytes(key).map_err(|_| ParserError::InvalidSubtag)?;
+    let tkey = TinyStr4::try_from_utf8(key).map_err(|_| ParserError::InvalidSubtag)?;
     Ok(tkey.to_ascii_lowercase())
 }
 
 const TRUE_TVALUE: TinyStr8 = tinystr::tinystr!(8, "true"); // "true"
 
 fn parse_tvalue(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
-    let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
+    let s = TinyStr8::try_from_utf8(t).map_err(|_| ParserError::InvalidSubtag)?;
     if t.len() < 3 || t.len() > 8 || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }

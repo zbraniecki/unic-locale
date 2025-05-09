@@ -15,4 +15,4 @@ include.workspace = true
 proc-macro-hack = "0.5"
 unic-langid-macros-impl = { workspace = true }
 unic-langid-impl = { workspace = true }
-tinystr = "0.7.0"
+tinystr = "0.8.0"

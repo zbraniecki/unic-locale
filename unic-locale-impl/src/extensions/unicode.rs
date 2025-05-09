@@ -48,14 +48,14 @@ fn parse_key(key: &[u8]) -> Result<TinyStr4, ParserError> {
     if key.len() != KEY_LENGTH || !key[0].is_ascii_alphanumeric() || !key[1].is_ascii_alphabetic() {
         return Err(ParserError::InvalidSubtag);
     }
-    let key = TinyStr4::from_bytes(key).map_err(|_| ParserError::InvalidSubtag)?;
+    let key = TinyStr4::try_from_utf8(key).map_err(|_| ParserError::InvalidSubtag)?;
     Ok(key.to_ascii_lowercase())
 }
 
 const TRUE_TYPE: TinyStr8 = tinystr::tinystr!(8, "true"); // "true"
 
 fn parse_type(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
-    let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
+    let s = TinyStr8::try_from_utf8(t).map_err(|_| ParserError::InvalidSubtag)?;
     if !TYPE_LENGTH.contains(&t.len()) || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
@@ -70,7 +70,7 @@ fn parse_type(t: &[u8]) -> Result<Option<TinyStr8>, ParserError> {
 }
 
 fn parse_attribute(t: &[u8]) -> Result<TinyStr8, ParserError> {
-    let s = TinyStr8::from_bytes(t).map_err(|_| ParserError::InvalidSubtag)?;
+    let s = TinyStr8::try_from_utf8(t).map_err(|_| ParserError::InvalidSubtag)?;
     if !ATTR_LENGTH.contains(&t.len()) || !s.is_ascii_alphanumeric() {
         return Err(ParserError::InvalidSubtag);
     }
