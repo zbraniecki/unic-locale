@@ -12,7 +12,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.9.5"
+version = "0.9.6"
 authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
 edition = "2021"
 repository = "https://github.com/zbraniecki/unic-locale"
@@ -30,11 +30,11 @@ include = [
 ]
 
 [workspace.dependencies]
-unic-langid-impl = { version = "0.9.5", path = "unic-langid-impl" }
-unic-langid = { version = "0.9.5", path = "unic-langid" }
-unic-langid-macros-impl = { version = "0.9.5", path = "unic-langid-macros-impl" }
-unic-langid-macros = { version = "0.9.5", path = "unic-langid-macros" }
-unic-locale-impl = { version = "0.9.5", path = "unic-locale-impl" }
-unic-locale = { version = "0.9.5", path = "unic-locle" }
-unic-locale-macros-impl = { version = "0.9.5", path = "unic-locale-macros-impl" }
-unic-locale-macros = { version = "0.9.5", path = "unic-locale-macros" }
+unic-langid-impl = { version = "0.9.6", path = "unic-langid-impl" }
+unic-langid = { version = "0.9.6", path = "unic-langid" }
+unic-langid-macros-impl = { version = "0.9.6", path = "unic-langid-macros-impl" }
+unic-langid-macros = { version = "0.9.6", path = "unic-langid-macros" }
+unic-locale-impl = { version = "0.9.6", path = "unic-locale-impl" }
+unic-locale = { version = "0.9.6", path = "unic-locle" }
+unic-locale-macros-impl = { version = "0.9.6", path = "unic-locale-macros-impl" }
+unic-locale-macros = { version = "0.9.6", path = "unic-locale-macros" }
